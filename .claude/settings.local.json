@@ -5,7 +5,10 @@
       "Bash(git push:*)",
       "Bash(git add:*)",
       "Bash(mkdir:*)",
-      "Bash(rm:*)"
+      "Bash(rm:*)",
+      "Bash(timeout:*)",
+      "Bash(mv:*)",
+      "Bash(node:*)"
     ],
     "deny": [],
     "ask": []

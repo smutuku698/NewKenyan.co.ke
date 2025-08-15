@@ -10,6 +10,7 @@ const nextConfig: NextConfig = {
         pathname: '/storage/v1/object/public/**',
       },
     ],
+    unoptimized: false,
   },
   // Skip API routes during static generation to avoid build-time environment issues
   trailingSlash: true,

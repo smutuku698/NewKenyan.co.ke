@@ -174,6 +174,7 @@ export default function PropertyDetailPage() {
                       src={property.images[currentImageIndex]}
                       alt={property.property_title}
                       fill
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 66vw, 50vw"
                       className="object-cover"
                     />
                     <div className="absolute top-4 right-4 flex space-x-2">
@@ -204,6 +205,7 @@ export default function PropertyDetailPage() {
                             src={image}
                             alt={`Property image ${index + 1}`}
                             fill
+                            sizes="80px"
                             className="object-cover"
                           />
                         </div>

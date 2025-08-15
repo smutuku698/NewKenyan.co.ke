@@ -130,28 +130,22 @@ export default function AddPropertyForm() {
   };
 
   const uploadImages = async (files: File[]): Promise<string[]> => {
-    const uploadPromises = files.map(async (file, index) => {
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${user?.id}-${Date.now()}-${index}.${fileExt}`;
-      
-      const { error } = await supabase.storage
-        .from('property-images')
-        .upload(fileName, file);
+    const formData = new FormData();
+    files.forEach(file => formData.append('files', file));
 
-      if (error) {
-        console.error('Storage upload error:', error);
-        return null;
-      }
-
-      const { data: { publicUrl } } = supabase.storage
-        .from('property-images')
-        .getPublicUrl(fileName);
-
-      return publicUrl;
+    const response = await fetch('/api/upload-images', {
+      method: 'POST',
+      body: formData,
     });
 
-    const results = await Promise.all(uploadPromises);
-    return results.filter(url => url !== null) as string[];
+    const result = await response.json();
+    
+    if (result.success) {
+      return result.urls;
+    } else {
+      console.error('Image upload failed:', result.error);
+      return [];
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -212,12 +206,14 @@ export default function AddPropertyForm() {
         setImages([]);
         setImagePreviews([]);
       }
-    } catch (error: unknown) {
+    } catch (error: unknown) {      
       if (error && typeof error === 'object' && 'errors' in error) {
         const fieldErrors: Record<string, string> = {};
         const zodError = error as { errors: Array<{ path: string[]; message: string }> };
+        
         zodError.errors.forEach((err) => {
-          fieldErrors[err.path[0]] = err.message;
+          const fieldName = err.path[0];
+          fieldErrors[fieldName] = err.message;
         });
         setErrors(fieldErrors);
       } else {
@@ -268,7 +264,16 @@ export default function AddPropertyForm() {
             placeholder="e.g., Modern 2BR Apartment with City Views"
             className={errors.propertyTitle ? 'border-red-300' : ''}
           />
-          {errors.propertyTitle && <p className="text-red-600 text-sm mt-1">{errors.propertyTitle}</p>}
+          <div className="flex justify-between items-center mt-1">
+            <div>
+              {errors.propertyTitle && <p className="text-red-600 text-sm">{errors.propertyTitle}</p>}
+            </div>
+            <p className={`text-xs ${
+              (formData.propertyTitle || '').length < 5 ? 'text-red-500' : 'text-gray-500'
+            }`}>
+              {(formData.propertyTitle || '').length}/100 characters (minimum 5)
+            </p>
+          </div>
         </div>
 
         {/* Property Type & Price Type */}
@@ -344,7 +349,16 @@ export default function AddPropertyForm() {
               errors.description ? 'border-red-300' : ''
             }`}
           />
-          {errors.description && <p className="text-red-600 text-sm mt-1">{errors.description}</p>}
+          <div className="flex justify-between items-center mt-1">
+            <div>
+              {errors.description && <p className="text-red-600 text-sm">{errors.description}</p>}
+            </div>
+            <p className={`text-xs ${
+              (formData.description || '').length < 20 ? 'text-red-500' : 'text-gray-500'
+            }`}>
+              {(formData.description || '').length}/1000 characters (minimum 20)
+            </p>
+          </div>
         </div>
 
         {/* Property Details */}
