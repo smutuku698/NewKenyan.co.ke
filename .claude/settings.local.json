@@ -8,7 +8,8 @@
       "Bash(rm:*)",
       "Bash(timeout:*)",
       "Bash(mv:*)",
-      "Bash(node:*)"
+      "Bash(node:*)",
+      "Bash(npm run build:*)"
     ],
     "deny": [],
     "ask": []

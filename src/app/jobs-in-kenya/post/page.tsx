@@ -1,0 +1,422 @@
+'use client';
+
+import { useState } from 'react';
+import Header from '@/components/Header';
+import Footer from '@/components/Footer';
+import { Button } from '@/components/ui/button';
+import { 
+  CheckCircle, 
+  Briefcase, 
+  Building2, 
+  FileText,
+  Mail,
+  Calendar,
+  ArrowLeft
+} from 'lucide-react';
+import Link from 'next/link';
+
+interface JobFormData {
+  job_title: string;
+  nature_of_job: string;
+  industry: string;
+  salary: string;
+  job_location: string;
+  duties_and_responsibilities: string;
+  key_requirements_skills_qualification: string;
+  how_to_apply: string;
+  company_name: string;
+  contact_email: string;
+  contact_phone: string;
+}
+
+export default function PostJobPage() {
+  const [formData, setFormData] = useState<JobFormData>({
+    job_title: '',
+    nature_of_job: '',
+    industry: '',
+    salary: '',
+    job_location: '',
+    duties_and_responsibilities: '',
+    key_requirements_skills_qualification: '',
+    how_to_apply: '',
+    company_name: '',
+    contact_email: '',
+    contact_phone: ''
+  });
+
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [error, setError] = useState('');
+
+  const jobTypes = ['FULL TIME', 'PART TIME', 'CASUAL', 'CONTRACT', 'INTERNSHIP', 'FREELANCE'];
+  const industries = [
+    'HOSPITALITY', 'AGRICULTURE', 'TECHNOLOGY', 'HEALTHCARE', 'FINANCE', 'EDUCATION',
+    'CONSTRUCTION', 'MANUFACTURING', 'RETAIL', 'TRANSPORT', 'MEDIA', 'GOVERNMENT',
+    'NGO', 'BANKING', 'INSURANCE', 'REAL ESTATE', 'TELECOMMUNICATIONS', 'ENERGY',
+    'MINING', 'AUTOMOTIVE', 'FOOD & BEVERAGE', 'TOURISM', 'SECURITY', 'LOGISTICS'
+  ];
+
+  const locations = [
+    'NAIROBI', 'MOMBASA', 'KISUMU', 'NAKURU', 'ELDORET', 'THIKA', 'MALINDI',
+    'KITALE', 'GARISSA', 'KAKAMEGA', 'MACHAKOS', 'MERU', 'NYERI', 'KERICHO',
+    'MAASAI MARA', 'KAJIADO', 'KIAMBU', 'MURANG&apos;A', 'EMBU', 'ISIOLO',
+    'REMOTE', 'NATIONWIDE'
+  ];
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    setError('');
+
+    try {
+      const response = await fetch('https://formspree.io/f/xrbldvpy', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          ...formData,
+          form_type: 'job_posting',
+          submitted_at: new Date().toISOString(),
+        }),
+      });
+
+      if (response.ok) {
+        setIsSubmitted(true);
+      } else {
+        throw new Error('Failed to submit job posting');
+      }
+    } catch (err) {
+      setError('Failed to submit job posting. Please try again.');
+      console.error('Submission error:', err);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  if (isSubmitted) {
+    return (
+      <div className="min-h-screen bg-gray-50">
+        <Header />
+        <main className="py-16">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-2xl">
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8 text-center">
+              <div className="flex items-center justify-center w-16 h-16 bg-green-100 rounded-full mx-auto mb-6">
+                <CheckCircle className="h-8 w-8 text-green-600" />
+              </div>
+              <h1 className="text-3xl font-bold text-gray-900 mb-4">Job Posted Successfully!</h1>
+              <p className="text-gray-600 mb-8">
+                Thank you for posting your job opportunity. We&apos;ll review your submission and add it to our job listings within 24-48 hours.
+              </p>
+              <div className="space-y-4">
+                <Button className="bg-green-600 hover:bg-green-700 text-white" asChild>
+                  <Link href="/jobs-in-kenya">Browse All Jobs</Link>
+                </Button>
+                <div>
+                  <Button variant="outline" asChild>
+                    <Link href="/jobs-in-kenya/post">Post Another Job</Link>
+                  </Button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </main>
+        <Footer />
+      </div>
+    );
+  }
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      <Header />
+      
+      <main className="py-8">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl">
+          {/* Breadcrumb */}
+          <nav className="mb-6 text-sm">
+            <div className="flex items-center space-x-2 text-gray-600">
+              <Link href="/" className="hover:text-green-600">Home</Link>
+              <span>/</span>
+              <Link href="/jobs-in-kenya" className="hover:text-green-600">Jobs in Kenya</Link>
+              <span>/</span>
+              <span className="text-gray-900">Post Job</span>
+            </div>
+          </nav>
+
+          {/* Header */}
+          <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8 mb-8">
+            <div className="flex items-center mb-6">
+              <div className="flex items-center justify-center w-12 h-12 bg-blue-100 rounded-full mr-4">
+                <Briefcase className="h-6 w-6 text-blue-600" />
+              </div>
+              <div>
+                <h1 className="text-3xl font-bold text-gray-900">Post a Job in Kenya</h1>
+                <p className="text-gray-600 mt-2">Reach thousands of qualified candidates across Kenya</p>
+              </div>
+            </div>
+            
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 p-6 bg-gray-50 rounded-lg">
+              <div className="text-center">
+                <div className="flex items-center justify-center w-10 h-10 bg-green-100 rounded-full mx-auto mb-2">
+                  <FileText className="h-5 w-5 text-green-600" />
+                </div>
+                <p className="text-sm text-gray-600">Free to Post</p>
+                <p className="font-semibold text-gray-900">No Hidden Fees</p>
+              </div>
+              <div className="text-center">
+                <div className="flex items-center justify-center w-10 h-10 bg-blue-100 rounded-full mx-auto mb-2">
+                  <Mail className="h-5 w-5 text-blue-600" />
+                </div>
+                <p className="text-sm text-gray-600">Quick Review</p>
+                <p className="font-semibold text-gray-900">24-48 Hours</p>
+              </div>
+              <div className="text-center">
+                <div className="flex items-center justify-center w-10 h-10 bg-purple-100 rounded-full mx-auto mb-2">
+                  <Calendar className="h-5 w-5 text-purple-600" />
+                </div>
+                <p className="text-sm text-gray-600">Wide Reach</p>
+                <p className="font-semibold text-gray-900">270K+ Views</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Form */}
+          <form onSubmit={handleSubmit} className="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
+            <div className="space-y-8">
+              {/* Company Information */}
+              <div>
+                <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center">
+                  <Building2 className="h-5 w-5 mr-2 text-green-600" />
+                  Company Information
+                </h2>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      Company Name *
+                    </label>
+                    <input
+                      type="text"
+                      name="company_name"
+                      value={formData.company_name}
+                      onChange={handleInputChange}
+                      required
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                      placeholder="Enter company name"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      Contact Email *
+                    </label>
+                    <input
+                      type="email"
+                      name="contact_email"
+                      value={formData.contact_email}
+                      onChange={handleInputChange}
+                      required
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                      placeholder="hr@company.com"
+                    />
+                  </div>
+                </div>
+                <div className="mt-6">
+                  <label className="block text-sm font-semibold text-gray-700 mb-2">
+                    Contact Phone
+                  </label>
+                  <input
+                    type="tel"
+                    name="contact_phone"
+                    value={formData.contact_phone}
+                    onChange={handleInputChange}
+                    className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                    placeholder="+254 700 000 000"
+                  />
+                </div>
+              </div>
+
+              {/* Job Details */}
+              <div>
+                <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center">
+                  <Briefcase className="h-5 w-5 mr-2 text-blue-600" />
+                  Job Details
+                </h2>
+                <div className="space-y-6">
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      Job Title *
+                    </label>
+                    <input
+                      type="text"
+                      name="job_title"
+                      value={formData.job_title}
+                      onChange={handleInputChange}
+                      required
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                      placeholder="e.g. Marketing Manager"
+                    />
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        Job Type *
+                      </label>
+                      <select
+                        name="nature_of_job"
+                        value={formData.nature_of_job}
+                        onChange={handleInputChange}
+                        required
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                      >
+                        <option value="">Select job type</option>
+                        {jobTypes.map(type => (
+                          <option key={type} value={type}>{type}</option>
+                        ))}
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        Industry *
+                      </label>
+                      <select
+                        name="industry"
+                        value={formData.industry}
+                        onChange={handleInputChange}
+                        required
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                      >
+                        <option value="">Select industry</option>
+                        {industries.map(industry => (
+                          <option key={industry} value={industry}>{industry}</option>
+                        ))}
+                      </select>
+                    </div>
+                    <div>
+                      <label className="block text-sm font-semibold text-gray-700 mb-2">
+                        Location *
+                      </label>
+                      <select
+                        name="job_location"
+                        value={formData.job_location}
+                        onChange={handleInputChange}
+                        required
+                        className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                      >
+                        <option value="">Select location</option>
+                        {locations.map(location => (
+                          <option key={location} value={location}>{location}</option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      Salary *
+                    </label>
+                    <input
+                      type="text"
+                      name="salary"
+                      value={formData.salary}
+                      onChange={handleInputChange}
+                      required
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                      placeholder="e.g. KSHS. 50,000-80,000 or Negotiable"
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Job Description */}
+              <div>
+                <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center">
+                  <FileText className="h-5 w-5 mr-2 text-purple-600" />
+                  Job Description
+                </h2>
+                <div className="space-y-6">
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      Duties and Responsibilities *
+                    </label>
+                    <textarea
+                      name="duties_and_responsibilities"
+                      value={formData.duties_and_responsibilities}
+                      onChange={handleInputChange}
+                      required
+                      rows={8}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                      placeholder="Describe the main duties and responsibilities for this position. Use line breaks to separate different points."
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      Key Requirements & Qualifications *
+                    </label>
+                    <textarea
+                      name="key_requirements_skills_qualification"
+                      value={formData.key_requirements_skills_qualification}
+                      onChange={handleInputChange}
+                      required
+                      rows={6}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                      placeholder="List the required qualifications, skills, and experience. Use line breaks to separate different requirements."
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-semibold text-gray-700 mb-2">
+                      How to Apply *
+                    </label>
+                    <textarea
+                      name="how_to_apply"
+                      value={formData.how_to_apply}
+                      onChange={handleInputChange}
+                      required
+                      rows={4}
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
+                      placeholder="Provide instructions on how candidates should apply for this position."
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {error && (
+                <div className="bg-red-50 border border-red-200 rounded-lg p-4">
+                  <p className="text-red-600">{error}</p>
+                </div>
+              )}
+
+              {/* Submit Button */}
+              <div className="flex flex-col sm:flex-row gap-4 pt-6 border-t border-gray-200">
+                <Button
+                  type="submit"
+                  disabled={isSubmitting}
+                  className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 text-lg flex-1"
+                >
+                  {isSubmitting ? 'Submitting...' : 'Post Job Listing'}
+                </Button>
+                <Button variant="outline" asChild className="px-8 py-3 text-lg">
+                  <Link href="/jobs-in-kenya">
+                    <ArrowLeft className="h-4 w-4 mr-2" />
+                    Back to Jobs
+                  </Link>
+                </Button>
+              </div>
+            </div>
+          </form>
+        </div>
+      </main>
+      
+      <Footer />
+    </div>
+  );
+}

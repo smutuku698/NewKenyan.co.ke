@@ -39,12 +39,18 @@ const PropertyCard = ({
       <div className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow cursor-pointer">
       {/* Image */}
       <div className="relative h-48">
-        <Image
-          src={images[0]}
-          alt={title}
-          fill
-          className="object-cover"
-        />
+        {images[0] ? (
+          <Image
+            src={images[0]}
+            alt={title}
+            fill
+            className="object-cover"
+          />
+        ) : (
+          <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+            <span className="text-gray-400">No Image</span>
+          </div>
+        )}
         <div className="absolute top-2 left-2">
           <Badge className="bg-blue-100 text-blue-800 text-xs">{type}</Badge>
         </div>

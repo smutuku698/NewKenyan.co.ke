@@ -19,6 +19,8 @@ import {
 import jobsData from '@/data/jobs.json';
 import { generateJobSlug } from '@/lib/slugify';
 import JobActions from '@/components/JobActions';
+import MoreJobsSection from '@/components/MoreJobsSection';
+import JobsFAQSection from '@/components/JobsFAQSection';
 
 interface JobDetailsPageProps {
   params: Promise<{ slug: string }>;
@@ -283,6 +285,12 @@ export default async function JobDetailsPage({ params }: JobDetailsPageProps) {
             </div>
           </div>
         </main>
+        
+        {/* More Jobs Section */}
+        <MoreJobsSection currentJobId={job.id} />
+        
+        {/* Jobs FAQ Section */}
+        <JobsFAQSection />
         
         <Footer />
       </div>

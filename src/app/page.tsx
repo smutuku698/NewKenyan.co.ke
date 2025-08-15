@@ -1,5 +1,6 @@
 'use client';
 
+import { useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
@@ -16,9 +17,50 @@ import {
   heroStats 
 } from '@/data/sampleData';
 import jobsData from '@/data/jobs.json';
-import { Users, Briefcase, Home, ArrowRight, Building2, BookOpen } from 'lucide-react';
+import { Users, Briefcase, Home, ArrowRight, Building2, BookOpen, ChevronDown } from 'lucide-react';
 
 export default function HomePage() {
+  const [openFAQ, setOpenFAQ] = useState<number | null>(null);
+
+  const toggleFAQ = (index: number) => {
+    setOpenFAQ(openFAQ === index ? null : index);
+  };
+
+  const faqData = [
+    {
+      question: "How do I find houses for rent in Nairobi on NewKenyan.com?",
+      answer: "Browse our extensive <a href='/properties' class='text-green-600 hover:underline'>property listings</a> to find affordable houses for rent in Nairobi. Use our search filters to narrow down by location, price, and property type. You can also contact property owners directly through our platform."
+    },
+    {
+      question: "Are there apartments for sale in Kenya on your platform?",
+      answer: "Yes! We have a wide selection of <a href='/properties' class='text-green-600 hover:underline'>apartments for sale</a> across Kenya, especially in Nairobi. Browse by budget, location, and amenities to find your dream apartment."
+    },
+    {
+      question: "How can I find job opportunities in Kenya?",
+      answer: "Visit our <a href='/jobs-in-kenya' class='text-green-600 hover:underline'>jobs section</a> to explore thousands of job opportunities in Kenya. We feature positions across all industries and experience levels, from entry-level to executive roles."
+    },
+    {
+      question: "Do you have office space for rent listings?",
+      answer: "Absolutely! Our <a href='/properties' class='text-green-600 hover:underline'>commercial properties</a> section includes office spaces for rent across Kenya. Filter by size, location, and amenities to find the perfect office space for your business."
+    },
+    {
+      question: "How do I list my company in your business directory?",
+      answer: "Adding your company to our <a href='/directory' class='text-green-600 hover:underline'>business directory</a> is easy. Click on <a href='/add-listing' class='text-green-600 hover:underline'>Post Your Listing</a> and provide your business details. Verified businesses get priority placement."
+    },
+    {
+      question: "Is there land for sale in Kenya on your website?",
+      answer: "Yes, we have extensive listings for <a href='/properties' class='text-green-600 hover:underline'>land for sale in Kenya</a>. Whether you're looking for residential plots, commercial land, or agricultural property, browse our land listings with detailed information and photos."
+    },
+    {
+      question: "How do I contact NewKenyan.com for support?",
+      answer: "You can reach us at <a href='mailto:hr@newkenyan.com' class='text-green-600 hover:underline'>hr@newkenyan.com</a> or call <a href='tel:+254736407642' class='text-green-600 hover:underline'>+254 736 407 642</a>. Our team is ready to help with any questions about properties, jobs, or business listings."
+    },
+    {
+      question: "Are your property listings verified and legitimate?",
+      answer: "We work hard to ensure all our property listings are legitimate. However, we recommend verifying property details and visiting in person before making any commitments. Check our <a href='/blog' class='text-green-600 hover:underline'>blog</a> for tips on safe property transactions."
+    }
+  ];
+
   return (
     <div className="min-h-screen bg-white">
       <Header />
@@ -39,17 +81,17 @@ export default function HomePage() {
           
           <div className="relative container mx-auto px-4 text-center">
             <h1 className="text-5xl font-bold mb-6">
-              Welcome to NewKenyan.com
+              Houses for Rent & Sale in Nairobi Kenya | Jobs & Business Directory
             </h1>
             <p className="text-xl mb-8 max-w-2xl mx-auto">
-              Connect with Kenya&apos;s fastest-growing business directory, job board, and property marketplace.
+              Find affordable houses for rent, apartments for sale, job opportunities in Kenya, and business listings. Your trusted marketplace for real estate, jobs, and business directory in Nairobi.
             </p>
             <div className="flex gap-4 justify-center mb-12">
               <Button className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 text-lg" asChild>
-                <Link href="/directory">Explore Directory</Link>
+                <Link href="/properties">Find Houses for Rent</Link>
               </Button>
               <Button variant="outline" className="border-2 border-white text-white hover:bg-white hover:text-gray-900 px-8 py-3 text-lg bg-transparent" asChild>
-                <Link href="/jobs-in-kenya">Find Jobs</Link>
+                <Link href="/jobs-in-kenya">Browse Jobs in Kenya</Link>
               </Button>
             </div>
 
@@ -92,9 +134,9 @@ export default function HomePage() {
         <section className="py-16 bg-gray-50">
           <div className="container mx-auto px-4">
             <div className="text-center mb-16">
-              <h2 className="text-3xl font-bold mb-4">Explore Kenya&apos;s Opportunities</h2>
+              <h2 className="text-3xl font-bold mb-4">Find Houses for Rent, Jobs & Business Opportunities in Kenya</h2>
               <p className="text-gray-600 max-w-2xl mx-auto">
-                Discover the best jobs, businesses, properties, and stories from across Kenya
+                Browse affordable houses for rent in Nairobi, apartments for sale, job opportunities in Kenya, office space for rent, and registered companies in our comprehensive business directory.
               </p>
             </div>
 
@@ -105,7 +147,7 @@ export default function HomePage() {
                   <div className="flex items-center justify-center w-10 h-10 bg-blue-100 rounded-lg">
                     <Briefcase className="h-5 w-5 text-blue-600" />
                   </div>
-                  <h3 className="text-2xl font-bold">Latest Jobs</h3>
+                  <h3 className="text-2xl font-bold">Latest Job Opportunities in Kenya</h3>
                 </div>
                 <Button variant="outline" className="border-2 border-gray-300 hover:bg-gray-100" asChild>
                   <Link href="/jobs-in-kenya" className="flex items-center">
@@ -129,7 +171,7 @@ export default function HomePage() {
                   <div className="flex items-center justify-center w-10 h-10 bg-green-100 rounded-lg">
                     <Building2 className="h-5 w-5 text-green-600" />
                   </div>
-                  <h3 className="text-2xl font-bold">Top Businesses</h3>
+                  <h3 className="text-2xl font-bold">Top Companies in Kenya - Business Directory</h3>
                 </div>
                 <Button variant="outline" className="border-2 border-gray-300 hover:bg-gray-100" asChild>
                   <Link href="/directory" className="flex items-center">
@@ -167,7 +209,7 @@ export default function HomePage() {
                   <div className="flex items-center justify-center w-10 h-10 bg-orange-100 rounded-lg">
                     <Home className="h-5 w-5 text-orange-600" />
                   </div>
-                  <h3 className="text-2xl font-bold">Featured Properties</h3>
+                  <h3 className="text-2xl font-bold">Houses for Sale & Rent in Nairobi - Featured Properties</h3>
                 </div>
                 <Button variant="outline" className="border-2 border-gray-300 hover:bg-gray-100" asChild>
                   <Link href="/properties" className="flex items-center">
@@ -191,7 +233,7 @@ export default function HomePage() {
                   <div className="flex items-center justify-center w-10 h-10 bg-purple-100 rounded-lg">
                     <BookOpen className="h-5 w-5 text-purple-600" />
                   </div>
-                  <h3 className="text-2xl font-bold">Recent Blog Posts</h3>
+                  <h3 className="text-2xl font-bold">Business Daily Kenya - Latest News & Updates</h3>
                 </div>
                 <Button variant="outline" className="border-2 border-gray-300 hover:bg-gray-100" asChild>
                   <Link href="/blog" className="flex items-center">
@@ -214,17 +256,74 @@ export default function HomePage() {
         <section className="py-16 bg-white">
           <div className="container mx-auto px-4 text-center">
             <div className="max-w-2xl mx-auto">
-              <h2 className="text-3xl font-bold mb-4">Ready to Get Started?</h2>
+              <h2 className="text-3xl font-bold mb-4">Ready to Find Your Dream Property or Job in Kenya?</h2>
               <p className="text-gray-600 mb-8">
-                Join thousands of Kenyans already using our platform to grow their careers and businesses.
+                Join thousands of Kenyans finding affordable houses for rent, apartments for sale, and job opportunities in Nairobi on our platform.
               </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center">
+              <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
                 <Button className="bg-green-600 hover:bg-green-700 text-white text-lg px-8" asChild>
-                  <Link href="/add-listing">Post Your Listing</Link>
+                  <Link href="/add-listing">List Your Property</Link>
                 </Button>
                 <Button variant="outline" className="border-2 border-gray-300 hover:bg-gray-100 text-lg px-8" asChild>
-                  <Link href="/directory">Explore More</Link>
+                  <Link href="/properties">Browse Properties</Link>
                 </Button>
+              </div>
+              <div className="text-sm text-gray-600">
+                <p className="mb-2">Contact us: <a href="mailto:hr@newkenyan.com" className="text-green-600 hover:underline">hr@newkenyan.com</a> | <a href="tel:+254736407642" className="text-green-600 hover:underline">+254 736 407 642</a></p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* FAQ Section */}
+        <section className="py-16 bg-gray-50">
+          <div className="container mx-auto px-4">
+            <div className="max-w-3xl mx-auto">
+              <div className="text-center mb-12">
+                <h2 className="text-3xl font-bold mb-4">Frequently Asked Questions</h2>
+                <p className="text-gray-600">
+                  Get answers to common questions about finding houses for rent, apartments for sale, and job opportunities in Kenya
+                </p>
+              </div>
+
+              <div className="space-y-4">
+                {faqData.map((faq, index) => (
+                  <div key={index} className="bg-white rounded-lg shadow-sm border">
+                    <button
+                      onClick={() => toggleFAQ(index)}
+                      className="w-full px-6 py-4 text-left flex justify-between items-center hover:bg-gray-50 transition-colors"
+                    >
+                      <h3 className="font-semibold text-gray-900 pr-4">{faq.question}</h3>
+                      <ChevronDown 
+                        className={`h-5 w-5 text-gray-500 transform transition-transform ${
+                          openFAQ === index ? 'rotate-180' : ''
+                        }`} 
+                      />
+                    </button>
+                    {openFAQ === index && (
+                      <div className="px-6 pb-4">
+                        <div 
+                          className="text-gray-600 leading-relaxed"
+                          dangerouslySetInnerHTML={{ __html: faq.answer }}
+                        />
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+
+              <div className="text-center mt-8">
+                <p className="text-gray-600 mb-4">
+                  Still have questions? We&apos;re here to help!
+                </p>
+                <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                  <Button variant="outline" className="border-2 border-gray-300 hover:bg-gray-100" asChild>
+                    <Link href="mailto:hr@newkenyan.com">Email Support</Link>
+                  </Button>
+                  <Button variant="outline" className="border-2 border-gray-300 hover:bg-gray-100" asChild>
+                    <Link href="tel:+254736407642">Call Us</Link>
+                  </Button>
+                </div>
               </div>
             </div>
           </div>
