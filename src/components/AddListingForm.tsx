@@ -3,11 +3,12 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import { useUser } from '@clerk/nextjs';
+import { useRouter } from 'next/navigation';
 import { businessListingSchema, type BusinessListingInput } from '@/lib/validations';
 import { supabase } from '@/lib/supabase';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Upload, MapPin, Phone, Mail, Globe, Clock, DollarSign, MessageCircle } from 'lucide-react';
+import { Upload, MapPin, Phone, Mail, Globe, Clock, DollarSign, MessageCircle, CheckCircle, ArrowRight } from 'lucide-react';
 
 const BUSINESS_CATEGORIES = [
   'Food & Dining',
@@ -30,12 +31,14 @@ const BUSINESS_CATEGORIES = [
 
 export default function AddListingForm() {
   const { user } = useUser();
+  const router = useRouter();
   const [formData, setFormData] = useState<Partial<BusinessListingInput>>({});
-  const [image, setImage] = useState<File | null>(null);
-  const [imagePreview, setImagePreview] = useState<string>('');
+  const [images, setImages] = useState<File[]>([]);
+  const [imagePreviews, setImagePreviews] = useState<string[]>([]);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitMessage, setSubmitMessage] = useState('');
+  const [isSuccess, setIsSuccess] = useState(false);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -46,57 +49,64 @@ export default function AddListingForm() {
   };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
+    const files = Array.from(e.target.files || []);
+    
+    if (files.length + images.length > 3) {
+      setErrors(prev => ({ ...prev, images: 'Maximum 3 images allowed' }));
+      return;
+    }
+
+    let hasErrors = false;
+    for (const file of files) {
       if (file.size > 5 * 1024 * 1024) {
-        setErrors(prev => ({ ...prev, image: 'File size must be less than 5MB' }));
-        return;
+        setErrors(prev => ({ ...prev, images: 'Each file must be less than 5MB' }));
+        hasErrors = true;
+        break;
       }
       
       if (!['image/jpeg', 'image/jpg', 'image/png', 'image/webp'].includes(file.type)) {
-        setErrors(prev => ({ ...prev, image: 'File must be JPEG, PNG, or WebP format' }));
-        return;
+        setErrors(prev => ({ ...prev, images: 'Files must be JPEG, PNG, or WebP format' }));
+        hasErrors = true;
+        break;
       }
+    }
 
-      setImage(file);
-      setErrors(prev => ({ ...prev, image: '' }));
-      
+    if (hasErrors) return;
+
+    setImages(prev => [...prev, ...files]);
+    setErrors(prev => ({ ...prev, images: '' }));
+    
+    // Create previews
+    files.forEach(file => {
       const reader = new FileReader();
       reader.onload = (e) => {
-        setImagePreview(e.target?.result as string);
+        setImagePreviews(prev => [...prev, e.target?.result as string]);
       };
       reader.readAsDataURL(file);
-    }
+    });
   };
 
-  const uploadImage = async (file: File): Promise<string | null> => {
-    try {
-      const fileExt = file.name.split('.').pop();
-      const fileName = `${user?.id}-${Date.now()}.${fileExt}`;
-      
-      console.log('Uploading image:', fileName, 'Size:', file.size);
-      
-      const { data, error } = await supabase.storage
-        .from('business-images')
-        .upload(fileName, file);
+  const removeImage = (index: number) => {
+    setImages(prev => prev.filter((_, i) => i !== index));
+    setImagePreviews(prev => prev.filter((_, i) => i !== index));
+  };
 
-      if (error) {
-        console.error('Storage upload error:', error);
-        setErrors(prev => ({ ...prev, image: `Upload failed: ${error.message}` }));
-        return null;
-      }
+  const uploadImages = async (files: File[]): Promise<string[]> => {
+    const formData = new FormData();
+    files.forEach(file => formData.append('files', file));
 
-      console.log('Upload successful:', data);
+    const response = await fetch('/api/upload-images', {
+      method: 'POST',
+      body: formData,
+    });
 
-      const { data: { publicUrl } } = supabase.storage
-        .from('business-images')
-        .getPublicUrl(fileName);
-
-      console.log('Public URL:', publicUrl);
-      return publicUrl;
-    } catch (error) {
-      console.error('Upload function error:', error);
-      return null;
+    const result = await response.json();
+    
+    if (result.success) {
+      return result.urls;
+    } else {
+      console.error('Image upload failed:', result.error);
+      return [];
     }
   };
 
@@ -112,12 +122,21 @@ export default function AddListingForm() {
     setSubmitMessage('');
 
     try {
+      // Check if at least one image is provided
+      if (images.length === 0) {
+        setErrors({ images: 'At least one image is required' });
+        setIsSubmitting(false);
+        return;
+      }
+
       const validatedData = businessListingSchema.parse(formData);
       
-      let imageUrl = null;
-      if (image) {
-        imageUrl = await uploadImage(image);
-        // Continue without image if upload fails
+      // Upload images
+      const imageUrls = await uploadImages(images);
+      if (imageUrls.length === 0) {
+        setErrors({ images: 'Failed to upload images. Please try again.' });
+        setIsSubmitting(false);
+        return;
       }
 
       const { error } = await supabase
@@ -136,16 +155,19 @@ export default function AddListingForm() {
           business_days: validatedData.businessDays,
           pricing_info: validatedData.pricingInfo,
           whatsapp_number: validatedData.whatsappNumber,
-          image_url: imageUrl,
+          image_url: imageUrls[0], // Use first image for now
         });
 
       if (error) {
         setErrors({ general: `Failed to submit listing: ${error.message}` });
       } else {
-        setSubmitMessage('Listing submitted successfully! It will be reviewed by our admin team before being published.');
-        setFormData({});
-        setImage(null);
-        setImagePreview('');
+        setIsSuccess(true);
+        setSubmitMessage('Business listing submitted successfully! It will be reviewed by our admin team before being published.');
+        
+        // Redirect to dashboard after 3 seconds
+        setTimeout(() => {
+          router.push('/dashboard');
+        }, 3000);
       }
     } catch (error: unknown) {
       if (error && typeof error === 'object' && 'errors' in error) {
@@ -168,6 +190,22 @@ export default function AddListingForm() {
       <div className="max-w-2xl mx-auto p-6 text-center">
         <h2 className="text-2xl font-semibold mb-4">Sign In Required</h2>
         <p className="text-gray-600">Please sign in to submit a business listing.</p>
+      </div>
+    );
+  }
+
+  if (isSuccess) {
+    return (
+      <div className="max-w-2xl mx-auto p-6 text-center">
+        <div className="bg-green-50 border border-green-200 rounded-lg p-8">
+          <CheckCircle className="h-16 w-16 text-green-500 mx-auto mb-4" />
+          <h2 className="text-2xl font-semibold text-green-800 mb-2">Business Submitted Successfully!</h2>
+          <p className="text-green-700 mb-6">{submitMessage}</p>
+          <div className="flex items-center justify-center text-gray-600">
+            <span>Redirecting to your dashboard</span>
+            <ArrowRight className="h-4 w-4 ml-2 animate-pulse" />
+          </div>
+        </div>
       </div>
     );
   }
@@ -203,7 +241,16 @@ export default function AddListingForm() {
             placeholder="Enter your business name"
             className={errors.businessName ? 'border-red-300' : ''}
           />
-          {errors.businessName && <p className="text-red-600 text-sm mt-1">{errors.businessName}</p>}
+          <div className="flex justify-between items-center mt-1">
+            <div>
+              {errors.businessName && <p className="text-red-600 text-sm">{errors.businessName}</p>}
+            </div>
+            <p className={`text-xs ${
+              (formData.businessName || '').length < 2 ? 'text-red-500' : 'text-gray-500'
+            }`}>
+              {(formData.businessName || '').length}/100 characters (minimum 2)
+            </p>
+          </div>
         </div>
 
         {/* Category */}
@@ -244,7 +291,16 @@ export default function AddListingForm() {
               errors.description ? 'border-red-300' : ''
             }`}
           />
-          {errors.description && <p className="text-red-600 text-sm mt-1">{errors.description}</p>}
+          <div className="flex justify-between items-center mt-1">
+            <div>
+              {errors.description && <p className="text-red-600 text-sm">{errors.description}</p>}
+            </div>
+            <p className={`text-xs ${
+              (formData.description || '').length < 10 ? 'text-red-500' : 'text-gray-500'
+            }`}>
+              {(formData.description || '').length}/1000 characters (minimum 10)
+            </p>
+          </div>
         </div>
 
         {/* Location */}
@@ -413,32 +469,54 @@ export default function AddListingForm() {
 
         {/* Image Upload */}
         <div>
-          <label htmlFor="image" className="block text-sm font-medium text-gray-700 mb-2">
+          <label htmlFor="images" className="block text-sm font-medium text-gray-700 mb-2">
             <Upload className="inline h-4 w-4 mr-1" />
-            Business Image (Optional)
+            Business Images * (1 required, max 3)
           </label>
           <input
-            id="image"
-            name="image"
+            id="images"
+            name="images"
             type="file"
+            multiple
             accept="image/jpeg,image/jpg,image/png,image/webp"
             onChange={handleImageChange}
             className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 ${
-              errors.image ? 'border-red-300' : ''
+              errors.images ? 'border-red-300' : ''
             }`}
           />
-          <p className="text-sm text-gray-500 mt-1">Max 5MB, JPG/PNG/WebP format</p>
-          {errors.image && <p className="text-red-600 text-sm mt-1">{errors.image}</p>}
+          <div className="mt-2 text-sm text-gray-600">
+            <p className="mb-1"><strong>Recommended sizes for best display:</strong></p>
+            <p>• Business cards: 400x250px (landscape)</p>
+            <p>• Detail pages: 800x600px (4:3 ratio)</p>
+            <p>• Max 5MB per image, JPG/PNG/WebP format</p>
+          </div>
+          {errors.images && <p className="text-red-600 text-sm mt-1">{errors.images}</p>}
           
-          {imagePreview && (
+          {imagePreviews.length > 0 && (
             <div className="mt-4">
-              <Image
-                src={imagePreview}
-                alt="Business preview"
-                width={384}
-                height={192}
-                className="w-full max-w-md h-48 object-cover rounded-md border"
-              />
+              <p className="text-sm font-medium text-gray-700 mb-2">Selected Images ({images.length}/3):</p>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                {imagePreviews.map((preview, index) => (
+                  <div key={index} className="relative">
+                    <Image
+                      src={preview}
+                      alt={`Business image ${index + 1}`}
+                      width={200}
+                      height={150}
+                      sizes="200px"
+                      className="w-full h-32 object-cover rounded-md border"
+                    />
+                    <Button
+                      type="button"
+                      onClick={() => removeImage(index)}
+                      className="absolute -top-2 -right-2 h-6 w-6 rounded-full bg-red-500 hover:bg-red-600 text-white text-xs"
+                      size="sm"
+                    >
+                      ×
+                    </Button>
+                  </div>
+                ))}
+              </div>
             </div>
           )}
         </div>

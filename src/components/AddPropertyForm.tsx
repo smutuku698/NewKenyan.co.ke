@@ -3,11 +3,12 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import { useUser } from '@clerk/nextjs';
+import { useRouter } from 'next/navigation';
 import { propertyListingSchema, type PropertyListingInput } from '@/lib/validations';
 import { supabase } from '@/lib/supabase';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Upload, MapPin, Phone, Mail, MessageCircle, Bed, Bath, Square, Calendar } from 'lucide-react';
+import { Upload, MapPin, Phone, Mail, MessageCircle, Bed, Bath, Square, Calendar, CheckCircle, ArrowRight } from 'lucide-react';
 
 const PROPERTY_TYPES = [
   'Apartment',
@@ -46,6 +47,7 @@ const COMMON_AMENITIES = [
 
 export default function AddPropertyForm() {
   const { user } = useUser();
+  const router = useRouter();
   const [formData, setFormData] = useState<Partial<PropertyListingInput>>({
     priceType: 'rent',
     isFurnished: false,
@@ -57,6 +59,7 @@ export default function AddPropertyForm() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitMessage, setSubmitMessage] = useState('');
+  const [isSuccess, setIsSuccess] = useState(false);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value, type } = e.target;
@@ -160,11 +163,21 @@ export default function AddPropertyForm() {
     setSubmitMessage('');
 
     try {
+      // Check if at least one image is provided
+      if (images.length === 0) {
+        setErrors({ images: 'At least one image is required' });
+        setIsSubmitting(false);
+        return;
+      }
+
       const validatedData = propertyListingSchema.parse(formData);
       
-      let imageUrls: string[] = [];
-      if (images.length > 0) {
-        imageUrls = await uploadImages(images);
+      // Upload images
+      const imageUrls = await uploadImages(images);
+      if (imageUrls.length === 0) {
+        setErrors({ images: 'Failed to upload images. Please try again.' });
+        setIsSubmitting(false);
+        return;
       }
 
       const { error } = await supabase
@@ -196,15 +209,13 @@ export default function AddPropertyForm() {
       if (error) {
         setErrors({ general: `Failed to submit property listing: ${error.message}` });
       } else {
+        setIsSuccess(true);
         setSubmitMessage('Property listing submitted successfully! It will be reviewed by our admin team before being published.');
-        setFormData({
-          priceType: 'rent',
-          isFurnished: false,
-          petsAllowed: false,
-          amenities: []
-        });
-        setImages([]);
-        setImagePreviews([]);
+        
+        // Redirect to dashboard after 3 seconds
+        setTimeout(() => {
+          router.push('/dashboard');
+        }, 3000);
       }
     } catch (error: unknown) {      
       if (error && typeof error === 'object' && 'errors' in error) {
@@ -229,6 +240,22 @@ export default function AddPropertyForm() {
       <div className="max-w-2xl mx-auto p-6 text-center">
         <h2 className="text-2xl font-semibold mb-4">Sign In Required</h2>
         <p className="text-gray-600">Please sign in to submit a property listing.</p>
+      </div>
+    );
+  }
+
+  if (isSuccess) {
+    return (
+      <div className="max-w-2xl mx-auto p-6 text-center">
+        <div className="bg-green-50 border border-green-200 rounded-lg p-8">
+          <CheckCircle className="h-16 w-16 text-green-500 mx-auto mb-4" />
+          <h2 className="text-2xl font-semibold text-green-800 mb-2">Property Submitted Successfully!</h2>
+          <p className="text-green-700 mb-6">{submitMessage}</p>
+          <div className="flex items-center justify-center text-gray-600">
+            <span>Redirecting to your dashboard</span>
+            <ArrowRight className="h-4 w-4 ml-2 animate-pulse" />
+          </div>
+        </div>
       </div>
     );
   }
@@ -615,7 +642,7 @@ export default function AddPropertyForm() {
         <div>
           <label htmlFor="images" className="block text-sm font-medium text-gray-700 mb-2">
             <Upload className="inline h-4 w-4 mr-1" />
-            Property Images (Max 6)
+            Property Images * (1 required, max 6)
           </label>
           <input
             id="images"
@@ -628,7 +655,12 @@ export default function AddPropertyForm() {
               errors.images ? 'border-red-300' : ''
             }`}
           />
-          <p className="text-sm text-gray-500 mt-1">Max 5MB per image, JPG/PNG/WebP format</p>
+          <div className="mt-2 text-sm text-gray-600">
+            <p className="mb-1"><strong>Recommended sizes for best display:</strong></p>
+            <p>• Property cards: 400x300px (4:3 ratio)</p>
+            <p>• Detail pages: 1200x800px (3:2 ratio)</p>
+            <p>• Max 5MB per image, JPG/PNG/WebP format</p>
+          </div>
           {errors.images && <p className="text-red-600 text-sm mt-1">{errors.images}</p>}
           
           {imagePreviews.length > 0 && (

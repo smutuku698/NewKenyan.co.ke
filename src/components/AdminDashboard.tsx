@@ -87,15 +87,26 @@ export default function AdminDashboard() {
     }
   }, [isAdmin]);
 
+  // Auto-refresh every 30 seconds to keep data fresh
+  useEffect(() => {
+    if (isAdmin) {
+      const interval = setInterval(fetchAllListings, 30000);
+      return () => clearInterval(interval);
+    }
+  }, [isAdmin]);
+
   const fetchAllListings = async () => {
+    setLoading(true);
     try {
+      console.log('🔄 Fetching all listings...');
+      
       // Fetch business listings
       const { data: businessData, error: businessError } = await supabase
         .from('business_listings')
         .select('*')
         .order('created_at', { ascending: false });
 
-      // Fetch property listings
+      // Fetch property listings  
       const { data: propertyData, error: propertyError } = await supabase
         .from('property_listings')
         .select('*')
@@ -104,12 +115,14 @@ export default function AdminDashboard() {
       if (businessError) {
         console.error('Error fetching business listings:', businessError);
       } else {
+        console.log('✅ Business listings:', businessData?.length || 0);
         setBusinessListings(businessData || []);
       }
 
       if (propertyError) {
         console.error('Error fetching property listings:', propertyError);
       } else {
+        console.log('✅ Property listings:', propertyData?.length || 0);
         setPropertyListings(propertyData || []);
       }
     } catch (error) {
@@ -307,10 +320,16 @@ export default function AdminDashboard() {
             <h1 className="text-3xl font-bold text-gray-900 mb-2">Admin Dashboard</h1>
             <p className="text-gray-600">Manage business and property listings</p>
           </div>
-          <Button onClick={runDailyViewIncrement} className="bg-blue-600 hover:bg-blue-700">
-            <TrendingUp className="h-4 w-4 mr-2" />
-            Run Daily View Increment
-          </Button>
+          <div className="flex space-x-3">
+            <Button onClick={fetchAllListings} variant="outline" disabled={loading}>
+              <BarChart3 className="h-4 w-4 mr-2" />
+              {loading ? 'Refreshing...' : 'Refresh Data'}
+            </Button>
+            <Button onClick={runDailyViewIncrement} className="bg-blue-600 hover:bg-blue-700">
+              <TrendingUp className="h-4 w-4 mr-2" />
+              Run Daily View Increment
+            </Button>
+          </div>
         </div>
       </div>
 
@@ -588,12 +607,14 @@ export default function AdminDashboard() {
                 </div>
                 {selectedBusinessListing.image_url && (
                   <div className="mt-4">
+                    <h5 className="font-medium mb-2">Business Image</h5>
                     <Image
                       src={selectedBusinessListing.image_url}
                       alt={selectedBusinessListing.business_name}
                       width={300}
                       height={200}
-                      className="rounded-lg object-cover"
+                      sizes="300px"
+                      className="rounded-lg object-cover border"
                     />
                   </div>
                 )}
@@ -632,13 +653,25 @@ export default function AdminDashboard() {
                 </div>
                 {selectedPropertyListing.images.length > 0 && (
                   <div className="mt-4">
-                    <Image
-                      src={selectedPropertyListing.images[0]}
-                      alt={selectedPropertyListing.property_title}
-                      width={300}
-                      height={200}
-                      className="rounded-lg object-cover"
-                    />
+                    <h5 className="font-medium mb-2">Property Images ({selectedPropertyListing.images.length})</h5>
+                    <div className="grid grid-cols-2 gap-2">
+                      {selectedPropertyListing.images.slice(0, 4).map((image, index) => (
+                        <Image
+                          key={index}
+                          src={image}
+                          alt={`${selectedPropertyListing.property_title} image ${index + 1}`}
+                          width={150}
+                          height={100}
+                          sizes="150px"
+                          className="rounded-lg object-cover border"
+                        />
+                      ))}
+                    </div>
+                    {selectedPropertyListing.images.length > 4 && (
+                      <p className="text-sm text-gray-500 mt-1">
+                        +{selectedPropertyListing.images.length - 4} more images
+                      </p>
+                    )}
                   </div>
                 )}
               </div>
