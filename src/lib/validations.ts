@@ -8,6 +8,29 @@ export function sanitizeInput(input: string): string {
   return input.replace(/<[^>]*>/g, '').trim();
 }
 
+export function sanitizeReviewInput(input: string): string {
+  let sanitized = sanitizeInput(input);
+  
+  // Remove URLs (http, https, www, and common TLDs)
+  sanitized = sanitized.replace(/https?:\/\/[^\s]+/gi, '[link removed]');
+  sanitized = sanitized.replace(/www\.[^\s]+/gi, '[link removed]');
+  sanitized = sanitized.replace(/[^\s]+\.(com|org|net|edu|gov|co\.ke|ke)[^\s]*/gi, '[link removed]');
+  
+  // Remove common XSS patterns
+  sanitized = sanitized.replace(/javascript:/gi, '');
+  sanitized = sanitized.replace(/on\w+\s*=/gi, '');
+  sanitized = sanitized.replace(/data:/gi, '');
+  sanitized = sanitized.replace(/vbscript:/gi, '');
+  
+  // Remove email addresses to prevent spam
+  sanitized = sanitized.replace(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g, '[email removed]');
+  
+  // Remove phone numbers in various formats
+  sanitized = sanitized.replace(/(\+254|0)[0-9\s\-]{8,}/g, '[phone removed]');
+  
+  return sanitized.trim();
+}
+
 export const businessListingSchema = z.object({
   businessName: z.string()
     .min(2, 'Business name must be at least 2 characters')
@@ -80,7 +103,19 @@ export const reviewSchema = z.object({
   comment: z.string()
     .max(500, 'Comment must be less than 500 characters')
     .optional()
-    .transform(val => val ? sanitizeInput(val) : null),
+    .refine((val) => {
+      if (!val) return true;
+      // Check for suspicious patterns before sanitization
+      const hasUrls = /https?:\/\/|www\.|[^\s]+\.(com|org|net|edu|gov|co\.ke|ke)/i.test(val);
+      const hasEmails = /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/.test(val);
+      const hasPhones = /(\+254|0)[0-9\s\-]{8,}/.test(val);
+      
+      if (hasUrls || hasEmails || hasPhones) {
+        return false;
+      }
+      return true;
+    }, 'Reviews cannot contain links, email addresses, or phone numbers')
+    .transform(val => val ? sanitizeReviewInput(val) : null),
 });
 
 export const imageUploadSchema = z.object({

@@ -210,9 +210,14 @@ export default function ReviewSystem({ businessId, businessName }: ReviewSystemP
               className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
               maxLength={500}
             />
-            <p className="text-sm text-gray-500 mt-1">
-              {newComment.length}/500 characters
-            </p>
+            <div className="flex justify-between items-start mt-1">
+              <p className="text-xs text-gray-500">
+                Links, emails, and phone numbers are not allowed in reviews
+              </p>
+              <p className="text-sm text-gray-500">
+                {newComment.length}/500 characters
+              </p>
+            </div>
           </div>
 
           {/* Submit Buttons */}
