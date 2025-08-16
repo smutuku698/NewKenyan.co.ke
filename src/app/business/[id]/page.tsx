@@ -173,15 +173,15 @@ export default function BusinessDetailPage() {
       },
       {
         question: `Is ${business.business_name} a verified business on NewKenyan.com?`,
-        answer: `${business.is_verified ? `Yes, ${business.business_name} is a verified business on NewKenyan.com.` : `${business.business_name} is listed on NewKenyan.com.`} All businesses go through our verification process. You can find more verified businesses in our <a href='/directory' class='text-green-600 hover:underline'>business directory</a>.`
+        answer: `${business.is_verified ? `Yes, ${business.business_name} is a verified business on NewKenyan.com.` : `${business.business_name} is listed on NewKenyan.com.`} All businesses go through our verification process. You can find more verified businesses in our <a href='/business-directory' class='text-green-600 hover:underline'>business directory</a>.`
       },
       {
         question: `What do customers say about ${business.business_name}?`,
-        answer: `${business.business_name} has a rating of ${business.rating} stars based on ${business.review_count} customer reviews. Read detailed customer reviews and experiences below, or browse more ${business.category.toLowerCase()} businesses in our <a href='/directory' class='text-green-600 hover:underline'>Kenya business directory</a>.`
+        answer: `${business.business_name} has a rating of ${business.rating} stars based on ${business.review_count} customer reviews. Read detailed customer reviews and experiences below, or browse more ${business.category.toLowerCase()} businesses in our <a href='/business-directory' class='text-green-600 hover:underline'>Kenya business directory</a>.`
       },
       {
         question: `Where is ${business.business_name} located in ${business.city}?`,
-        answer: `${business.business_name} is located at ${business.address}, ${business.city}. ${business.pin_location_url ? 'You can view their exact location on the map using the location link provided.' : 'Contact them for specific directions and landmarks.'} Find more businesses near you in our <a href='/directory' class='text-green-600 hover:underline'>local business listings</a>.`
+        answer: `${business.business_name} is located at ${business.address}, ${business.city}. ${business.pin_location_url ? 'You can view their exact location on the map using the location link provided.' : 'Contact them for specific directions and landmarks.'} Find more businesses near you in our <a href='/business-directory' class='text-green-600 hover:underline'>local business listings</a>.`
       }
     ];
 
@@ -203,7 +203,7 @@ export default function BusinessDetailPage() {
     if (business.pricing_info) {
       baseQuestions.push({
         question: `What are the prices at ${business.business_name}?`,
-        answer: `${business.business_name} pricing: ${business.pricing_info}. Contact them at ${business.phone} for the most current pricing and to discuss your specific needs. Find more businesses with competitive pricing in our <a href='/directory' class='text-green-600 hover:underline'>business directory</a>.`
+        answer: `${business.business_name} pricing: ${business.pricing_info}. Contact them at ${business.phone} for the most current pricing and to discuss your specific needs. Find more businesses with competitive pricing in our <a href='/business-directory' class='text-green-600 hover:underline'>business directory</a>.`
       });
     }
 
@@ -286,9 +286,9 @@ export default function BusinessDetailPage() {
             <nav className="flex items-center space-x-2 text-sm text-gray-600">
               <Link href="/" className="hover:text-green-600">Home</Link>
               <ChevronRight className="h-4 w-4" />
-              <Link href="/directory" className="hover:text-green-600">Business Directory</Link>
+              <Link href="/business-directory" className="hover:text-green-600">Business Directory</Link>
               <ChevronRight className="h-4 w-4" />
-              <Link href={`/directory?category=${business.category}`} className="hover:text-green-600">{business.category}</Link>
+              <Link href={`/business-directory?category=${business.category}`} className="hover:text-green-600">{business.category}</Link>
               <ChevronRight className="h-4 w-4" />
               <span className="text-gray-900 truncate">{business.business_name}</span>
             </nav>
@@ -301,7 +301,7 @@ export default function BusinessDetailPage() {
               
               {/* Back Button */}
               <div className="mb-6">
-                <Link href="/directory" className="inline-flex items-center text-green-600 hover:text-green-700">
+                <Link href="/business-directory" className="inline-flex items-center text-green-600 hover:text-green-700">
                   <ArrowLeft className="h-4 w-4 mr-2" />
                   Back to Business Directory
                 </Link>
@@ -552,7 +552,7 @@ export default function BusinessDetailPage() {
                   <div className="flex items-center justify-between mb-8">
                     <h2 className="text-2xl font-bold text-gray-900">More {business.category} Businesses in {business.city}</h2>
                     <Link 
-                      href={`/directory?category=${business.category}&city=${business.city}`}
+                      href={`/business-directory?category=${business.category}&city=${business.city}`}
                       className="text-green-600 hover:text-green-700 font-semibold flex items-center"
                     >
                       View All {business.category} in {business.city}
@@ -624,7 +624,7 @@ export default function BusinessDetailPage() {
                     </p>
                     <div className="flex flex-col sm:flex-row gap-4 justify-center">
                       <Button variant="outline" asChild>
-                        <Link href="/directory">Browse All Businesses</Link>
+                        <Link href="/business-directory">Browse All Businesses</Link>
                       </Button>
                       <Button variant="outline" asChild>
                         <Link href="/blog">Business Tips & News</Link>

@@ -14,7 +14,7 @@ const Header = () => {
 
   const navigation = [
     { name: 'Home', path: '/' },
-    { name: 'Directory', path: '/directory' },
+    { name: 'BDirectory', path: '/business-directory' },
     { name: 'Jobs', path: '/jobs-in-kenya' },
     { name: 'Properties', path: '/properties' },
     { name: 'Blog', path: '/blog' },
@@ -22,8 +22,8 @@ const Header = () => {
 
   return (
     <header className="sticky top-0 z-50 w-full bg-gradient-to-r from-green-600 via-green-700 to-emerald-800 shadow-lg">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex h-20 items-center justify-between">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
+        <div className="flex h-20 items-center justify-between gap-4">
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-3 group">
             <div className="h-12 w-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform duration-200">
@@ -40,15 +40,15 @@ const Header = () => {
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden md:flex items-center space-x-8">
+          <nav className="hidden lg:flex items-center space-x-6 flex-1 justify-center max-w-md">
             {navigation.map((item) => (
               <Link
                 key={item.path}
                 href={item.path}
-                className={`text-lg font-semibold transition-all duration-200 hover:scale-105 ${
+                className={`text-sm font-semibold transition-all duration-200 hover:scale-105 whitespace-nowrap ${
                   currentPath === item.path
-                    ? 'text-white bg-white/20 px-4 py-2 rounded-lg backdrop-blur-sm shadow-lg'
-                    : 'text-green-50 hover:text-white hover:bg-white/10 px-4 py-2 rounded-lg'
+                    ? 'text-white bg-white/20 px-3 py-2 rounded-lg backdrop-blur-sm shadow-lg'
+                    : 'text-green-50 hover:text-white hover:bg-white/10 px-3 py-2 rounded-lg'
                 }`}
               >
                 {item.name}
@@ -57,31 +57,32 @@ const Header = () => {
           </nav>
 
           {/* Desktop Actions */}
-          <div className="hidden md:flex items-center space-x-4">
+          <div className="hidden md:flex items-center space-x-3 flex-shrink-0">
             <Button 
               variant="ghost" 
-              size="lg"
+              size="sm"
               className="text-white hover:bg-white/20 hover:text-white backdrop-blur-sm transition-all duration-200"
             >
-              <Search className="h-5 w-5" />
+              <Search className="h-4 w-4" />
             </Button>
             <SignedIn>
               <Link href="/dashboard">
                 <Button 
                   variant="outline" 
-                  size="lg"
-                  className="border-white/30 text-white hover:bg-white hover:text-green-700 backdrop-blur-sm font-semibold transition-all duration-200"
+                  size="sm"
+                  className="border-white/30 text-white bg-transparent hover:bg-white hover:text-green-700 backdrop-blur-sm font-semibold transition-all duration-200 px-4"
                 >
                   Dashboard
                 </Button>
               </Link>
               <div className="relative">
                 <Button 
-                  className="bg-white text-green-700 hover:bg-green-50 hover:text-green-800 font-bold px-6 py-2 text-base shadow-lg transition-all duration-200 hover:scale-105"
+                  size="sm"
+                  className="bg-white text-green-700 hover:bg-green-50 hover:text-green-800 font-bold px-4 shadow-lg transition-all duration-200 hover:scale-105"
                   onClick={() => setIsPostDropdownOpen(!isPostDropdownOpen)}
                 >
                   Post Listing
-                  <ChevronDown className="h-4 w-4 ml-2" />
+                  <ChevronDown className="h-3 w-3 ml-2" />
                 </Button>
                 {isPostDropdownOpen && (
                   <div className="absolute right-0 mt-2 w-56 bg-white border border-gray-200 rounded-xl shadow-xl z-50 backdrop-blur-lg">
@@ -114,15 +115,13 @@ const Header = () => {
                   </div>
                 )}
               </div>
-              <div className="ml-2">
-                <UserButton 
-                  appearance={{
-                    elements: {
-                      avatarBox: "w-10 h-10 ring-2 ring-white/30 hover:ring-white/50 transition-all duration-200"
-                    }
-                  }}
-                />
-              </div>
+              <UserButton 
+                appearance={{
+                  elements: {
+                    avatarBox: "w-9 h-9 ring-2 ring-white/30 hover:ring-white/50 transition-all duration-200"
+                  }
+                }}
+              />
             </SignedIn>
             <SignedOut>
               <SignInButton>
@@ -177,17 +176,17 @@ const Header = () => {
           </div>
 
           {/* Mobile Menu Button */}
-          <div className="flex md:hidden">
+          <div className="flex lg:hidden">
             <Button
               variant="ghost"
-              size="lg"
+              size="sm"
               className="text-white hover:bg-white/20 hover:text-white transition-all duration-200"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             >
               {isMobileMenuOpen ? (
-                <X className="h-6 w-6" />
+                <X className="h-5 w-5" />
               ) : (
-                <Menu className="h-6 w-6" />
+                <Menu className="h-5 w-5" />
               )}
             </Button>
           </div>
@@ -195,7 +194,7 @@ const Header = () => {
 
         {/* Mobile Navigation */}
         {isMobileMenuOpen && (
-          <div className="md:hidden">
+          <div className="lg:hidden">
             <div className="mx-2 mt-4 mb-2 bg-white/95 backdrop-blur-lg border border-white/20 rounded-xl shadow-2xl overflow-hidden">
               <div className="px-4 py-4 space-y-2">
                 {navigation.map((item) => (

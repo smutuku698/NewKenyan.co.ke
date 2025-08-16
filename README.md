@@ -86,7 +86,7 @@ The site uses a Kenya-inspired color palette:
 
 - **Homepage** (`/`) - Hero section with featured content from all categories
 - **Jobs** (`/jobs-in-kenya`) - Job listings with filters and search
-- **Directory** (`/directory`) - Business listings with ratings and contact info
+- **BDirectory** (`/business-directory`) - Business listings with ratings and contact info
 - **Properties** (`/properties`) - Property listings with images and details
 - **Blog** (`/blog`) - Articles and news about Kenya
 

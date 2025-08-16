@@ -23,7 +23,8 @@ import {
   Building,
   Home,
   Bed,
-  Bath
+  Bath,
+  Briefcase
 } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -83,6 +84,32 @@ interface PropertyListing {
   user_id: string;
 }
 
+interface JobListing {
+  id: string;
+  created_at: string;
+  job_title: string;
+  nature_of_job: string;
+  industry: string;
+  salary: string;
+  job_location: string;
+  duties_and_responsibilities: string;
+  key_requirements_skills_qualification: string;
+  how_to_apply: string;
+  company_name: string;
+  contact_email: string;
+  contact_phone: string | null;
+  payment_reference: string | null;
+  payment_amount: string;
+  payment_status: string;
+  payment_verified: boolean;
+  status: string;
+  featured: boolean;
+  slug: string;
+  approved_at: string | null;
+  expires_at: string;
+  admin_notes: string | null;
+  user_id: string;
+}
 
 const BusinessServicesWidget = () => {
   return (
@@ -123,12 +150,14 @@ const BusinessServicesWidget = () => {
 
 export default function UserDashboard() {
   const { user } = useUser();
-  const [activeTab, setActiveTab] = useState<'business' | 'property'>('business');
+  const [activeTab, setActiveTab] = useState<'business' | 'property' | 'jobs'>('business');
   const [businessListings, setBusinessListings] = useState<BusinessListing[]>([]);
   const [propertyListings, setPropertyListings] = useState<PropertyListing[]>([]);
+  const [jobListings, setJobListings] = useState<JobListing[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedBusinessListing, setSelectedBusinessListing] = useState<BusinessListing | null>(null);
   const [selectedPropertyListing, setSelectedPropertyListing] = useState<PropertyListing | null>(null);
+  const [selectedJobListing, setSelectedJobListing] = useState<JobListing | null>(null);
 
   useEffect(() => {
     if (user) {
@@ -152,6 +181,13 @@ export default function UserDashboard() {
         .eq('user_id', user?.id)
         .order('created_at', { ascending: false });
 
+      // Fetch job listings
+      const { data: jobData, error: jobError } = await supabase
+        .from('jobs')
+        .select('*')
+        .eq('user_id', user?.id)
+        .order('created_at', { ascending: false });
+
       if (businessError) {
         console.error('Error fetching business listings:', businessError);
       } else {
@@ -162,6 +198,12 @@ export default function UserDashboard() {
         console.error('Error fetching property listings:', propertyError);
       } else {
         setPropertyListings(propertyData || []);
+      }
+
+      if (jobError) {
+        console.error('Error fetching job listings:', jobError);
+      } else {
+        setJobListings(jobData || []);
       }
     } catch (error) {
       console.error('Error:', error);
@@ -220,14 +262,63 @@ export default function UserDashboard() {
     }
   };
 
+  const getJobStatusBadge = (listing: JobListing) => {
+    if (listing.status === 'approved' && listing.payment_verified) {
+      return (
+        <Badge className="bg-green-100 text-green-800">
+          <CheckCircle className="h-3 w-3 mr-1" />
+          Live
+        </Badge>
+      );
+    } else if (listing.status === 'approved') {
+      return (
+        <Badge className="bg-blue-100 text-blue-800">
+          <CheckCircle className="h-3 w-3 mr-1" />
+          Approved
+        </Badge>
+      );
+    } else if (listing.status === 'pending') {
+      return (
+        <Badge className="bg-yellow-100 text-yellow-800">
+          <Clock className="h-3 w-3 mr-1" />
+          Under Review
+        </Badge>
+      );
+    } else if (listing.status === 'rejected') {
+      return (
+        <Badge className="bg-red-100 text-red-800">
+          <Clock className="h-3 w-3 mr-1" />
+          Rejected
+        </Badge>
+      );
+    } else {
+      return (
+        <Badge className="bg-gray-100 text-gray-800">
+          <Clock className="h-3 w-3 mr-1" />
+          Draft
+        </Badge>
+      );
+    }
+  };
+
   const getStats = () => {
-    const currentListings = activeTab === 'business' ? businessListings : propertyListings;
+    const currentListings = activeTab === 'business' ? businessListings : 
+                           activeTab === 'property' ? propertyListings : jobListings;
     const total = currentListings.length;
-    const approved = currentListings.filter(l => l.is_approved).length;
-    const pending = currentListings.filter(l => !l.is_approved).length;
-    const totalViews = activeTab === 'business' 
-      ? businessListings.reduce((sum, l) => sum + l.review_count, 0)
-      : propertyListings.reduce((sum, l) => sum + l.views_count, 0);
+    
+    let approved, pending, totalViews;
+    
+    if (activeTab === 'jobs') {
+      approved = jobListings.filter(l => l.status === 'approved').length;
+      pending = jobListings.filter(l => l.status === 'pending').length;
+      totalViews = 0; // Jobs don't have views in current structure
+    } else {
+      approved = currentListings.filter(l => (l as BusinessListing | PropertyListing).is_approved).length;
+      pending = currentListings.filter(l => !(l as BusinessListing | PropertyListing).is_approved).length;
+      totalViews = activeTab === 'business' 
+        ? businessListings.reduce((sum, l) => sum + l.review_count, 0)
+        : propertyListings.reduce((sum, l) => sum + l.views_count, 0);
+    }
     
     return { total, approved, pending, totalViews };
   };
@@ -326,9 +417,15 @@ export default function UserDashboard() {
                       </Button>
                     </Link>
                     <Link href="/properties/add">
-                      <Button size="sm" className="bg-green-600 hover:bg-green-700">
+                      <Button size="sm" variant="outline" className="border-blue-600 text-blue-600">
                         <Home className="h-4 w-4 mr-2" />
                         Add Property
+                      </Button>
+                    </Link>
+                    <Link href="/jobs-in-kenya/post">
+                      <Button size="sm" className="bg-green-600 hover:bg-green-700">
+                        <Briefcase className="h-4 w-4 mr-2" />
+                        Post Job
                       </Button>
                     </Link>
                   </div>
@@ -357,6 +454,17 @@ export default function UserDashboard() {
                   >
                     <Home className="h-4 w-4 inline mr-2" />
                     Properties ({propertyListings.length})
+                  </button>
+                  <button
+                    onClick={() => setActiveTab('jobs')}
+                    className={`flex-1 py-2 px-4 text-sm font-medium rounded-md transition-colors ${
+                      activeTab === 'jobs'
+                        ? 'bg-white text-green-600 shadow-sm'
+                        : 'text-gray-600 hover:text-gray-900'
+                    }`}
+                  >
+                    <Briefcase className="h-4 w-4 inline mr-2" />
+                    Jobs ({jobListings.length})
                   </button>
                 </div>
               </div>
@@ -729,7 +837,7 @@ export default function UserDashboard() {
                       Add Property Listing
                     </Button>
                   </Link>
-                  <Link href="/directory">
+                  <Link href="/business-directory">
                     <Button variant="outline" className="w-full">
                       <Eye className="h-4 w-4 mr-2" />
                       Browse Directory

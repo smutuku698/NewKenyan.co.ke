@@ -181,7 +181,7 @@ export default function PropertyDetailPage() {
       },
       {
         question: `Is this property listing verified and legitimate?`,
-        answer: `All properties on NewKenyan.com go through our verification process. However, we always recommend viewing the property in person, verifying the owner's identity, and getting all agreements in writing. Never send money without seeing the property first. Visit our <a href='/directory' class='text-green-600 hover:underline'>business directory</a> for verified property agents.`
+        answer: `All properties on NewKenyan.com go through our verification process. However, we always recommend viewing the property in person, verifying the owner's identity, and getting all agreements in writing. Never send money without seeing the property first. Visit our <a href='/business-directory' class='text-green-600 hover:underline'>business directory</a> for verified property agents.`
       }
     ];
 
@@ -196,7 +196,7 @@ export default function PropertyDetailPage() {
     if (property.price_type === 'sale') {
       baseQuestions.push({
         question: `What are the property transfer and legal costs for buying this ${property.property_type.toLowerCase()}?`,
-        answer: `Property transfer costs in Kenya typically include stamp duty, legal fees, and registration costs. For this property priced at KSh ${property.price.toLocaleString()}, consult with a qualified lawyer for exact costs. Find legal professionals in our <a href='/directory' class='text-green-600 hover:underline'>business directory</a>.`
+        answer: `Property transfer costs in Kenya typically include stamp duty, legal fees, and registration costs. For this property priced at KSh ${property.price.toLocaleString()}, consult with a qualified lawyer for exact costs. Find legal professionals in our <a href='/business-directory' class='text-green-600 hover:underline'>business directory</a>.`
       });
     }
 

@@ -45,7 +45,7 @@ export default function HomePage() {
     },
     {
       question: "How do I list my company in your business directory?",
-      answer: "Adding your company to our <a href='/directory' class='text-green-600 hover:underline'>business directory</a> is easy. Click on <a href='/add-listing' class='text-green-600 hover:underline'>Post Your Listing</a> and provide your business details. Verified businesses get priority placement."
+      answer: "Adding your company to our <a href='/business-directory' class='text-green-600 hover:underline'>business directory</a> is easy. Click on <a href='/add-listing' class='text-green-600 hover:underline'>Post Your Listing</a> and provide your business details. Verified businesses get priority placement."
     },
     {
       question: "Is there land for sale in Kenya on your website?",
@@ -187,7 +187,7 @@ export default function HomePage() {
                   <h3 className="text-2xl font-bold">Top Companies in Kenya - Business Directory</h3>
                 </div>
                 <Button variant="outline" className="border-2 border-gray-300 hover:bg-gray-100" asChild>
-                  <Link href="/directory" className="flex items-center">
+                  <Link href="/business-directory" className="flex items-center">
                     View All
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Link>

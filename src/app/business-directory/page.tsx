@@ -47,7 +47,7 @@ export default function DirectoryPage() {
     },
     {
       question: "Are all businesses in your directory verified?",
-      answer: "Yes, we verify all business listings in our Kenya directory. Companies must provide valid registration details and contact information before being approved for our <a href='/directory' class='text-green-600 hover:underline'>business directory</a>."
+      answer: "Yes, we verify all business listings in our Kenya directory. Companies must provide valid registration details and contact information before being approved for our <a href='/business-directory' class='text-green-600 hover:underline'>business directory</a>."
     },
     {
       question: "How can I add my company to the business directory?",
@@ -63,7 +63,7 @@ export default function DirectoryPage() {
     },
     {
       question: "Is there a cost to search the business directory?",
-      answer: "No, searching our Kenya business directory is completely free. Browse <a href='/directory' class='text-green-600 hover:underline'>companies in Kenya</a>, view business details, and access contact information at no cost."
+      answer: "No, searching our Kenya business directory is completely free. Browse <a href='/business-directory' class='text-green-600 hover:underline'>companies in Kenya</a>, view business details, and access contact information at no cost."
     },
     {
       question: "How often is the business directory updated?",
@@ -141,7 +141,7 @@ export default function DirectoryPage() {
               "@type": "CollectionPage",
               "name": "Kenya Business Directory",
               "description": "Comprehensive directory of registered companies and businesses in Kenya",
-              "url": "https://newkenyan.com/directory",
+              "url": "https://newkenyan.com/business-directory",
               "mainEntity": {
                 "@type": "ItemList",
                 "name": "Companies in Kenya",
@@ -161,7 +161,7 @@ export default function DirectoryPage() {
                     "@type": "ListItem",
                     "position": 2,
                     "name": "Business Directory",
-                    "item": "https://newkenyan.com/directory"
+                    "item": "https://newkenyan.com/business-directory"
                   }
                 ]
               }

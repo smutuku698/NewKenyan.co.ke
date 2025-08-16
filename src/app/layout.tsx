@@ -9,24 +9,38 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "NewKenyan.com - Houses for Rent & Sale in Nairobi Kenya | Jobs | Business Directory",
-  description: "Find houses for rent, apartments for sale, affordable properties, and job opportunities in Nairobi Kenya. Leading real estate marketplace and business directory. Office space for rent, land for sale.",
-  keywords: "house for rent, apartment for rent, house for sale, apartment for sale, houses for sale in Nairobi Kenya, apartment for rent in Nairobi, affordable houses, land for sale in Kenya, office space for rent, business daily kenya, companies in kenya, jobs in kenya, job opportunities in kenya, houses for rent in nairobi",
-  authors: [{ name: "NewKenyan.com" }],
+  title: "NewKenyan.com - Find Jobs, Businesses & Properties in Kenya",
+  description: "Discover job opportunities, explore businesses, and find properties across Kenya on NewKenyan.com. Your gateway to Kenya's digital economy with verified listings and trusted connections.",
+  keywords: "Kenya jobs, jobs in Kenya, Kenya business directory, properties for sale Kenya, houses for rent Nairobi, apartments Kenya, office space rent Kenya, business opportunities Kenya, employment Kenya, real estate Kenya",
+  authors: [{ name: "Legit Hustles" }],
   creator: "NewKenyan.com",
-  publisher: "NewKenyan.com",
+  publisher: "Legit Hustles",
   openGraph: {
-    title: "NewKenyan.com - Houses for Rent & Sale in Nairobi Kenya | Jobs | Business Directory",
-    description: "Find houses for rent, apartments for sale, affordable properties, and job opportunities in Nairobi Kenya. Leading real estate marketplace and business directory.",
+    title: "NewKenyan.com - Find Jobs, Businesses & Properties in Kenya",
+    description: "Discover job opportunities, explore businesses, and find properties across Kenya on NewKenyan.com.",
     url: "https://newkenyan.com",
     siteName: "NewKenyan.com",
     type: "website",
     locale: "en_KE",
+    images: [
+      {
+        url: "https://newkenyan.com/og-image.jpg",
+        width: 1200,
+        height: 630,
+        alt: "NewKenyan.com - Kenya's Premier Opportunity Platform",
+      },
+    ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "NewKenyan.com - Houses for Rent & Sale in Nairobi Kenya",
-    description: "Find houses for rent, apartments for sale, affordable properties, and job opportunities in Nairobi Kenya.",
+    title: "NewKenyan.com - Find Jobs, Businesses & Properties in Kenya",
+    description: "Discover job opportunities, explore businesses, and find properties across Kenya.",
+    images: ["https://newkenyan.com/og-image.jpg"],
+    site: "@newkenyan",
+    creator: "@newkenyan",
+  },
+  alternates: {
+    canonical: "https://newkenyan.com",
   },
   robots: {
     index: true,
@@ -39,6 +53,8 @@ export const metadata: Metadata = {
       'max-snippet': -1,
     },
   },
+  category: "Business Directory",
+  classification: "Business & Employment",
 };
 
 export default function RootLayout({
@@ -61,34 +77,80 @@ export default function RootLayout({
             dangerouslySetInnerHTML={{
               __html: JSON.stringify({
                 "@context": "https://schema.org",
-                "@type": "RealEstateAgent",
+                "@type": "Organization",
                 "name": "NewKenyan.com",
-                "description": "Leading real estate marketplace and business directory in Kenya offering houses for rent, apartments for sale, job opportunities, and business listings.",
+                "alternateName": "NewKenyan",
+                "description": "Kenya's premier digital platform connecting people with job opportunities, businesses, and properties across the nation.",
                 "url": "https://newkenyan.com",
                 "logo": "https://newkenyan.com/logo.png",
-                "contactPoint": {
-                  "@type": "ContactPoint",
-                  "telephone": "+254736407642",
-                  "email": "hr@newkenyan.com",
-                  "contactType": "customer service",
-                  "areaServed": "KE",
-                  "availableLanguage": ["English", "Swahili"]
+                "foundingDate": "2024",
+                "founder": {
+                  "@type": "Organization",
+                  "name": "Legit Hustles"
                 },
+                "contactPoint": [
+                  {
+                    "@type": "ContactPoint",
+                    "telephone": "+254-700-000-000",
+                    "email": "info@newkenyan.com",
+                    "contactType": "customer service",
+                    "areaServed": "KE",
+                    "availableLanguage": ["English", "Swahili"]
+                  },
+                  {
+                    "@type": "ContactPoint",
+                    "email": "partnerships@newkenyan.com",
+                    "contactType": "partnerships",
+                    "areaServed": "KE"
+                  },
+                  {
+                    "@type": "ContactPoint",
+                    "email": "advertising@newkenyan.com",
+                    "contactType": "advertising",
+                    "areaServed": "KE"
+                  }
+                ],
                 "address": {
                   "@type": "PostalAddress",
                   "addressCountry": "KE",
-                  "addressRegion": "Nairobi"
+                  "addressLocality": "Nairobi",
+                  "addressRegion": "Nairobi County"
                 },
                 "areaServed": {
                   "@type": "Country",
                   "name": "Kenya"
                 },
-                "serviceType": ["Real Estate", "Property Management", "Job Board", "Business Directory"],
-                "potentialAction": {
-                  "@type": "SearchAction",
-                  "target": "https://newkenyan.com/properties?search={search_term_string}",
-                  "query-input": "required name=search_term_string"
-                }
+                "serviceType": ["Job Board", "Business Directory", "Real Estate Listings", "Employment Services"],
+                "knowsAbout": [
+                  "Kenya Jobs",
+                  "Kenyan Business Directory", 
+                  "Kenya Real Estate",
+                  "Property Listings",
+                  "Employment Opportunities",
+                  "Business Networking"
+                ],
+                "sameAs": [
+                  "https://twitter.com/newkenyan",
+                  "https://facebook.com/newkenyan",
+                  "https://linkedin.com/company/newkenyan"
+                ],
+                "potentialAction": [
+                  {
+                    "@type": "SearchAction",
+                    "target": "https://newkenyan.com/jobs-in-kenya?search={search_term_string}",
+                    "query-input": "required name=search_term_string"
+                  },
+                  {
+                    "@type": "SearchAction",
+                    "target": "https://newkenyan.com/properties?search={search_term_string}",
+                    "query-input": "required name=search_term_string"
+                  },
+                  {
+                    "@type": "SearchAction",
+                    "target": "https://newkenyan.com/business-directory?search={search_term_string}",
+                    "query-input": "required name=search_term_string"
+                  }
+                ]
               })
             }}
           />
