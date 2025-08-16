@@ -101,7 +101,7 @@ export default function EditPropertyForm({ property }: EditPropertyFormProps) {
         pinLocationUrl: '', // Default value as pin_location_url doesn't exist in schema
         contactPhone: property.contact_phone,
         contactEmail: property.contact_email,
-        whatsappNumber: property.whatsapp_number,
+        whatsappNumber: property.whatsapp_number || '',
         availableFrom: '', // Default value as available_from doesn't exist in schema
         isFurnished: property.is_furnished,
         petsAllowed: property.pets_allowed,
@@ -573,7 +573,7 @@ export default function EditPropertyForm({ property }: EditPropertyFormProps) {
           <div>
             <label htmlFor="whatsappNumber" className="block text-sm font-medium text-gray-700 mb-2">
               <MessageCircle className="inline h-4 w-4 mr-1" />
-              WhatsApp Number
+              WhatsApp Number *
             </label>
             <Input
               id="whatsappNumber"

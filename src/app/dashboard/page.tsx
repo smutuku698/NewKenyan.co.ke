@@ -9,7 +9,6 @@ import {
   FileText, 
   Clock, 
   CheckCircle, 
- 
   Edit3, 
   Eye, 
   Calendar,
@@ -83,6 +82,7 @@ interface PropertyListing {
   views_count: number;
   user_id: string;
 }
+
 
 const BusinessServicesWidget = () => {
   return (

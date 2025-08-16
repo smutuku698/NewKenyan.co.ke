@@ -159,8 +159,115 @@ export default function JobsInKenyaPage() {
         <main className="py-12">
           <div className="container mx-auto px-4">
             
-            {/* Jobs Statistics */}
+            {/* All Jobs Section - Now First */}
             <section className="mb-16">
+              <div className="text-center mb-8">
+                <h2 className="text-3xl font-bold mb-4">All Job Vacancies in Kenya</h2>
+                <p className="text-gray-600 max-w-2xl mx-auto">
+                  Browse all available positions including online jobs in Kenya, jobs in Nakuru, and opportunities across all Kenyan cities
+                </p>
+              </div>
+              
+              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                {jobsData.jobs.slice(0, 9).map((job) => (
+                  <JobCard key={job.id} {...job} />
+                ))}
+              </div>
+              
+              <div className="text-center mt-8">
+                <Button className="bg-green-600 hover:bg-green-700 text-white px-8">
+                  Load More Job Vacancies
+                </Button>
+              </div>
+            </section>
+
+            {/* Jobs in Nairobi Section */}
+            <section className="mb-16">
+              <div className="flex items-center justify-between mb-8">
+                <div>
+                  <h2 className="text-3xl font-bold mb-2">Jobs in Nairobi - Latest Vacancies</h2>
+                  <p className="text-gray-600">Find the best job opportunities in Kenya&apos;s capital city</p>
+                </div>
+                <Button variant="outline" asChild>
+                  <Link href="/jobs-in-kenya">View All Jobs in Nairobi</Link>
+                </Button>
+              </div>
+              
+              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                {nairobiJobs.map((job) => (
+                  <JobCard key={job.id} {...job} />
+                ))}
+              </div>
+            </section>
+
+            {/* Jobs in Mombasa Section */}
+            <section className="mb-16">
+              <div className="flex items-center justify-between mb-8">
+                <div>
+                  <h2 className="text-3xl font-bold mb-2">Jobs in Mombasa - Coastal Opportunities</h2>
+                  <p className="text-gray-600">Discover career opportunities in Kenya&apos;s coastal region</p>
+                </div>
+                <Button variant="outline" asChild>
+                  <Link href="/jobs-in-kenya">View All Jobs in Mombasa</Link>
+                </Button>
+              </div>
+              
+              <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-3">
+                {mombasaJobs.map((job) => (
+                  <JobCard key={job.id} {...job} />
+                ))}
+              </div>
+            </section>
+
+            {/* NGO Jobs Section */}
+            <section className="mb-16 bg-gray-50 p-8 rounded-lg">
+              <div className="text-center mb-8">
+                <h2 className="text-3xl font-bold mb-4">NGO Jobs in Kenya - Non-Profit Opportunities</h2>
+                <p className="text-gray-600 max-w-2xl mx-auto">
+                  Explore meaningful career opportunities with NGOs, foundations, and international organizations operating in Kenya
+                </p>
+              </div>
+              
+              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-8">
+                {ngoJobs.map((job) => (
+                  <JobCard key={job.id} {...job} />
+                ))}
+              </div>
+              
+              <div className="text-center">
+                <Button className="bg-purple-600 hover:bg-purple-700" asChild>
+                  <Link href="/jobs-in-kenya">View All NGO Jobs</Link>
+                </Button>
+              </div>
+            </section>
+
+            {/* Call to Action */}
+            <section className="mb-16 bg-green-50 p-8 rounded-lg">
+              <div className="text-center">
+                <h3 className="text-2xl font-bold mb-4">Post Your Job Vacancy in Kenya</h3>
+                <p className="text-gray-600 mb-6 max-w-2xl mx-auto">
+                  Reach thousands of qualified professionals looking for jobs in Kenya. Post your job vacancy and find the best talent in Nairobi, Mombasa, and across Kenya.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                  <Button className="bg-green-600 hover:bg-green-700 text-white px-8" asChild>
+                    <Link href="/add-listing">Post Job Vacancy</Link>
+                  </Button>
+                  <Button variant="outline" className="border-green-600 text-green-600 hover:bg-green-50 px-8" asChild>
+                    <Link href="/directory">Browse Companies</Link>
+                  </Button>
+                </div>
+                <div className="mt-4 text-sm text-gray-600">
+                  <p>Contact us: <a href="mailto:hr@newkenyan.com" className="text-green-600 hover:underline">hr@newkenyan.com</a> | <a href="tel:+254736407642" className="text-green-600 hover:underline">+254 736 407 642</a></p>
+                </div>
+              </div>
+            </section>
+
+            {/* Jobs Statistics - Moved to end */}
+            <section className="mb-16">
+              <div className="text-center mb-8">
+                <h2 className="text-2xl font-bold mb-4">Job Opportunities by Location</h2>
+                <p className="text-gray-600">Explore job statistics across Kenya</p>
+              </div>
               <div className="grid md:grid-cols-4 gap-6">
                 <div className="text-center p-6 bg-blue-50 rounded-lg">
                   <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center mx-auto mb-3">
@@ -192,109 +299,6 @@ export default function JobsInKenyaPage() {
                   </div>
                   <div className="text-2xl font-bold text-purple-600 mb-1">{ngoJobs.length}+</div>
                   <div className="text-sm text-gray-600">NGO Jobs</div>
-                </div>
-              </div>
-            </section>
-
-            {/* Jobs in Nairobi Section */}
-            <section className="mb-16">
-              <div className="flex items-center justify-between mb-8">
-                <div>
-                  <h2 className="text-3xl font-bold mb-2">Jobs in Nairobi - Latest Vacancies</h2>
-                  <p className="text-gray-600">Find the best job opportunities in Kenya&apos;s capital city</p>
-                </div>
-                <Button variant="outline" asChild>
-                  <Link href="/jobs-in-kenya">View All Jobs in Nairobi</Link>
-                </Button>
-              </div>
-              
-              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                {nairobiJobs.map((job) => (
-                  <JobCard key={job.id} {...job} />
-                ))}
-              </div>
-            </section>
-
-            {/* NGO Jobs Section */}
-            <section className="mb-16 bg-gray-50 p-8 rounded-lg">
-              <div className="text-center mb-8">
-                <h2 className="text-3xl font-bold mb-4">NGO Jobs in Kenya - Non-Profit Opportunities</h2>
-                <p className="text-gray-600 max-w-2xl mx-auto">
-                  Explore meaningful career opportunities with NGOs, foundations, and international organizations operating in Kenya
-                </p>
-              </div>
-              
-              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mb-8">
-                {ngoJobs.map((job) => (
-                  <JobCard key={job.id} {...job} />
-                ))}
-              </div>
-              
-              <div className="text-center">
-                <Button className="bg-purple-600 hover:bg-purple-700" asChild>
-                  <Link href="/jobs-in-kenya">View All NGO Jobs</Link>
-                </Button>
-              </div>
-            </section>
-
-            {/* Jobs in Mombasa Section */}
-            <section className="mb-16">
-              <div className="flex items-center justify-between mb-8">
-                <div>
-                  <h2 className="text-3xl font-bold mb-2">Jobs in Mombasa - Coastal Opportunities</h2>
-                  <p className="text-gray-600">Discover career opportunities in Kenya&apos;s coastal region</p>
-                </div>
-                <Button variant="outline" asChild>
-                  <Link href="/jobs-in-kenya">View All Jobs in Mombasa</Link>
-                </Button>
-              </div>
-              
-              <div className="grid gap-6 md:grid-cols-1 lg:grid-cols-3">
-                {mombasaJobs.map((job) => (
-                  <JobCard key={job.id} {...job} />
-                ))}
-              </div>
-            </section>
-
-            {/* All Jobs Section */}
-            <section className="mb-16">
-              <div className="text-center mb-8">
-                <h2 className="text-3xl font-bold mb-4">All Job Vacancies in Kenya</h2>
-                <p className="text-gray-600 max-w-2xl mx-auto">
-                  Browse all available positions including online jobs in Kenya, jobs in Nakuru, and opportunities across all Kenyan cities
-                </p>
-              </div>
-              
-              <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                {jobsData.jobs.slice(0, 9).map((job) => (
-                  <JobCard key={job.id} {...job} />
-                ))}
-              </div>
-              
-              <div className="text-center mt-8">
-                <Button className="bg-green-600 hover:bg-green-700 text-white px-8">
-                  Load More Job Vacancies
-                </Button>
-              </div>
-            </section>
-
-            {/* Call to Action */}
-            <section className="mb-16 bg-green-50 p-8 rounded-lg">
-              <div className="text-center">
-                <h3 className="text-2xl font-bold mb-4">Post Your Job Vacancy in Kenya</h3>
-                <p className="text-gray-600 mb-6 max-w-2xl mx-auto">
-                  Reach thousands of qualified professionals looking for jobs in Kenya. Post your job vacancy and find the best talent in Nairobi, Mombasa, and across Kenya.
-                </p>
-                <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                  <Button className="bg-green-600 hover:bg-green-700 text-white px-8" asChild>
-                    <Link href="/add-listing">Post Job Vacancy</Link>
-                  </Button>
-                  <Button variant="outline" className="border-green-600 text-green-600 hover:bg-green-50 px-8" asChild>
-                    <Link href="/directory">Browse Companies</Link>
-                  </Button>
-                </div>
-                <div className="mt-4 text-sm text-gray-600">
-                  <p>Contact us: <a href="mailto:hr@newkenyan.com" className="text-green-600 hover:underline">hr@newkenyan.com</a> | <a href="tel:+254736407642" className="text-green-600 hover:underline">+254 736 407 642</a></p>
                 </div>
               </div>
             </section>

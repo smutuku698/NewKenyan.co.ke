@@ -9,6 +9,7 @@ import { supabase } from '@/lib/supabase';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Upload, MapPin, Phone, Mail, Globe, Clock, DollarSign, MessageCircle, CheckCircle, ArrowRight } from 'lucide-react';
+import PaymentModal from '@/components/PaymentModal';
 
 const BUSINESS_CATEGORIES = [
   'Food & Dining',
@@ -39,6 +40,11 @@ export default function AddListingForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitMessage, setSubmitMessage] = useState('');
   const [isSuccess, setIsSuccess] = useState(false);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [pendingBusinessData, setPendingBusinessData] = useState<{
+    validatedData: BusinessListingInput;
+    imageFile: File | null;
+  } | null>(null);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value } = e.target;
@@ -117,7 +123,6 @@ export default function AddListingForm() {
       return;
     }
 
-    setIsSubmitting(true);
     setErrors({});
     setSubmitMessage('');
 
@@ -125,20 +130,43 @@ export default function AddListingForm() {
       // Check if at least one image is provided
       if (images.length === 0) {
         setErrors({ images: 'At least one image is required' });
-        setIsSubmitting(false);
         return;
       }
 
       const validatedData = businessListingSchema.parse(formData);
       
-      // Upload images
-      const imageUrls = await uploadImages(images);
-      if (imageUrls.length === 0) {
-        setErrors({ images: 'Failed to upload images. Please try again.' });
-        setIsSubmitting(false);
-        return;
+      // Store business data for after payment
+      setPendingBusinessData({
+        validatedData,
+        imageFile: images[0] || null
+      });
+      
+      // Show payment modal
+      setShowPaymentModal(true);
+    } catch (error: unknown) {
+      if (error && typeof error === 'object' && 'errors' in error) {
+        const fieldErrors: Record<string, string> = {};
+        const zodError = error as { errors: Array<{ path: string[]; message: string }> };
+        zodError.errors.forEach((err) => {
+          fieldErrors[err.path[0]] = err.message;
+        });
+        setErrors(fieldErrors);
+      } else {
+        setErrors({ general: 'Please check your input and try again.' });
       }
+    }
+  };
 
+  const submitBusinessAfterPayment = async () => {
+    if (!pendingBusinessData || !user) return;
+    
+    setIsSubmitting(true);
+    const { validatedData, imageFile } = pendingBusinessData;
+
+    try {
+      // Upload image
+      const imageUrls = imageFile ? await uploadImages([imageFile]) : [];
+      
       const { error } = await supabase
         .from('business_listings')
         .insert({
@@ -155,7 +183,7 @@ export default function AddListingForm() {
           business_days: validatedData.businessDays,
           pricing_info: validatedData.pricingInfo,
           whatsapp_number: validatedData.whatsappNumber,
-          image_url: imageUrls[0], // Use first image for now
+          image_url: imageUrls[0] || null,
         });
 
       if (error) {
@@ -164,25 +192,26 @@ export default function AddListingForm() {
         setIsSuccess(true);
         setSubmitMessage('Business listing submitted successfully! It will be reviewed by our admin team before being published.');
         
+        // Clear pending data
+        setPendingBusinessData(null);
+        
         // Redirect to dashboard after 3 seconds
         setTimeout(() => {
           router.push('/dashboard');
         }, 3000);
       }
     } catch (error: unknown) {
-      if (error && typeof error === 'object' && 'errors' in error) {
-        const fieldErrors: Record<string, string> = {};
-        const zodError = error as { errors: Array<{ path: string[]; message: string }> };
-        zodError.errors.forEach((err) => {
-          fieldErrors[err.path[0]] = err.message;
-        });
-        setErrors(fieldErrors);
-      } else {
-        setErrors({ general: 'Please check your input and try again.' });
-      }
+      const errorMessage = error instanceof Error ? error.message : 'Failed to submit business listing. Please try again.';
+      setErrors({ general: errorMessage });
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const handlePaymentSuccess = (reference: string) => {
+    setShowPaymentModal(false);
+    console.log('Payment successful:', reference);
+    submitBusinessAfterPayment();
   };
 
   if (!user) {
@@ -378,7 +407,7 @@ export default function AddListingForm() {
           <div>
             <label htmlFor="whatsappNumber" className="block text-sm font-medium text-gray-700 mb-2">
               <MessageCircle className="inline h-4 w-4 mr-1" />
-              WhatsApp Number (Optional)
+              WhatsApp Number *
             </label>
             <Input
               id="whatsappNumber"
@@ -528,13 +557,23 @@ export default function AddListingForm() {
             disabled={isSubmitting}
             className="w-full bg-green-600 hover:bg-green-700 text-white"
           >
-            {isSubmitting ? 'Submitting...' : 'Submit Listing for Review'}
+            {isSubmitting ? 'Submitting...' : '🎉 Anniversary Special: Pay KES 100 & Submit Business'}
           </Button>
           <p className="text-sm text-gray-500 mt-2 text-center">
-            Your listing will be reviewed by our admin team before being published.
+            🎉 8 Years Anniversary Special: KES 100 (normally KES 3,000) for 4 months listing period. Celebrating 8 years of trusted service! Your listing will be reviewed by our admin team before being published.
           </p>
         </div>
       </form>
+
+      {/* Payment Modal */}
+      <PaymentModal
+        isOpen={showPaymentModal}
+        onClose={() => setShowPaymentModal(false)}
+        onPaymentSuccess={handlePaymentSuccess}
+        email={formData.email || ''}
+        listingData={formData}
+        listingType="business"
+      />
     </div>
   );
 }

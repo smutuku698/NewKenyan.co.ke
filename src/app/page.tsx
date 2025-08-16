@@ -65,6 +65,19 @@ export default function HomePage() {
     <div className="min-h-screen bg-white">
       <Header />
       
+      {/* 8 Years Anniversary Banner */}
+      <div className="bg-gradient-to-r from-purple-600 to-blue-600 text-white py-3 px-4">
+        <div className="container mx-auto text-center">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-2 text-sm sm:text-base">
+            <span className="font-bold">🎉 Celebrating 8 Years of Service!</span>
+            <span className="hidden sm:inline">•</span>
+            <span>Special Anniversary Price: <strong>KES 100</strong> (normally KES 2,000-5,000)</span>
+            <span className="hidden sm:inline">•</span>
+            <span className="text-yellow-200 font-semibold">⏰ Limited Time Offer</span>
+          </div>
+        </div>
+      </div>
+      
       <main>
         {/* Hero Section */}
         <section className="relative bg-gray-900 text-white py-20">

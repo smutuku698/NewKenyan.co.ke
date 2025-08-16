@@ -91,10 +91,9 @@ export const businessListingSchema = z.object({
     .transform(val => val ? sanitizeInput(val) : null),
   
   whatsappNumber: z.string()
+    .min(1, 'WhatsApp number is required')
     .regex(/^\+254[0-9]{9}$/, 'WhatsApp number must be in format +254XXXXXXXXX')
-    .optional()
-    .or(z.literal(''))
-    .transform(val => val || null),
+    .transform(sanitizeInput),
 });
 
 export const reviewSchema = z.object({
@@ -200,10 +199,9 @@ export const propertyListingSchema = z.object({
     .transform(val => val || null),
   
   whatsappNumber: z.string()
+    .min(1, 'WhatsApp number is required')
     .regex(/^\+254[0-9]{9}$/, 'WhatsApp number must be in format +254XXXXXXXXX')
-    .optional()
-    .or(z.literal(''))
-    .transform(val => val || null),
+    .transform(sanitizeInput),
   
   availableFrom: z.string()
     .optional()

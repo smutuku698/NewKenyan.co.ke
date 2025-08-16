@@ -9,6 +9,7 @@ import { supabase } from '@/lib/supabase';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Upload, MapPin, Phone, Mail, MessageCircle, Bed, Bath, Square, Calendar, CheckCircle, ArrowRight } from 'lucide-react';
+import PaymentModal from '@/components/PaymentModal';
 
 const PROPERTY_TYPES = [
   'Apartment',
@@ -60,6 +61,11 @@ export default function AddPropertyForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitMessage, setSubmitMessage] = useState('');
   const [isSuccess, setIsSuccess] = useState(false);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [pendingPropertyData, setPendingPropertyData] = useState<{
+    validatedData: PropertyListingInput;
+    imageFiles: File[];
+  } | null>(null);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value, type } = e.target;
@@ -158,7 +164,6 @@ export default function AddPropertyForm() {
       return;
     }
 
-    setIsSubmitting(true);
     setErrors({});
     setSubmitMessage('');
 
@@ -166,14 +171,44 @@ export default function AddPropertyForm() {
       // Check if at least one image is provided
       if (images.length === 0) {
         setErrors({ images: 'At least one image is required' });
-        setIsSubmitting(false);
         return;
       }
 
       const validatedData = propertyListingSchema.parse(formData);
       
+      // Store property data for after payment
+      setPendingPropertyData({
+        validatedData,
+        imageFiles: images
+      });
+      
+      // Show payment modal
+      setShowPaymentModal(true);
+    } catch (error: unknown) {      
+      if (error && typeof error === 'object' && 'errors' in error) {
+        const fieldErrors: Record<string, string> = {};
+        const zodError = error as { errors: Array<{ path: string[]; message: string }> };
+        
+        zodError.errors.forEach((err) => {
+          const fieldName = err.path[0];
+          fieldErrors[fieldName] = err.message;
+        });
+        setErrors(fieldErrors);
+      } else {
+        setErrors({ general: 'Please check your input and try again.' });
+      }
+    }
+  };
+
+  const submitPropertyAfterPayment = async () => {
+    if (!pendingPropertyData || !user) return;
+    
+    setIsSubmitting(true);
+    const { validatedData, imageFiles } = pendingPropertyData;
+
+    try {
       // Upload images
-      const imageUrls = await uploadImages(images);
+      const imageUrls = await uploadImages(imageFiles);
       if (imageUrls.length === 0) {
         setErrors({ images: 'Failed to upload images. Please try again.' });
         setIsSubmitting(false);
@@ -212,27 +247,26 @@ export default function AddPropertyForm() {
         setIsSuccess(true);
         setSubmitMessage('Property listing submitted successfully! It will be reviewed by our admin team before being published.');
         
+        // Clear pending data
+        setPendingPropertyData(null);
+        
         // Redirect to dashboard after 3 seconds
         setTimeout(() => {
           router.push('/dashboard');
         }, 3000);
       }
-    } catch (error: unknown) {      
-      if (error && typeof error === 'object' && 'errors' in error) {
-        const fieldErrors: Record<string, string> = {};
-        const zodError = error as { errors: Array<{ path: string[]; message: string }> };
-        
-        zodError.errors.forEach((err) => {
-          const fieldName = err.path[0];
-          fieldErrors[fieldName] = err.message;
-        });
-        setErrors(fieldErrors);
-      } else {
-        setErrors({ general: 'Please check your input and try again.' });
-      }
+    } catch (error: unknown) {
+      const errorMessage = error instanceof Error ? error.message : 'Failed to submit property listing. Please try again.';
+      setErrors({ general: errorMessage });
     } finally {
       setIsSubmitting(false);
     }
+  };
+
+  const handlePaymentSuccess = (reference: string) => {
+    setShowPaymentModal(false);
+    console.log('Payment successful:', reference);
+    submitPropertyAfterPayment();
   };
 
   if (!user) {
@@ -559,7 +593,7 @@ export default function AddPropertyForm() {
           <div>
             <label htmlFor="whatsappNumber" className="block text-sm font-medium text-gray-700 mb-2">
               <MessageCircle className="inline h-4 w-4 mr-1" />
-              WhatsApp Number
+              WhatsApp Number *
             </label>
             <Input
               id="whatsappNumber"
@@ -694,13 +728,23 @@ export default function AddPropertyForm() {
             disabled={isSubmitting}
             className="w-full bg-green-600 hover:bg-green-700 text-white"
           >
-            {isSubmitting ? 'Submitting...' : 'Submit Property Listing for Review'}
+            {isSubmitting ? 'Submitting...' : '🎉 Anniversary Special: Pay KES 100 & Submit Property'}
           </Button>
           <p className="text-sm text-gray-500 mt-2 text-center">
-            Your property listing will be reviewed by our admin team before being published.
+            🎉 8 Years Anniversary Special: KES 100 (normally KES 5,000) for 4 months listing period. Celebrating 8 years of trusted service! Your property listing will be reviewed by our admin team before being published.
           </p>
         </div>
       </form>
+
+      {/* Payment Modal */}
+      <PaymentModal
+        isOpen={showPaymentModal}
+        onClose={() => setShowPaymentModal(false)}
+        onPaymentSuccess={handlePaymentSuccess}
+        email={formData.contactEmail || ''}
+        listingData={formData}
+        listingType="property"
+      />
     </div>
   );
 }
