@@ -416,11 +416,11 @@ export default function AdminDashboard() {
   }
 
   const stats = getStats();
-  const currentListings = activeTab === 'business' ? businessListings : 
-                         activeTab === 'property' ? propertyListings : jobListings;
   const pendingListings = activeTab === 'jobs' 
     ? jobListings.filter(l => l.status === 'pending')
-    : currentListings.filter(l => !l.is_approved);
+    : activeTab === 'business' 
+      ? businessListings.filter(l => !l.is_approved)
+      : propertyListings.filter(l => !l.is_approved);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -635,7 +635,7 @@ export default function AdminDashboard() {
                               <span className="hidden sm:inline">•</span>
                               <div className="flex items-center">
                                 <MapPin className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
-                                <span className="truncate">{listing.city}</span>
+                                <span className="truncate">{(listing as BusinessListing).city}</span>
                               </div>
                               <span className="hidden sm:inline">•</span>
                               <span className="truncate">{(listing as BusinessListing).phone}</span>
@@ -648,7 +648,7 @@ export default function AdminDashboard() {
                               <span className="hidden sm:inline">•</span>
                               <div className="flex items-center">
                                 <MapPin className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
-                                <span className="truncate">{listing.city}</span>
+                                <span className="truncate">{(listing as PropertyListing).city}</span>
                               </div>
                               {(listing as PropertyListing).bedrooms && (
                                 <>
@@ -687,7 +687,9 @@ export default function AdminDashboard() {
                         <p className="text-gray-700 text-xs sm:text-sm mb-3 line-clamp-2">
                           {activeTab === 'jobs' 
                             ? (listing as JobListing).duties_and_responsibilities
-                            : listing.description}
+                            : activeTab === 'business'
+                              ? (listing as BusinessListing).description
+                              : (listing as PropertyListing).description}
                         </p>
                         
                         <div className="flex items-center text-xs sm:text-sm text-gray-500">

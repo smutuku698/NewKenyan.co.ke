@@ -135,7 +135,7 @@ export const openPaystackPayment = (
         ...metadata,
       },
       onSuccess: (response: unknown) => {
-        onSuccess({ ...response, reference });
+        onSuccess({ ...(response as Record<string, unknown>), reference });
       },
       onCancel: onCancel,
     });

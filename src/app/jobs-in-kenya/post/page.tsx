@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
@@ -19,7 +19,7 @@ import {
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 
-interface JobFormData {
+interface JobFormData extends Record<string, unknown> {
   job_title: string;
   nature_of_job: string;
   industry: string;
@@ -33,7 +33,7 @@ interface JobFormData {
   contact_phone: string;
 }
 
-export default function PostJobPage() {
+function PostJobForm() {
   const { user } = useUser();
   const searchParams = useSearchParams();
   const [formData, setFormData] = useState<JobFormData>({
@@ -545,5 +545,13 @@ Send your CV and cover letter to hr@company.co.ke with subject 'Marketing Manage
         listingType="job"
       />
     </div>
+  );
+}
+
+export default function PostJobPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <PostJobForm />
+    </Suspense>
   );
 }
