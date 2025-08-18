@@ -1,6 +1,10 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import { ClerkProvider } from '@clerk/nextjs';
+import GoogleAnalytics from '@/components/GoogleAnalytics';
+import CookieConsent from '@/components/CookieConsent';
+import GoogleTagManager, { GoogleTagManagerNoScript } from '@/components/GoogleTagManager';
+import SEOOptimizations from '@/components/SEOOptimizations';
 import "./globals.css";
 
 const inter = Inter({
@@ -9,6 +13,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL('https://newkenyan.com'),
   title: "NewKenyan.com - Find Jobs, Businesses & Properties in Kenya",
   description: "Discover job opportunities, explore businesses, and find properties across Kenya on NewKenyan.com. Your gateway to Kenya's digital economy with verified listings and trusted connections.",
   keywords: "Kenya jobs, jobs in Kenya, Kenya business directory, properties for sale Kenya, houses for rent Nairobi, apartments Kenya, office space rent Kenya, business opportunities Kenya, employment Kenya, real estate Kenya",
@@ -72,6 +77,17 @@ export default function RootLayout({
     <ClerkProvider publishableKey={publishableKey}>
       <html lang="en">
         <head>
+          <meta name="google-site-verification" content="KFIY3r_abgH8brcISSFLhXS-g6_8TGzcb78MCA5YtxM" />
+          <meta name="msvalidate.01" content="REPLACE_WITH_BING_VERIFICATION_CODE" />
+          <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+          <meta name="theme-color" content="#10B981" />
+          <link rel="canonical" href="https://newkenyan.com" />
+          <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+          <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+          <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+          <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+          <link rel="manifest" href="/manifest.webmanifest" />
+          <GoogleTagManager />
           <script
             type="application/ld+json"
             dangerouslySetInnerHTML={{
@@ -158,7 +174,11 @@ export default function RootLayout({
         <body
           className={`${inter.variable} font-sans antialiased`}
         >
+          <GoogleTagManagerNoScript />
+          <GoogleAnalytics />
+          <SEOOptimizations />
           {children}
+          <CookieConsent />
         </body>
       </html>
     </ClerkProvider>
