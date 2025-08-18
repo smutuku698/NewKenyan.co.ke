@@ -60,6 +60,9 @@ export const metadata: Metadata = {
   },
   category: "Business Directory",
   classification: "Business & Employment",
+  verification: {
+    google: "KFIY3r_abgH8brcISSFLhXS-g6_8TGzcb78MCA5YtxM",
+  },
 };
 
 export default function RootLayout({
@@ -77,7 +80,6 @@ export default function RootLayout({
     <ClerkProvider publishableKey={publishableKey}>
       <html lang="en">
         <head>
-          <meta name="google-site-verification" content="KFIY3r_abgH8brcISSFLhXS-g6_8TGzcb78MCA5YtxM" />
           <meta name="msvalidate.01" content="REPLACE_WITH_BING_VERIFICATION_CODE" />
           <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
           <meta name="theme-color" content="#10B981" />

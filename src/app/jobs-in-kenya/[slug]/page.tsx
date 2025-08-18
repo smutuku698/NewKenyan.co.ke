@@ -56,7 +56,7 @@ export async function generateMetadata({ params }: JobDetailsPageProps): Promise
       title,
       description,
       type: 'article',
-      url: `https://newkenyan.co.ke/jobs-in-kenya/${slug}`,
+      url: `https://newkenyan.com/jobs-in-kenya/${slug}`,
       siteName: 'NewKenyan.com',
     },
     twitter: {
@@ -65,7 +65,7 @@ export async function generateMetadata({ params }: JobDetailsPageProps): Promise
       description,
     },
     alternates: {
-      canonical: `https://newkenyan.co.ke/jobs-in-kenya/${slug}`,
+      canonical: `https://newkenyan.com/jobs-in-kenya/${slug}`,
     },
   };
 }
@@ -78,7 +78,7 @@ export default async function JobDetailsPage({ params }: JobDetailsPageProps) {
     notFound();
   }
 
-  const currentUrl = `https://newkenyan.co.ke/jobs-in-kenya/${slug}`;
+  const currentUrl = `https://newkenyan.com/jobs-in-kenya/${slug}`;
   const shareText = `${job.job_title} job in ${job.job_location} - Jobs in Kenya`;
 
   // Process how_to_apply text to replace emails with hr@newkenyan.com
@@ -103,8 +103,8 @@ export default async function JobDetailsPage({ params }: JobDetailsPageProps) {
     "hiringOrganization": {
       "@type": "Organization",
       "name": "NewKenyan.com",
-      "sameAs": "https://newkenyan.co.ke",
-      "url": "https://newkenyan.co.ke"
+      "sameAs": "https://newkenyan.com",
+      "url": "https://newkenyan.com"
     },
     "jobLocation": {
       "@type": "Place",
