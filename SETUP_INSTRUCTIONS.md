@@ -50,3 +50,69 @@
 - Image upload restrictions (5MB, JPG/PNG/WebP)
 
 Your business listing platform is ready to use once you complete steps A and B above!
+
+## 6. 💰 Customizing M-Pesa Listing Costs
+
+You can easily change the pricing for job, property, and business listings by modifying the following files:
+
+### Main Pricing Configuration
+**File:** `src/components/PaymentModal.tsx` (Lines 28-47)
+```javascript
+const PRICING = {
+  job: { 
+    amount: 100,           // Anniversary price in KES
+    originalAmount: 2000,  // Original price shown for comparison
+    label: 'Job Listing', 
+    description: 'Get CVs delivered to your email' 
+  },
+  property: { 
+    amount: 100,           // Anniversary price in KES
+    originalAmount: 5000,  // Original price shown for comparison
+    label: 'Property Listing', 
+    description: 'Reach thousands of potential tenants/buyers' 
+  },
+  business: { 
+    amount: 100,           // Anniversary price in KES
+    originalAmount: 3000,  // Original price shown for comparison
+    label: 'Business Listing', 
+    description: 'Boost your business visibility' 
+  }
+};
+```
+
+### Job Posting Page
+**File:** `src/app/jobs-in-kenya/post/page.tsx`
+- Line 157: `payment_amount: 'KES 300',` (change to match your pricing)
+- Line 195: Payment confirmation text showing "KES 300"
+- Line 367: Pricing display showing "KES 300"
+- Line 634: Button text showing "Pay KES 100"
+
+### API Route
+**File:** `src/app/api/jobs/route.ts`
+- Line 166: `payment_amount: payment_amount || 'KES 300',` (default fallback)
+
+### Database Schema
+**File:** `jobs_schema.sql`
+- Line 27: `payment_amount VARCHAR(20) DEFAULT 'KES 300',` (database default)
+
+### Admin Dashboard Revenue Calculation
+**File:** `src/components/AdminDashboard.tsx`
+- Line 384: `totalRevenue: jobListings.filter(l => l.payment_verified).length * 300,` (change 300 to match your job pricing)
+
+### Anniversary Banner (Homepage)
+**File:** `src/app/page.tsx`
+- Line 74: Anniversary pricing text and amounts
+
+### Form Components
+**Files:** `src/components/AddListingForm.tsx`, `src/components/AddPropertyForm.tsx`
+- Search for "Anniversary Special" text and pricing amounts
+
+### To Change Pricing:
+1. **Update main pricing** in `PaymentModal.tsx` 
+2. **Update job-specific prices** in `jobs-in-kenya/post/page.tsx`
+3. **Update API defaults** in `api/jobs/route.ts`
+4. **Update admin calculations** in `AdminDashboard.tsx`
+5. **Update marketing text** in homepage and form components
+6. **Update database schema** if creating new tables
+
+**Note:** The current setup shows "Anniversary Special" pricing of KES 100 for all listings, down from original prices of KES 2000-5000. Remove anniversary messaging and adjust prices as needed for regular operations.
