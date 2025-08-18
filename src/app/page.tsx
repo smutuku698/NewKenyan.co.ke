@@ -99,11 +99,11 @@ export default function HomePage() {
             <p className="text-xl mb-8 max-w-2xl mx-auto">
               Find affordable houses for rent, apartments for sale, job opportunities in Kenya, and business listings. Your trusted marketplace for real estate, jobs, and business directory in Nairobi.
             </p>
-            <div className="flex gap-4 justify-center mb-12">
-              <Button className="bg-green-600 hover:bg-green-700 text-white px-8 py-3 text-lg" asChild>
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center mb-12 px-4">
+              <Button className="bg-green-600 hover:bg-green-700 text-white px-4 sm:px-8 py-3 text-base sm:text-lg w-full sm:w-auto" asChild>
                 <Link href="/properties">Find Houses for Rent</Link>
               </Button>
-              <Button variant="outline" className="border-2 border-white text-white hover:bg-white hover:text-gray-900 px-8 py-3 text-lg bg-transparent" asChild>
+              <Button variant="outline" className="border-2 border-white text-white hover:bg-white hover:text-gray-900 px-4 sm:px-8 py-3 text-base sm:text-lg bg-transparent w-full sm:w-auto" asChild>
                 <Link href="/jobs-in-kenya">Browse Jobs in Kenya</Link>
               </Button>
             </div>
@@ -273,11 +273,11 @@ export default function HomePage() {
               <p className="text-gray-600 mb-8">
                 Join thousands of Kenyans finding affordable houses for rent, apartments for sale, and job opportunities in Nairobi on our platform.
               </p>
-              <div className="flex flex-col sm:flex-row gap-4 justify-center mb-8">
-                <Button className="bg-green-600 hover:bg-green-700 text-white text-lg px-8" asChild>
+              <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center mb-8 px-4">
+                <Button className="bg-green-600 hover:bg-green-700 text-white text-base sm:text-lg px-4 sm:px-8 w-full sm:w-auto" asChild>
                   <Link href="/add-listing">List Your Property</Link>
                 </Button>
-                <Button variant="outline" className="border-2 border-gray-300 hover:bg-gray-100 text-lg px-8" asChild>
+                <Button variant="outline" className="border-2 border-gray-300 hover:bg-gray-100 text-base sm:text-lg px-4 sm:px-8 w-full sm:w-auto" asChild>
                   <Link href="/properties">Browse Properties</Link>
                 </Button>
               </div>

@@ -74,7 +74,7 @@ const BusinessCard = ({
         {/* Header */}
         <div className="mb-4">
           <Link href={`/business/${id}`}>
-            <h3 className="font-semibold text-lg text-gray-900 mb-1 hover:text-green-600 transition-colors cursor-pointer">
+            <h3 className="font-semibold text-lg text-gray-900 mb-1 hover:text-green-600 transition-colors cursor-pointer line-clamp-2">
               {name}
             </h3>
           </Link>
@@ -112,24 +112,24 @@ const BusinessCard = ({
         </p>
 
         {/* Actions */}
-        <div className="flex space-x-2">
+        <div className="flex gap-2">
           <Button 
             variant="outline" 
-            className="flex-1 border-gray-300 hover:bg-gray-50" 
+            className="flex-1 border-gray-300 hover:bg-gray-50 min-w-0" 
             size="sm"
             onClick={() => window.open(`tel:${phoneNumber}`, '_self')}
           >
-            <Phone className="h-4 w-4 mr-2" />
-            Call
+            <Phone className="h-4 w-4 mr-1 flex-shrink-0" />
+            <span className="truncate">Call</span>
           </Button>
           {whatsappNumber && (
             <Button 
-              className="bg-green-600 hover:bg-green-700 text-white flex-1" 
+              className="bg-green-600 hover:bg-green-700 text-white flex-1 min-w-0" 
               size="sm"
               onClick={() => window.open(`https://wa.me/${whatsappNumber.replace('+', '')}`, '_blank')}
             >
-              <MessageCircle className="h-4 w-4 mr-2" />
-              WhatsApp
+              <MessageCircle className="h-4 w-4 mr-1 flex-shrink-0" />
+              <span className="truncate">WhatsApp</span>
             </Button>
           )}
         </div>

@@ -62,7 +62,7 @@ Best regards,`);
             </Badge>
           </div>
           
-          <h3 className="font-semibold text-lg text-gray-900 mb-1">
+          <h3 className="font-semibold text-lg text-gray-900 mb-1 line-clamp-2">
             {job_title}
           </h3>
         </div>
@@ -103,17 +103,17 @@ Best regards,`);
       </div>
 
       {/* Actions */}
-      <div className="flex space-x-3">
+      <div className="flex gap-2">
         <Link href={`/jobs-in-kenya/${generateJobSlug(job_title, job_location, id)}`} className="flex-1">
-          <Button variant="outline" className="w-full border-gray-300 hover:bg-gray-100">
-            Learn More
+          <Button variant="outline" className="w-full border-gray-300 hover:bg-gray-100 text-sm min-w-0">
+            <span className="truncate">Learn More</span>
           </Button>
         </Link>
         <Button 
           onClick={handleApplyNow}
-          className="bg-green-600 hover:bg-green-700 text-white flex-1"
+          className="bg-green-600 hover:bg-green-700 text-white flex-1 text-sm min-w-0"
         >
-          Apply Now
+          <span className="truncate">Apply Now</span>
         </Button>
       </div>
     </div>

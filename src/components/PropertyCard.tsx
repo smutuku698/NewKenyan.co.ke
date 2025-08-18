@@ -93,8 +93,8 @@ const PropertyCard = ({
 
         {/* Location */}
         <div className="flex items-center text-gray-600 text-sm mb-4">
-          <MapPin className="h-4 w-4 mr-2" />
-          {location}
+          <MapPin className="h-4 w-4 mr-2 flex-shrink-0" />
+          <span className="truncate">{location}</span>
         </div>
 
         {/* Amenities */}
@@ -114,15 +114,15 @@ const PropertyCard = ({
         </div>
 
         {/* Actions */}
-        <div className="flex space-x-2">
-          <Button variant="outline" className="flex-1 border-gray-300 hover:bg-gray-50" size="sm">
-            <Phone className="h-4 w-4 mr-2" />
-            Call
+        <div className="flex gap-2">
+          <Button variant="outline" className="flex-1 border-gray-300 hover:bg-gray-50 min-w-0" size="sm">
+            <Phone className="h-4 w-4 mr-1 flex-shrink-0" />
+            <span className="truncate">Call</span>
           </Button>
           {whatsappNumber && (
-            <Button className="bg-green-600 hover:bg-green-700 text-white flex-1" size="sm">
-              <MessageCircle className="h-4 w-4 mr-2" />
-              WhatsApp
+            <Button className="bg-green-600 hover:bg-green-700 text-white flex-1 min-w-0" size="sm">
+              <MessageCircle className="h-4 w-4 mr-1 flex-shrink-0" />
+              <span className="truncate">WhatsApp</span>
             </Button>
           )}
         </div>
