@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { SignInButton, SignedIn, SignedOut, UserButton } from '@clerk/nextjs';
-import { Menu, X, Search, MapPin, ChevronDown, Building, Home, Briefcase } from 'lucide-react';
+import { Menu, X, Search, MapPin, ChevronDown, Building, Home, Briefcase, Heart } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 const Header = () => {
@@ -65,6 +65,16 @@ const Header = () => {
             >
               <Search className="h-4 w-4" />
             </Button>
+            <Link href="/favorites">
+              <Button 
+                variant="ghost" 
+                size="sm"
+                className="text-white hover:bg-white/20 hover:text-white backdrop-blur-sm transition-all duration-200"
+                title="My Favorite Properties"
+              >
+                <Heart className="h-4 w-4" />
+              </Button>
+            </Link>
             <SignedIn>
               <Link href="/dashboard">
                 <Button 
@@ -221,6 +231,16 @@ const Header = () => {
                   <Search className="h-4 w-4 mr-2" />
                   Search
                 </Button>
+                <Link href="/favorites">
+                  <Button 
+                    variant="outline" 
+                    className="w-full justify-center font-semibold border-red-200 text-red-700 hover:bg-red-50 hover:border-red-300"
+                    onClick={() => setIsMobileMenuOpen(false)}
+                  >
+                    <Heart className="h-4 w-4 mr-2" />
+                    My Favorites
+                  </Button>
+                </Link>
                 
                 <SignedIn>
                   <Link href="/dashboard">

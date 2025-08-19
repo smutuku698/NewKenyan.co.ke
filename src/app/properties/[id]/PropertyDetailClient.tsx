@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import Header from '@/components/Header';
@@ -24,9 +24,11 @@ import {
   Home,
   ChevronRight,
   ChevronDown,
+  ChevronLeft,
   Star,
   Shield,
-  CheckCircle
+  CheckCircle,
+  X
 } from 'lucide-react';
 
 interface PropertyListing {
@@ -66,7 +68,10 @@ interface PropertyDetailClientProps {
 
 export default function PropertyDetailClient({ property, similarProperties }: PropertyDetailClientProps) {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [isGalleryOpen, setIsGalleryOpen] = useState(false);
   const [openFAQ, setOpenFAQ] = useState<number | null>(null);
+  const [isFavorite, setIsFavorite] = useState(false);
+  const [showToast, setShowToast] = useState<{message: string; type: 'success' | 'error'} | null>(null);
 
   const toggleFAQ = (index: number) => {
     setOpenFAQ(openFAQ === index ? null : index);
@@ -142,6 +147,115 @@ export default function PropertyDetailClient({ property, similarProperties }: Pr
 
   const propertyFAQ = generatePropertyFAQ(property);
 
+  const nextImage = () => {
+    setCurrentImageIndex((prev) => (prev + 1) % property.images.length);
+  };
+
+  const prevImage = () => {
+    setCurrentImageIndex((prev) => (prev - 1 + property.images.length) % property.images.length);
+  };
+
+  const closeGallery = () => {
+    setIsGalleryOpen(false);
+  };
+
+  // Favorites functionality
+  const getFavorites = (): string[] => {
+    if (typeof window === 'undefined') return [];
+    const favorites = localStorage.getItem('propertyFavorites');
+    return favorites ? JSON.parse(favorites) : [];
+  };
+
+  const addToFavorites = (propertyId: string) => {
+    const favorites = getFavorites();
+    const updatedFavorites = [...favorites, propertyId];
+    localStorage.setItem('propertyFavorites', JSON.stringify(updatedFavorites));
+  };
+
+  const removeFromFavorites = (propertyId: string) => {
+    const favorites = getFavorites();
+    const updatedFavorites = favorites.filter(id => id !== propertyId);
+    localStorage.setItem('propertyFavorites', JSON.stringify(updatedFavorites));
+  };
+
+  const toggleFavorite = () => {
+    const favorites = getFavorites();
+    const isCurrentlyFavorite = favorites.includes(property.id);
+    
+    if (isCurrentlyFavorite) {
+      removeFromFavorites(property.id);
+      setIsFavorite(false);
+      showToastMessage('Removed from favorites', 'success');
+    } else {
+      addToFavorites(property.id);
+      setIsFavorite(true);
+      showToastMessage('Added to favorites', 'success');
+    }
+  };
+
+  const handleShare = async () => {
+    const shareData = {
+      title: property.property_title,
+      text: `Check out this ${property.property_type.toLowerCase()} in ${property.city} - ${formatPrice(property.price, property.price_type)}`,
+      url: window.location.href,
+    };
+
+    // Try Web Share API first (mobile)
+    if (navigator.share) {
+      try {
+        await navigator.share(shareData);
+        showToastMessage('Property shared successfully', 'success');
+      } catch (error) {
+        // User cancelled sharing
+        if (error instanceof Error && error.name !== 'AbortError') {
+          showToastMessage('Failed to share property', 'error');
+        }
+      }
+    } else {
+      // Fallback to clipboard (desktop)
+      try {
+        await navigator.clipboard.writeText(window.location.href);
+        showToastMessage('Property link copied to clipboard', 'success');
+      } catch (error) {
+        showToastMessage('Failed to copy link', 'error');
+      }
+    }
+  };
+
+  const showToastMessage = (message: string, type: 'success' | 'error') => {
+    setShowToast({ message, type });
+    setTimeout(() => setShowToast(null), 3000);
+  };
+
+  // Check if property is already in favorites on component mount
+  useEffect(() => {
+    const favorites = getFavorites();
+    setIsFavorite(favorites.includes(property.id));
+  }, [property.id]);
+
+  // Keyboard navigation for gallery
+  useEffect(() => {
+    if (!isGalleryOpen) return;
+    
+    const handleKeyPress = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        closeGallery();
+      } else if (e.key === 'ArrowRight') {
+        nextImage();
+      } else if (e.key === 'ArrowLeft') {
+        prevImage();
+      }
+    };
+
+    document.addEventListener('keydown', handleKeyPress);
+    document.body.style.overflow = 'hidden'; // Prevent scrolling when modal is open
+
+    return () => {
+      document.removeEventListener('keydown', handleKeyPress);
+      document.body.style.overflow = 'unset';
+    };
+  }, [isGalleryOpen, property.images.length]);
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />
@@ -174,10 +288,10 @@ export default function PropertyDetailClient({ property, similarProperties }: Pr
           {/* Main Content */}
           <div className="lg:col-span-2">
             {/* Property Header */}
-            <div className="bg-white rounded-lg shadow-sm border p-6 mb-6">
-              <div className="flex items-start justify-between mb-4">
-                <div className="flex-1">
-                  <h1 className="text-3xl font-bold text-gray-900 mb-3">{property.property_title}</h1>
+            <div className="bg-white rounded-lg shadow-sm border p-4 sm:p-6 mb-6">
+              <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-4">
+                <div className="flex-1 min-w-0">
+                  <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-3 leading-tight">{property.property_title}</h1>
                   <div className="flex items-center space-x-3 mb-3">
                     <Badge variant="secondary" className="text-sm">{property.property_type}</Badge>
                     {property.is_featured && (
@@ -198,7 +312,7 @@ export default function PropertyDetailClient({ property, similarProperties }: Pr
                   </div>
                   
                   {/* Property Stats */}
-                  <div className="flex items-center space-x-6 text-gray-600">
+                  <div className="flex flex-wrap items-center gap-4 text-gray-600">
                     {property.bedrooms && (
                       <div className="flex items-center">
                         <Bed className="h-5 w-5 mr-2" />
@@ -224,18 +338,34 @@ export default function PropertyDetailClient({ property, similarProperties }: Pr
                   </div>
                 </div>
                 
-                <div className="text-right">
-                  <p className="text-3xl font-bold text-green-600 mb-1">
+                <div className="sm:text-right min-w-0 flex-shrink-0">
+                  <p className="text-xl sm:text-2xl lg:text-3xl font-bold text-green-600 mb-1 break-words">
                     {formatPrice(property.price, property.price_type)}
                   </p>
-                  <p className="text-sm text-gray-600 mb-3">
+                  <p className="text-xs sm:text-sm text-gray-600 mb-3">
                     {property.price_type === 'rent' ? 'Monthly rent' : 'Sale price'}
                   </p>
-                  <div className="flex space-x-2">
-                    <Button variant="ghost" size="sm" className="text-gray-500 hover:text-red-500">
-                      <Heart className="h-4 w-4" />
+                  <div className="flex space-x-2 sm:justify-end">
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      onClick={toggleFavorite}
+                      className={`transition-colors ${
+                        isFavorite 
+                          ? 'text-red-500 hover:text-red-600' 
+                          : 'text-gray-500 hover:text-red-500'
+                      }`}
+                      title={isFavorite ? 'Remove from favorites' : 'Add to favorites'}
+                    >
+                      <Heart className={`h-4 w-4 ${isFavorite ? 'fill-current' : ''}`} />
                     </Button>
-                    <Button variant="ghost" size="sm" className="text-gray-500 hover:text-blue-500">
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      onClick={handleShare}
+                      className="text-gray-500 hover:text-blue-500"
+                      title="Share property"
+                    >
                       <Share2 className="h-4 w-4" />
                     </Button>
                   </div>
@@ -248,41 +378,61 @@ export default function PropertyDetailClient({ property, similarProperties }: Pr
               <h2 className="text-xl font-semibold mb-4">Property Photos</h2>
               {property.images && property.images.length > 0 ? (
                 <div>
-                  <div className="relative h-96 mb-4 rounded-lg overflow-hidden">
+                  <div 
+                    className="relative aspect-video mb-4 rounded-lg overflow-hidden cursor-pointer bg-gray-100"
+                    onClick={() => setIsGalleryOpen(true)}
+                  >
                     <Image
                       src={property.images[currentImageIndex]}
                       alt={`${property.property_title} - ${property.city} property for ${property.price_type}`}
                       fill
                       sizes="(max-width: 768px) 100vw, (max-width: 1200px) 66vw, 50vw"
-                      className="object-cover"
+                      className="object-cover hover:scale-105 transition-transform duration-300"
                       priority
                     />
+                    <div className="absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-10 transition-colors duration-300" />
+                    <div className="absolute top-4 right-4 bg-black bg-opacity-50 text-white px-3 py-1 rounded-full text-sm">
+                      {property.images.length} photo{property.images.length > 1 ? 's' : ''}
+                    </div>
                   </div>
 
                   {property.images.length > 1 && (
-                    <div className="grid grid-cols-6 gap-2">
-                      {property.images.map((image, index) => (
+                    <div className="grid grid-cols-4 sm:grid-cols-6 gap-2">
+                      {property.images.slice(0, 5).map((image, index) => (
                         <div
                           key={index}
-                          className={`relative h-20 rounded cursor-pointer overflow-hidden border-2 transition-colors ${
+                          className={`relative aspect-square rounded cursor-pointer overflow-hidden border-2 transition-colors ${
                             index === currentImageIndex ? 'border-green-500' : 'border-gray-200 hover:border-gray-300'
                           }`}
-                          onClick={() => setCurrentImageIndex(index)}
+                          onClick={() => {
+                            setCurrentImageIndex(index);
+                            setIsGalleryOpen(true);
+                          }}
                         >
                           <Image
                             src={image}
                             alt={`Property view ${index + 1}`}
                             fill
-                            sizes="80px"
+                            sizes="120px"
                             className="object-cover"
                           />
                         </div>
                       ))}
+                      {property.images.length > 5 && (
+                        <div
+                          className="relative aspect-square rounded cursor-pointer overflow-hidden border-2 border-gray-200 hover:border-gray-300 bg-gray-900 bg-opacity-75 flex items-center justify-center"
+                          onClick={() => setIsGalleryOpen(true)}
+                        >
+                          <span className="text-white font-semibold">
+                            +{property.images.length - 5}
+                          </span>
+                        </div>
+                      )}
                     </div>
                   )}
                 </div>
               ) : (
-                <div className="h-64 bg-gray-100 rounded-lg flex items-center justify-center">
+                <div className="aspect-video bg-gray-100 rounded-lg flex items-center justify-center">
                   <div className="text-center text-gray-500">
                     <Home className="h-12 w-12 mx-auto mb-2" />
                     <p>No images available</p>
@@ -512,6 +662,121 @@ export default function PropertyDetailClient({ property, similarProperties }: Pr
           </div>
         </section>
       </main>
+
+      {/* Image Gallery Modal */}
+      {isGalleryOpen && property.images && property.images.length > 0 && (
+        <div 
+          className="fixed inset-0 z-50 bg-black bg-opacity-90 flex items-center justify-center"
+          onClick={closeGallery}
+        >
+          {/* Close Button */}
+          <button
+            onClick={closeGallery}
+            className="absolute top-4 right-4 z-10 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-70 transition-colors"
+          >
+            <X className="h-6 w-6" />
+          </button>
+
+          {/* Image Navigation */}
+          {property.images.length > 1 && (
+            <>
+              <button
+                onClick={prevImage}
+                className="absolute left-4 z-10 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-70 transition-colors"
+              >
+                <ChevronLeft className="h-6 w-6" />
+              </button>
+              <button
+                onClick={nextImage}
+                className="absolute right-4 z-10 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-70 transition-colors"
+              >
+                <ChevronRight className="h-6 w-6" />
+              </button>
+            </>
+          )}
+
+          {/* Main Image Container */}
+          <div 
+            className="relative w-full h-full max-w-4xl max-h-[80vh] mx-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <Image
+              src={property.images[currentImageIndex]}
+              alt={`${property.property_title} - Image ${currentImageIndex + 1}`}
+              fill
+              className="object-contain"
+              sizes="(max-width: 768px) 100vw, 80vw"
+            />
+          </div>
+
+          {/* Image Counter */}
+          <div className="absolute top-4 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-50 text-white px-4 py-2 rounded-full text-sm">
+            {currentImageIndex + 1} / {property.images.length}
+          </div>
+
+          {/* Contact Buttons */}
+          <div 
+            className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-4"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <Button
+              onClick={() => handleContactClick('phone')}
+              className="bg-green-600 hover:bg-green-700 text-white px-6 py-2"
+            >
+              <Phone className="h-4 w-4 mr-2" />
+              Call
+            </Button>
+            {property.whatsapp_number && (
+              <Button
+                onClick={() => handleContactClick('whatsapp')}
+                className="bg-green-600 hover:bg-green-700 text-white px-6 py-2"
+              >
+                <MessageCircle className="h-4 w-4 mr-2" />
+                WhatsApp
+              </Button>
+            )}
+          </div>
+
+          {/* Thumbnail Strip */}
+          {property.images.length > 1 && (
+            <div 
+              className="absolute bottom-20 left-1/2 transform -translate-x-1/2 flex space-x-2 bg-black bg-opacity-50 p-2 rounded-lg max-w-xs overflow-x-auto"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {property.images.map((image, index) => (
+                <div
+                  key={index}
+                  className={`relative w-12 h-12 rounded cursor-pointer overflow-hidden border-2 transition-colors flex-shrink-0 ${
+                    index === currentImageIndex ? 'border-green-500' : 'border-gray-400 hover:border-gray-300'
+                  }`}
+                  onClick={() => setCurrentImageIndex(index)}
+                >
+                  <Image
+                    src={image}
+                    alt={`Thumbnail ${index + 1}`}
+                    fill
+                    className="object-cover"
+                    sizes="48px"
+                  />
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Toast Notification */}
+      {showToast && (
+        <div className="fixed bottom-4 right-4 z-50">
+          <div className={`px-6 py-3 rounded-lg shadow-lg text-white font-medium ${
+            showToast.type === 'success' 
+              ? 'bg-green-600' 
+              : 'bg-red-600'
+          }`}>
+            {showToast.message}
+          </div>
+        </div>
+      )}
       
       <Footer />
     </div>

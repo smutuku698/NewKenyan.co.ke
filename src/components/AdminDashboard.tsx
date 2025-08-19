@@ -19,7 +19,10 @@ import {
   TrendingUp,
   Briefcase,
   CreditCard,
-  DollarSign
+  DollarSign,
+  Star,
+  Trash2,
+  Settings
 } from 'lucide-react';
 import Image from 'next/image';
 
@@ -101,6 +104,7 @@ interface JobListing {
 export default function AdminDashboard() {
   const { user } = useUser();
   const [activeTab, setActiveTab] = useState<'business' | 'property' | 'jobs'>('business');
+  const [viewMode, setViewMode] = useState<'pending' | 'all'>('pending');
   const [businessListings, setBusinessListings] = useState<BusinessListing[]>([]);
   const [propertyListings, setPropertyListings] = useState<PropertyListing[]>([]);
   const [jobListings, setJobListings] = useState<JobListing[]>([]);
@@ -339,6 +343,162 @@ export default function AdminDashboard() {
     }
   };
 
+  // New delete functionality
+  const handleBusinessDelete = async (listingId: string) => {
+    if (!confirm('Are you sure you want to permanently delete this business listing? This action cannot be undone.')) {
+      return;
+    }
+
+    setActionLoading(listingId);
+    try {
+      const { error } = await supabase
+        .from('business_listings')
+        .delete()
+        .eq('id', listingId);
+
+      if (error) {
+        console.error('Error deleting business listing:', error);
+        alert('Failed to delete business listing');
+      } else {
+        await fetchAllListings();
+        setSelectedBusinessListing(null);
+        alert('Business listing deleted successfully.');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Failed to delete business listing');
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handlePropertyDelete = async (listingId: string) => {
+    if (!confirm('Are you sure you want to permanently delete this property listing? This action cannot be undone.')) {
+      return;
+    }
+
+    setActionLoading(listingId);
+    try {
+      const { error } = await supabase
+        .from('property_listings')
+        .delete()
+        .eq('id', listingId);
+
+      if (error) {
+        console.error('Error deleting property listing:', error);
+        alert('Failed to delete property listing');
+      } else {
+        await fetchAllListings();
+        setSelectedPropertyListing(null);
+        alert('Property listing deleted successfully.');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Failed to delete property listing');
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleJobDelete = async (listingId: string) => {
+    if (!confirm('Are you sure you want to permanently delete this job listing? This action cannot be undone.')) {
+      return;
+    }
+
+    setActionLoading(listingId);
+    try {
+      const { error } = await supabase
+        .from('jobs')
+        .delete()
+        .eq('id', listingId);
+
+      if (error) {
+        console.error('Error deleting job listing:', error);
+        alert('Failed to delete job listing');
+      } else {
+        await fetchAllListings();
+        setSelectedJobListing(null);
+        alert('Job listing deleted successfully.');
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Failed to delete job listing');
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  // Toggle featured functionality
+  const handleBusinessToggleFeatured = async (listingId: string, currentFeatured: boolean) => {
+    setActionLoading(listingId);
+    try {
+      // Business listings don't have is_featured in the current schema, we'll add is_verified as featured
+      const { error } = await supabase
+        .from('business_listings')
+        .update({ is_verified: !currentFeatured })
+        .eq('id', listingId);
+
+      if (error) {
+        console.error('Error updating business featured status:', error);
+        alert('Failed to update featured status');
+      } else {
+        await fetchAllListings();
+        alert(`Business listing ${!currentFeatured ? 'featured' : 'unfeatured'} successfully!`);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Failed to update featured status');
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handlePropertyToggleFeatured = async (listingId: string, currentFeatured: boolean) => {
+    setActionLoading(listingId);
+    try {
+      const { error } = await supabase
+        .from('property_listings')
+        .update({ is_featured: !currentFeatured })
+        .eq('id', listingId);
+
+      if (error) {
+        console.error('Error updating property featured status:', error);
+        alert('Failed to update featured status');
+      } else {
+        await fetchAllListings();
+        alert(`Property listing ${!currentFeatured ? 'featured' : 'unfeatured'} successfully!`);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Failed to update featured status');
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
+  const handleJobToggleFeatured = async (listingId: string, currentFeatured: boolean) => {
+    setActionLoading(listingId);
+    try {
+      const { error } = await supabase
+        .from('jobs')
+        .update({ featured: !currentFeatured })
+        .eq('id', listingId);
+
+      if (error) {
+        console.error('Error updating job featured status:', error);
+        alert('Failed to update featured status');
+      } else {
+        await fetchAllListings();
+        alert(`Job listing ${!currentFeatured ? 'featured' : 'unfeatured'} successfully!`);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      alert('Failed to update featured status');
+    } finally {
+      setActionLoading(null);
+    }
+  };
+
   const runDailyViewIncrement = async () => {
     try {
       const response = await fetch('/api/increment-views', {
@@ -416,11 +576,26 @@ export default function AdminDashboard() {
   }
 
   const stats = getStats();
-  const pendingListings = activeTab === 'jobs' 
-    ? jobListings.filter(l => l.status === 'pending')
-    : activeTab === 'business' 
-      ? businessListings.filter(l => !l.is_approved)
-      : propertyListings.filter(l => !l.is_approved);
+  
+  // Get listings based on view mode
+  const getFilteredListings = () => {
+    if (viewMode === 'pending') {
+      return activeTab === 'jobs' 
+        ? jobListings.filter(l => l.status === 'pending')
+        : activeTab === 'business' 
+          ? businessListings.filter(l => !l.is_approved)
+          : propertyListings.filter(l => !l.is_approved);
+    } else {
+      // Show all listings
+      return activeTab === 'jobs' 
+        ? jobListings
+        : activeTab === 'business' 
+          ? businessListings
+          : propertyListings;
+    }
+  };
+
+  const filteredListings = getFilteredListings();
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -571,22 +746,65 @@ export default function AdminDashboard() {
 
         {/* Content */}
         <div className="p-4 sm:p-6">
-          {pendingListings.length === 0 ? (
+          {/* View Mode Toggle */}
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+            <div className="flex bg-gray-100 rounded-lg p-1">
+              <button
+                onClick={() => setViewMode('pending')}
+                className={`px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                  viewMode === 'pending'
+                    ? 'bg-white text-gray-900 shadow'
+                    : 'text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                <Clock className="h-4 w-4 inline mr-2" />
+                Pending ({viewMode === 'pending' ? filteredListings.length : 
+                  activeTab === 'jobs' 
+                    ? jobListings.filter(l => l.status === 'pending').length
+                    : activeTab === 'business' 
+                      ? businessListings.filter(l => !l.is_approved).length
+                      : propertyListings.filter(l => !l.is_approved).length})
+              </button>
+              <button
+                onClick={() => setViewMode('all')}
+                className={`px-3 py-2 text-sm font-medium rounded-md transition-colors ${
+                  viewMode === 'all'
+                    ? 'bg-white text-gray-900 shadow'
+                    : 'text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                <Settings className="h-4 w-4 inline mr-2" />
+                All ({viewMode === 'all' ? filteredListings.length : 
+                  activeTab === 'jobs' ? jobListings.length : activeTab === 'business' ? businessListings.length : propertyListings.length})
+              </button>
+            </div>
+            
+            <div className="text-sm text-gray-600">
+              {viewMode === 'pending' ? 'Showing pending listings only' : 'Showing all listings'}
+            </div>
+          </div>
+
+          {filteredListings.length === 0 ? (
             <div className="text-center py-12">
               <CheckCircle className="h-12 w-12 text-green-400 mx-auto mb-4" />
-              <h3 className="text-lg font-medium text-gray-600 mb-2">All caught up!</h3>
+              <h3 className="text-lg font-medium text-gray-600 mb-2">
+                {viewMode === 'pending' ? 'All caught up!' : 'No listings found'}
+              </h3>
               <p className="text-gray-500">
-                No pending {activeTab === 'business' ? 'business' : 'property'} listings to review.
+                {viewMode === 'pending' 
+                  ? `No pending ${activeTab === 'business' ? 'business' : activeTab === 'property' ? 'property' : 'job'} listings to review.`
+                  : `No ${activeTab === 'business' ? 'business' : activeTab === 'property' ? 'property' : 'job'} listings found.`
+                }
               </p>
             </div>
           ) : (
             <div className="space-y-6">
               <h2 className="text-base sm:text-lg font-semibold">
-                Pending {activeTab === 'business' ? 'Business' : activeTab === 'property' ? 'Property' : 'Job'} Listings ({pendingListings.length})
+                {viewMode === 'pending' ? 'Pending' : 'All'} {activeTab === 'business' ? 'Business' : activeTab === 'property' ? 'Property' : 'Job'} Listings ({filteredListings.length})
               </h2>
               
               <div className="space-y-4">
-                {pendingListings.map((listing) => (
+                {filteredListings.map((listing) => (
                   <div
                     key={listing.id}
                     className={`border border-gray-200 rounded-lg p-4 sm:p-6 transition-all hover:shadow-md ${
@@ -622,10 +840,62 @@ export default function AdminDashboard() {
                               ? (listing as PropertyListing).property_title
                               : (listing as JobListing).job_title}
                           </h3>
-                          <Badge className="bg-yellow-100 text-yellow-800 self-start">
-                            <Clock className="h-3 w-3 mr-1" />
-                            Pending
-                          </Badge>
+                          
+                          <div className="flex flex-wrap gap-2">
+                            {/* Status Badge */}
+                            {activeTab === 'business' ? (
+                              (listing as BusinessListing).is_approved ? (
+                                <Badge className="bg-green-100 text-green-800">
+                                  <CheckCircle className="h-3 w-3 mr-1" />
+                                  Approved
+                                </Badge>
+                              ) : (
+                                <Badge className="bg-yellow-100 text-yellow-800">
+                                  <Clock className="h-3 w-3 mr-1" />
+                                  Pending
+                                </Badge>
+                              )
+                            ) : activeTab === 'property' ? (
+                              (listing as PropertyListing).is_approved ? (
+                                <Badge className="bg-green-100 text-green-800">
+                                  <CheckCircle className="h-3 w-3 mr-1" />
+                                  Approved
+                                </Badge>
+                              ) : (
+                                <Badge className="bg-yellow-100 text-yellow-800">
+                                  <Clock className="h-3 w-3 mr-1" />
+                                  Pending
+                                </Badge>
+                              )
+                            ) : (
+                              (listing as JobListing).status === 'approved' ? (
+                                <Badge className="bg-green-100 text-green-800">
+                                  <CheckCircle className="h-3 w-3 mr-1" />
+                                  Approved
+                                </Badge>
+                              ) : (listing as JobListing).status === 'rejected' ? (
+                                <Badge className="bg-red-100 text-red-800">
+                                  <X className="h-3 w-3 mr-1" />
+                                  Rejected
+                                </Badge>
+                              ) : (
+                                <Badge className="bg-yellow-100 text-yellow-800">
+                                  <Clock className="h-3 w-3 mr-1" />
+                                  Pending
+                                </Badge>
+                              )
+                            )}
+
+                            {/* Featured Badge */}
+                            {((activeTab === 'business' && (listing as BusinessListing).is_verified) ||
+                              (activeTab === 'property' && (listing as PropertyListing).is_featured) ||
+                              (activeTab === 'jobs' && (listing as JobListing).featured)) && (
+                              <Badge className="bg-purple-100 text-purple-800">
+                                <Star className="h-3 w-3 mr-1" />
+                                Featured
+                              </Badge>
+                            )}
+                          </div>
                         </div>
                         
                         <div className="flex flex-wrap items-center gap-2 sm:gap-4 text-xs sm:text-sm text-gray-600 mb-2">
@@ -698,53 +968,133 @@ export default function AdminDashboard() {
                         </div>
                       </div>
 
-                      <div className="flex flex-col sm:flex-row gap-2 sm:space-x-2 sm:ml-4 w-full sm:w-auto">
-                        <Button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            if (activeTab === 'business') {
-                              handleBusinessApprove(listing.id);
-                            } else if (activeTab === 'property') {
-                              handlePropertyApprove(listing.id);
-                            } else {
-                              handleJobApprove(listing.id);
-                            }
-                          }}
-                          disabled={actionLoading === listing.id}
-                          className="bg-green-600 hover:bg-green-700 w-full sm:w-auto"
-                          size="sm"
-                        >
-                          {actionLoading === listing.id ? (
-                            'Processing...'
-                          ) : (
+                      <div className="flex flex-col gap-2 sm:ml-4 w-full sm:w-auto">
+                        {/* Action buttons based on status and view mode */}
+                        <div className="flex flex-wrap gap-2">
+                          {/* Approve/Reject buttons for pending listings */}
+                          {((activeTab === 'business' && !(listing as BusinessListing).is_approved) ||
+                            (activeTab === 'property' && !(listing as PropertyListing).is_approved) ||
+                            (activeTab === 'jobs' && (listing as JobListing).status === 'pending')) && (
                             <>
-                              <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
-                              <span className="hidden sm:inline">
-                                {activeTab === 'business' ? 'Approve' : activeTab === 'property' ? 'Approve (+100 views)' : 'Approve'}
-                              </span>
-                              <span className="sm:hidden">Approve</span>
+                              <Button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  if (activeTab === 'business') {
+                                    handleBusinessApprove(listing.id);
+                                  } else if (activeTab === 'property') {
+                                    handlePropertyApprove(listing.id);
+                                  } else {
+                                    handleJobApprove(listing.id);
+                                  }
+                                }}
+                                disabled={actionLoading === listing.id}
+                                className="bg-green-600 hover:bg-green-700"
+                                size="sm"
+                              >
+                                {actionLoading === listing.id ? 'Processing...' : (
+                                  <>
+                                    <CheckCircle className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                                    <span className="hidden sm:inline">
+                                      {activeTab === 'property' ? 'Approve (+100 views)' : 'Approve'}
+                                    </span>
+                                    <span className="sm:hidden">Approve</span>
+                                  </>
+                                )}
+                              </Button>
+                              <Button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  if (activeTab === 'business') {
+                                    handleBusinessReject(listing.id);
+                                  } else if (activeTab === 'property') {
+                                    handlePropertyReject(listing.id);
+                                  } else {
+                                    handleJobReject(listing.id);
+                                  }
+                                }}
+                                disabled={actionLoading === listing.id}
+                                variant="outline"
+                                className="border-red-300 text-red-600 hover:bg-red-50"
+                                size="sm"
+                              >
+                                <X className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                                <span className="hidden sm:inline">Reject</span>
+                                <span className="sm:hidden">Reject</span>
+                              </Button>
                             </>
                           )}
-                        </Button>
-                        <Button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            if (activeTab === 'business') {
-                              handleBusinessReject(listing.id);
-                            } else if (activeTab === 'property') {
-                              handlePropertyReject(listing.id);
-                            } else {
-                              handleJobReject(listing.id);
-                            }
-                          }}
-                          disabled={actionLoading === listing.id}
-                          variant="outline"
-                          className="border-red-300 text-red-600 hover:bg-red-50 w-full sm:w-auto"
-                          size="sm"
-                        >
-                          <X className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
-                          Reject
-                        </Button>
+
+                          {/* Featured toggle button */}
+                          <Button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              const currentFeatured = activeTab === 'business' 
+                                ? (listing as BusinessListing).is_verified
+                                : activeTab === 'property'
+                                ? (listing as PropertyListing).is_featured
+                                : (listing as JobListing).featured;
+                              
+                              if (activeTab === 'business') {
+                                handleBusinessToggleFeatured(listing.id, currentFeatured);
+                              } else if (activeTab === 'property') {
+                                handlePropertyToggleFeatured(listing.id, currentFeatured);
+                              } else {
+                                handleJobToggleFeatured(listing.id, currentFeatured);
+                              }
+                            }}
+                            disabled={actionLoading === listing.id}
+                            variant="outline"
+                            className={`${
+                              (activeTab === 'business' && (listing as BusinessListing).is_verified) ||
+                              (activeTab === 'property' && (listing as PropertyListing).is_featured) ||
+                              (activeTab === 'jobs' && (listing as JobListing).featured)
+                                ? 'border-purple-300 text-purple-600 bg-purple-50 hover:bg-purple-100'
+                                : 'border-gray-300 text-gray-600 hover:bg-gray-50'
+                            }`}
+                            size="sm"
+                          >
+                            <Star className={`h-3 w-3 sm:h-4 sm:w-4 mr-1 ${
+                              (activeTab === 'business' && (listing as BusinessListing).is_verified) ||
+                              (activeTab === 'property' && (listing as PropertyListing).is_featured) ||
+                              (activeTab === 'jobs' && (listing as JobListing).featured)
+                                ? 'fill-current' : ''
+                            }`} />
+                            <span className="hidden sm:inline">
+                              {(activeTab === 'business' && (listing as BusinessListing).is_verified) ||
+                               (activeTab === 'property' && (listing as PropertyListing).is_featured) ||
+                               (activeTab === 'jobs' && (listing as JobListing).featured)
+                                ? 'Unfeature' : 'Feature'}
+                            </span>
+                            <span className="sm:hidden">
+                              {(activeTab === 'business' && (listing as BusinessListing).is_verified) ||
+                               (activeTab === 'property' && (listing as PropertyListing).is_featured) ||
+                               (activeTab === 'jobs' && (listing as JobListing).featured)
+                                ? '★' : '☆'}
+                            </span>
+                          </Button>
+
+                          {/* Delete button */}
+                          <Button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              if (activeTab === 'business') {
+                                handleBusinessDelete(listing.id);
+                              } else if (activeTab === 'property') {
+                                handlePropertyDelete(listing.id);
+                              } else {
+                                handleJobDelete(listing.id);
+                              }
+                            }}
+                            disabled={actionLoading === listing.id}
+                            variant="outline"
+                            className="border-red-300 text-red-600 hover:bg-red-50"
+                            size="sm"
+                          >
+                            <Trash2 className="h-3 w-3 sm:h-4 sm:w-4 mr-1" />
+                            <span className="hidden sm:inline">Delete</span>
+                            <span className="sm:hidden">Del</span>
+                          </Button>
+                        </div>
                       </div>
                     </div>
                   </div>

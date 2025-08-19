@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
@@ -12,19 +12,129 @@ import PropertyCard from '@/components/PropertyCard';
 import BlogCard from '@/components/BlogCard';
 import { 
   sampleBusinesses, 
-  sampleProperties, 
   sampleBlogPosts, 
   heroStats 
 } from '@/data/sampleData';
-import jobsData from '@/data/jobs.json';
+import { supabase } from '@/lib/supabase';
 import { Users, Briefcase, Home, ArrowRight, Building2, BookOpen, ChevronDown } from 'lucide-react';
+
+interface BusinessListing {
+  id: string;
+  business_name: string;
+  category: string;
+  description: string;
+  address: string;
+  city: string;
+  phone: string;
+  email: string | null;
+  website: string | null;
+  image_url: string | null;
+  rating: number;
+  review_count: number;
+  is_approved: boolean;
+  is_verified: boolean;
+  whatsapp_number: string | null;
+}
+
+interface PropertyListing {
+  id: string;
+  property_title: string;
+  property_type: string;
+  description: string;
+  price: number;
+  price_type: string;
+  bedrooms: number | null;
+  bathrooms: number | null;
+  address: string;
+  city: string;
+  county: string | null;
+  contact_phone: string;
+  contact_email: string | null;
+  whatsapp_number: string | null;
+  amenities: string[];
+  images: string[];
+  is_approved: boolean;
+  is_featured: boolean;
+}
+
+interface JobListing {
+  id: string;
+  job_title: string;
+  nature_of_job: string;
+  industry: string;
+  salary: string;
+  job_location: string;
+  duties_and_responsibilities: string;
+  company_name: string;
+  contact_email: string;
+  status: string;
+  featured: boolean;
+  slug: string;
+}
 
 export default function HomePage() {
   const [openFAQ, setOpenFAQ] = useState<number | null>(null);
+  const [featuredBusinesses, setFeaturedBusinesses] = useState<BusinessListing[]>([]);
+  const [featuredProperties, setFeaturedProperties] = useState<PropertyListing[]>([]);
+  const [featuredJobs, setFeaturedJobs] = useState<JobListing[]>([]);
+  const [loading, setLoading] = useState(true);
 
   const toggleFAQ = (index: number) => {
     setOpenFAQ(openFAQ === index ? null : index);
   };
+
+  useEffect(() => {
+    const fetchFeaturedListings = async () => {
+      setLoading(true);
+      try {
+        // Fetch featured businesses (using is_verified as featured flag)
+        const { data: businessData, error: businessError } = await supabase
+          .from('business_listings')
+          .select('*')
+          .eq('is_approved', true)
+          .order('is_verified', { ascending: false })
+          .order('created_at', { ascending: false })
+          .limit(3);
+
+        // Fetch featured properties
+        const { data: propertyData, error: propertyError } = await supabase
+          .from('property_listings')
+          .select('*')
+          .eq('is_approved', true)
+          .order('is_featured', { ascending: false })
+          .order('created_at', { ascending: false })
+          .limit(3);
+
+        // Fetch featured jobs
+        const { data: jobData, error: jobError } = await supabase
+          .from('jobs')
+          .select('*')
+          .eq('status', 'approved')
+          .order('featured', { ascending: false })
+          .order('created_at', { ascending: false })
+          .limit(3);
+
+        if (!businessError && businessData) {
+          setFeaturedBusinesses(businessData);
+        }
+
+        if (!propertyError && propertyData) {
+          setFeaturedProperties(propertyData);
+        }
+
+        if (!jobError && jobData) {
+          setFeaturedJobs(jobData);
+        }
+
+      } catch (error) {
+        console.error('Error fetching featured listings:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchFeaturedListings();
+  }, []);
 
   const faqData = [
     {
@@ -153,17 +263,17 @@ export default function HomePage() {
               </p>
             </div>
 
-            {/* Latest Jobs */}
+            {/* Featured Properties */}
             <div className="mb-16">
               <div className="flex items-center justify-between mb-8">
                 <div className="flex items-center space-x-3">
-                  <div className="flex items-center justify-center w-10 h-10 bg-blue-100 rounded-lg">
-                    <Briefcase className="h-5 w-5 text-blue-600" />
+                  <div className="flex items-center justify-center w-10 h-10 bg-orange-100 rounded-lg">
+                    <Home className="h-5 w-5 text-orange-600" />
                   </div>
-                  <h3 className="text-2xl font-bold">Latest Job Opportunities in Kenya</h3>
+                  <h3 className="text-2xl font-bold">Houses for Sale & Rent in Nairobi - Featured Properties</h3>
                 </div>
                 <Button variant="outline" className="border-2 border-gray-300 hover:bg-gray-100" asChild>
-                  <Link href="/jobs-in-kenya" className="flex items-center">
+                  <Link href="/properties" className="flex items-center">
                     View All
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Link>
@@ -171,9 +281,37 @@ export default function HomePage() {
               </div>
               
               <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                {jobsData.jobs.slice(0, 3).map((job) => (
-                  <JobCard key={job.id} {...job} />
-                ))}
+                {loading ? (
+                  // Loading skeleton
+                  Array.from({ length: 3 }).map((_, index) => (
+                    <div key={index} className="bg-white rounded-lg shadow-sm border p-6 animate-pulse">
+                      <div className="h-4 bg-gray-200 rounded mb-3"></div>
+                      <div className="h-3 bg-gray-200 rounded mb-2"></div>
+                      <div className="h-3 bg-gray-200 rounded w-2/3"></div>
+                    </div>
+                  ))
+                ) : featuredProperties.length > 0 ? (
+                  featuredProperties.map((property) => (
+                    <PropertyCard 
+                      key={property.id} 
+                      id={property.id}
+                      title={property.property_title}
+                      type={property.property_type}
+                      price={property.price}
+                      bedrooms={property.bedrooms || undefined}
+                      bathrooms={property.bathrooms || undefined}
+                      location={`${property.city}${property.county ? `, ${property.county}` : ''}`}
+                      images={property.images}
+                      amenities={property.amenities}
+                      contactPhone={property.contact_phone}
+                      whatsappNumber={property.whatsapp_number || undefined}
+                    />
+                  ))
+                ) : (
+                  <div className="col-span-full text-center py-8 text-gray-500">
+                    No properties available at the moment. Check back soon!
+                  </div>
+                )}
               </div>
             </div>
 
@@ -195,37 +333,67 @@ export default function HomePage() {
               </div>
               
               <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                {sampleBusinesses.slice(0, 3).map((business) => (
-                  <BusinessCard 
-                    key={business.id} 
-                    id={business.id}
-                    name={business.name}
-                    category={business.category}
-                    rating={business.rating}
-                    reviewCount={business.reviewCount}
-                    location={business.location}
-                    imageUrl={business.imageUrl}
-                    isVerified={business.isVerified}
-                    isNew={business.isNew}
-                    phoneNumber={business.phoneNumber}
-                    whatsappNumber={business.whatsappNumber}
-                    description={business.description}
-                  />
-                ))}
+                {loading ? (
+                  // Loading skeleton
+                  Array.from({ length: 3 }).map((_, index) => (
+                    <div key={index} className="bg-white rounded-lg shadow-sm border p-6 animate-pulse">
+                      <div className="h-4 bg-gray-200 rounded mb-3"></div>
+                      <div className="h-3 bg-gray-200 rounded mb-2"></div>
+                      <div className="h-3 bg-gray-200 rounded w-2/3"></div>
+                    </div>
+                  ))
+                ) : featuredBusinesses.length > 0 ? (
+                  featuredBusinesses.map((business) => (
+                    <BusinessCard 
+                      key={business.id} 
+                      id={business.id}
+                      name={business.business_name}
+                      category={business.category}
+                      rating={business.rating}
+                      reviewCount={business.review_count}
+                      location={`${business.city}`}
+                      imageUrl={business.image_url}
+                      isVerified={business.is_verified}
+                      isNew={false}
+                      phoneNumber={business.phone}
+                      whatsappNumber={business.whatsapp_number}
+                      description={business.description}
+                    />
+                  ))
+                ) : (
+                  // Fallback to sample businesses if no real data
+                  sampleBusinesses.slice(0, 3).map((business) => (
+                    <BusinessCard 
+                      key={business.id} 
+                      id={business.id}
+                      name={business.name}
+                      category={business.category}
+                      rating={business.rating}
+                      reviewCount={business.reviewCount}
+                      location={business.location}
+                      imageUrl={business.imageUrl}
+                      isVerified={business.isVerified}
+                      isNew={business.isNew}
+                      phoneNumber={business.phoneNumber}
+                      whatsappNumber={business.whatsappNumber}
+                      description={business.description}
+                    />
+                  ))
+                )}
               </div>
             </div>
 
-            {/* Featured Properties */}
+            {/* Latest Jobs */}
             <div className="mb-16">
               <div className="flex items-center justify-between mb-8">
                 <div className="flex items-center space-x-3">
-                  <div className="flex items-center justify-center w-10 h-10 bg-orange-100 rounded-lg">
-                    <Home className="h-5 w-5 text-orange-600" />
+                  <div className="flex items-center justify-center w-10 h-10 bg-blue-100 rounded-lg">
+                    <Briefcase className="h-5 w-5 text-blue-600" />
                   </div>
-                  <h3 className="text-2xl font-bold">Houses for Sale & Rent in Nairobi - Featured Properties</h3>
+                  <h3 className="text-2xl font-bold">Latest Job Opportunities in Kenya</h3>
                 </div>
                 <Button variant="outline" className="border-2 border-gray-300 hover:bg-gray-100" asChild>
-                  <Link href="/properties" className="flex items-center">
+                  <Link href="/jobs-in-kenya" className="flex items-center">
                     View All
                     <ArrowRight className="ml-2 h-4 w-4" />
                   </Link>
@@ -233,9 +401,35 @@ export default function HomePage() {
               </div>
               
               <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-                {sampleProperties.slice(0, 3).map((property) => (
-                  <PropertyCard key={property.id} {...property} />
-                ))}
+                {loading ? (
+                  // Loading skeleton
+                  Array.from({ length: 3 }).map((_, index) => (
+                    <div key={index} className="bg-white rounded-lg shadow-sm border p-6 animate-pulse">
+                      <div className="h-4 bg-gray-200 rounded mb-3"></div>
+                      <div className="h-3 bg-gray-200 rounded mb-2"></div>
+                      <div className="h-3 bg-gray-200 rounded w-2/3"></div>
+                    </div>
+                  ))
+                ) : featuredJobs.length > 0 ? (
+                  featuredJobs.map((job) => (
+                    <JobCard 
+                      key={job.id} 
+                      id={job.id}
+                      title={job.job_title}
+                      company={job.company_name}
+                      location={job.job_location}
+                      salary={job.salary}
+                      type={job.nature_of_job}
+                      slug={job.slug}
+                      description={job.duties_and_responsibilities}
+                      industry={job.industry}
+                    />
+                  ))
+                ) : (
+                  <div className="col-span-full text-center py-8 text-gray-500">
+                    No jobs available at the moment. Check back soon!
+                  </div>
+                )}
               </div>
             </div>
 
