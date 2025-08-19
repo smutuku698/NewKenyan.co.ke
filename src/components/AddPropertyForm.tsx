@@ -2,13 +2,14 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
-import { useUser } from '@clerk/nextjs';
+import Link from 'next/link';
+import { useUser, SignInButton } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
 import { propertyListingSchema, type PropertyListingInput } from '@/lib/validations';
 import { supabase } from '@/lib/supabase';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Upload, MapPin, Phone, Mail, MessageCircle, Bed, Bath, Square, Calendar, CheckCircle, ArrowRight } from 'lucide-react';
+import { Upload, MapPin, Phone, Mail, MessageCircle, Bed, Bath, Square, Calendar, CheckCircle, ArrowRight, Shield, UserPlus, Home, Users, CreditCard } from 'lucide-react';
 import PaymentModal from '@/components/PaymentModal';
 
 const PROPERTY_TYPES = [
@@ -271,9 +272,106 @@ export default function AddPropertyForm() {
 
   if (!user) {
     return (
-      <div className="max-w-2xl mx-auto p-6 text-center">
-        <h2 className="text-2xl font-semibold mb-4">Sign In Required</h2>
-        <p className="text-gray-600">Please sign in to submit a property listing.</p>
+      <div className="min-h-screen bg-gray-50">
+        <main className="py-8">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl">
+            {/* Breadcrumb */}
+            <nav className="mb-6 text-sm">
+              <div className="flex items-center space-x-2 text-gray-600">
+                <Link href="/" className="hover:text-green-600">Home</Link>
+                <span>/</span>
+                <Link href="/properties" className="hover:text-green-600">Properties</Link>
+                <span>/</span>
+                <span className="text-gray-900">Add Property</span>
+              </div>
+            </nav>
+
+            {/* Authentication Required */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8 text-center">
+              <div className="max-w-md mx-auto">
+                <div className="flex items-center justify-center w-16 h-16 bg-blue-100 rounded-full mx-auto mb-6">
+                  <Shield className="h-8 w-8 text-blue-600" />
+                </div>
+                <h1 className="text-2xl font-bold text-gray-900 mb-4">Sign In Required</h1>
+                <p className="text-gray-600 mb-6">
+                  To list your property, you need to sign in to your account. This helps us:
+                </p>
+                <ul className="text-left text-gray-600 mb-8 space-y-2">
+                  <li className="flex items-center">
+                    <CheckCircle className="h-5 w-5 text-green-500 mr-2" />
+                    Verify your property ownership and listing authenticity
+                  </li>
+                  <li className="flex items-center">
+                    <CheckCircle className="h-5 w-5 text-green-500 mr-2" />
+                    Allow you to manage and edit your property listings
+                  </li>
+                  <li className="flex items-center">
+                    <CheckCircle className="h-5 w-5 text-green-500 mr-2" />
+                    Track tenant inquiries and responses
+                  </li>
+                  <li className="flex items-center">
+                    <CheckCircle className="h-5 w-5 text-green-500 mr-2" />
+                    Prevent spam and maintain quality
+                  </li>
+                </ul>
+                <div className="space-y-4">
+                  <SignInButton mode="modal">
+                    <Button className="w-full bg-green-600 hover:bg-green-700 text-white py-3">
+                      <UserPlus className="h-5 w-5 mr-2" />
+                      Sign In to List Property
+                    </Button>
+                  </SignInButton>
+                  <p className="text-sm text-gray-500">
+                    Don't have an account? Signing in will create one for you automatically.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Benefits Section */}
+            <div className="mt-8 bg-white rounded-xl shadow-sm border border-gray-200 p-8">
+              <h2 className="text-xl font-bold text-gray-900 mb-6 text-center">Why List Your Property on NewKenyan.com?</h2>
+              <div className="grid md:grid-cols-2 gap-6">
+                <div className="flex items-start space-x-3">
+                  <div className="flex-shrink-0 w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                    <Home className="h-4 w-4 text-green-600" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-gray-900 mb-1">Wide Reach</h3>
+                    <p className="text-gray-600 text-sm">Connect with thousands of potential tenants and buyers across Kenya.</p>
+                  </div>
+                </div>
+                <div className="flex items-start space-x-3">
+                  <div className="flex-shrink-0 w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                    <Users className="h-4 w-4 text-blue-600" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-gray-900 mb-1">Trusted Platform</h3>
+                    <p className="text-gray-600 text-sm">Kenya's most trusted property marketplace with verified listings.</p>
+                  </div>
+                </div>
+                <div className="flex items-start space-x-3">
+                  <div className="flex-shrink-0 w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center">
+                    <CreditCard className="h-4 w-4 text-yellow-600" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-gray-900 mb-1">Affordable Pricing</h3>
+                    <p className="text-gray-600 text-sm">Starting at just KSh 100 for 4 months of visibility.</p>
+                  </div>
+                </div>
+                <div className="flex items-start space-x-3">
+                  <div className="flex-shrink-0 w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
+                    <Calendar className="h-4 w-4 text-purple-600" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-gray-900 mb-1">Easy Management</h3>
+                    <p className="text-gray-600 text-sm">Manage all your property listings from one convenient dashboard.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </main>
       </div>
     );
   }

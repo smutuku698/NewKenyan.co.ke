@@ -2,13 +2,14 @@
 
 import { useState } from 'react';
 import Image from 'next/image';
-import { useUser } from '@clerk/nextjs';
+import Link from 'next/link';
+import { useUser, SignInButton } from '@clerk/nextjs';
 import { useRouter } from 'next/navigation';
 import { businessListingSchema, type BusinessListingInput } from '@/lib/validations';
 import { supabase } from '@/lib/supabase';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Upload, MapPin, Phone, Mail, Globe, Clock, DollarSign, MessageCircle, CheckCircle, ArrowRight } from 'lucide-react';
+import { Upload, MapPin, Phone, Mail, Globe, Clock, DollarSign, MessageCircle, CheckCircle, ArrowRight, Shield, UserPlus, Building2, Users, CreditCard } from 'lucide-react';
 import PaymentModal from '@/components/PaymentModal';
 
 const BUSINESS_CATEGORIES = [
@@ -216,9 +217,106 @@ export default function AddListingForm() {
 
   if (!user) {
     return (
-      <div className="max-w-2xl mx-auto p-6 text-center">
-        <h2 className="text-2xl font-semibold mb-4">Sign In Required</h2>
-        <p className="text-gray-600">Please sign in to submit a business listing.</p>
+      <div className="min-h-screen bg-gray-50">
+        <main className="py-8">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-4xl">
+            {/* Breadcrumb */}
+            <nav className="mb-6 text-sm">
+              <div className="flex items-center space-x-2 text-gray-600">
+                <Link href="/" className="hover:text-green-600">Home</Link>
+                <span>/</span>
+                <Link href="/business-directory" className="hover:text-green-600">Business Directory</Link>
+                <span>/</span>
+                <span className="text-gray-900">Add Business</span>
+              </div>
+            </nav>
+
+            {/* Authentication Required */}
+            <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8 text-center">
+              <div className="max-w-md mx-auto">
+                <div className="flex items-center justify-center w-16 h-16 bg-blue-100 rounded-full mx-auto mb-6">
+                  <Shield className="h-8 w-8 text-blue-600" />
+                </div>
+                <h1 className="text-2xl font-bold text-gray-900 mb-4">Sign In Required</h1>
+                <p className="text-gray-600 mb-6">
+                  To add your business listing, you need to sign in to your account. This helps us:
+                </p>
+                <ul className="text-left text-gray-600 mb-8 space-y-2">
+                  <li className="flex items-center">
+                    <CheckCircle className="h-5 w-5 text-green-500 mr-2" />
+                    Verify your business identity and listing authenticity
+                  </li>
+                  <li className="flex items-center">
+                    <CheckCircle className="h-5 w-5 text-green-500 mr-2" />
+                    Allow you to manage and edit your business listing
+                  </li>
+                  <li className="flex items-center">
+                    <CheckCircle className="h-5 w-5 text-green-500 mr-2" />
+                    Track customer inquiries and responses
+                  </li>
+                  <li className="flex items-center">
+                    <CheckCircle className="h-5 w-5 text-green-500 mr-2" />
+                    Prevent spam and maintain quality
+                  </li>
+                </ul>
+                <div className="space-y-4">
+                  <SignInButton mode="modal">
+                    <Button className="w-full bg-green-600 hover:bg-green-700 text-white py-3">
+                      <UserPlus className="h-5 w-5 mr-2" />
+                      Sign In to Add Business
+                    </Button>
+                  </SignInButton>
+                  <p className="text-sm text-gray-500">
+                    Don't have an account? Signing in will create one for you automatically.
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Benefits Section */}
+            <div className="mt-8 bg-white rounded-xl shadow-sm border border-gray-200 p-8">
+              <h2 className="text-xl font-bold text-gray-900 mb-6 text-center">Why List Your Business on NewKenyan.com?</h2>
+              <div className="grid md:grid-cols-2 gap-6">
+                <div className="flex items-start space-x-3">
+                  <div className="flex-shrink-0 w-8 h-8 bg-green-100 rounded-full flex items-center justify-center">
+                    <Building2 className="h-4 w-4 text-green-600" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-gray-900 mb-1">Wide Reach</h3>
+                    <p className="text-gray-600 text-sm">Connect with thousands of potential customers across all 47 counties in Kenya.</p>
+                  </div>
+                </div>
+                <div className="flex items-start space-x-3">
+                  <div className="flex-shrink-0 w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                    <Users className="h-4 w-4 text-blue-600" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-gray-900 mb-1">Trusted Platform</h3>
+                    <p className="text-gray-600 text-sm">Kenya's most trusted business directory with verified businesses and customers.</p>
+                  </div>
+                </div>
+                <div className="flex items-start space-x-3">
+                  <div className="flex-shrink-0 w-8 h-8 bg-yellow-100 rounded-full flex items-center justify-center">
+                    <CreditCard className="h-4 w-4 text-yellow-600" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-gray-900 mb-1">Affordable Pricing</h3>
+                    <p className="text-gray-600 text-sm">Starting at just KSh 100 for 4 months of visibility.</p>
+                  </div>
+                </div>
+                <div className="flex items-start space-x-3">
+                  <div className="flex-shrink-0 w-8 h-8 bg-purple-100 rounded-full flex items-center justify-center">
+                    <Mail className="h-4 w-4 text-purple-600" />
+                  </div>
+                  <div>
+                    <h3 className="font-semibold text-gray-900 mb-1">Easy Management</h3>
+                    <p className="text-gray-600 text-sm">Manage your business listing from one convenient dashboard.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </main>
       </div>
     );
   }
