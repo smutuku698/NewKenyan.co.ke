@@ -1,4 +1,6 @@
 import { Metadata } from 'next';
+import Header from '@/components/Header';
+import Footer from '@/components/Footer';
 import MortgageCalculator from './MortgageCalculator';
 
 export const metadata: Metadata = {
@@ -28,6 +30,7 @@ export const metadata: Metadata = {
 export default function MortgageCalculatorPage() {
   return (
     <div className="min-h-screen bg-gray-50">
+      <Header />
       {/* SEO Optimized Header Section */}
       <div className="bg-gradient-to-br from-green-50 to-blue-50 border-b">
         <div className="max-w-6xl mx-auto px-6 py-12">
@@ -114,6 +117,8 @@ export default function MortgageCalculatorPage() {
           </div>
         </div>
       </div>
+      
+      <Footer />
     </div>
   );
 }
