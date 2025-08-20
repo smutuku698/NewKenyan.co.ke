@@ -360,7 +360,7 @@ export default function PropertyDetailClient({ property, similarProperties }: Pr
               {property.images && property.images.length > 0 ? (
                 <div>
                   <div 
-                    className="relative aspect-video sm:aspect-video mb-4 rounded-lg overflow-hidden cursor-pointer bg-gray-100 h-[50vh] sm:h-auto"
+                    className="relative h-64 sm:h-72 md:h-80 mb-4 rounded-lg overflow-hidden cursor-pointer bg-gray-100"
                     onClick={() => setIsGalleryOpen(true)}
                   >
                     <Image
