@@ -116,3 +116,159 @@ const PRICING = {
 6. **Update database schema** if creating new tables
 
 **Note:** The current setup shows "Anniversary Special" pricing of KES 100 for all listings, down from original prices of KES 2000-5000. Remove anniversary messaging and adjust prices as needed for regular operations.
+
+## 7. 🚀 SEO & Ranking Strategy - NEXT STEPS
+
+### A. 🎯 Additional Important Pages to Create
+
+#### Location-Specific Content Pages
+1. **City Guides** (`/city-guides/[city]`)
+   - "Living in Nairobi Guide" - neighborhoods, cost of living, transportation
+   - "Mombasa Business Directory" - local market insights, opportunities
+   - "Kisumu Real Estate Market" - property trends, investment advice
+
+2. **Industry-Specific Pages** (`/industries/[industry]`)
+   - `/industries/hospitality-jobs-kenya` - hotels, restaurants, tourism
+   - `/industries/tech-jobs-nairobi` - IT, software, digital marketing
+   - `/industries/manufacturing-jobs-kenya` - factories, production, logistics
+   - `/industries/healthcare-jobs-kenya` - hospitals, clinics, medical
+
+3. **Property Type Pages** (`/property-types/[type]`)
+   - `/property-types/apartments-for-rent-nairobi`
+   - `/property-types/commercial-office-space-nairobi`
+   - `/property-types/land-for-sale-kenya`
+   - `/property-types/student-accommodation-nairobi`
+
+4. **Service Category Pages** (`/services/[category]`)
+   - `/services/construction-companies-kenya`
+   - `/services/digital-marketing-agencies-nairobi`
+   - `/services/logistics-companies-mombasa`
+   - `/services/financial-services-kenya`
+
+### B. 📊 Content Strategy for Top Rankings
+
+#### High-Impact Blog Topics (Target: 2-3 posts/week)
+1. **Market Analysis Content**
+   - "Kenya Property Market Report 2024/2025"
+   - "Best Neighborhoods for Rent in Nairobi - Price Comparison"
+   - "Top Growing Industries in Kenya for Job Seekers"
+   - "Small Business Opportunities in Kenyan Counties"
+
+2. **How-To Guides**
+   - "How to Find Affordable Houses for Rent in Nairobi"
+   - "Complete Guide to Starting a Business in Kenya"
+   - "Property Investment Guide for Kenyan Diaspora"
+   - "Job Interview Tips for Kenyan Companies"
+
+3. **Local SEO Content**
+   - "Best Places to Live in [City Name] - Complete Guide"
+   - "Top Employers in [City Name] - Job Opportunities"
+   - "[City Name] Real Estate Market Trends"
+   - "Starting a Business in [City Name] - Complete Guide"
+
+### C. 🔧 Technical SEO Improvements Needed
+
+#### Priority 1 (Next 2 weeks)
+1. **Google My Business**
+   - Create GMB listing for NewKenyan.com
+   - Add Nairobi location, hours, photos
+   - Start collecting reviews
+
+2. **Core Web Vitals Monitoring**
+   - Install Google PageSpeed insights tracking
+   - Monitor LCP, FID, CLS scores monthly
+   - Target: All pages <2.5s load time
+
+3. **Schema Markup Expansion**
+   - Add FAQ schema to help pages
+   - Property listing schema for each property
+   - Job posting schema for job listings
+   - Review schema for business listings
+
+#### Priority 2 (Next month)
+1. **Link Building Strategy**
+   - Partner with Kenyan business associations
+   - Guest posting on Kenyan blogs/news sites
+   - Directory submissions (Kenya Association of Manufacturers, etc.)
+   - Social media profile optimization
+
+2. **Content Hubs**
+   - Create comprehensive resource pages
+   - Industry reports and white papers
+   - Downloadable guides (PDF lead magnets)
+
+### D. 📈 Ranking Targets & Metrics
+
+#### Primary Keywords (Target: Top 5 in 6 months)
+- "houses for rent nairobi" (7,200/month)
+- "jobs in kenya" (12,000/month)
+- "business directory kenya" (2,400/month)
+- "apartments for sale nairobi" (3,600/month)
+
+#### Secondary Keywords (Target: Top 10 in 3 months)
+- "properties for rent mombasa"
+- "office space nairobi"
+- "kenya job opportunities"
+- "commercial property kenya"
+
+#### Long-tail Keywords (Target: Top 3 in 2 months)
+- "affordable houses for rent in nairobi under 20000"
+- "tech jobs in nairobi for fresh graduates"
+- "best business opportunities in kenya 2024"
+
+### E. 🛠 Implementation Checklist
+
+#### Week 1-2
+- [ ] Set up Google My Business
+- [ ] Install Google Analytics 4 goals tracking
+- [ ] Create content calendar for blog posts
+- [ ] Build 5 industry-specific landing pages
+
+#### Month 1
+- [ ] Publish 8-10 high-quality blog posts
+- [ ] Create 10 city guide pages
+- [ ] Submit to 20 Kenyan business directories
+- [ ] Start email newsletter for property/job alerts
+
+#### Month 2-3
+- [ ] Build 20+ quality backlinks from Kenyan sites
+- [ ] Create video content for YouTube SEO
+- [ ] Optimize for voice search ("Ok Google, find houses for rent in Nairobi")
+- [ ] Launch referral program for user-generated content
+
+### F. 💡 Competitive Advantage Strategies
+
+1. **Real-time Market Data**
+   - Property price trends by neighborhood
+   - Job market salary insights
+   - Business performance metrics
+
+2. **Community Features**
+   - User reviews and ratings
+   - Success stories and testimonials
+   - Neighborhood insights from residents
+
+3. **Mobile-first Experience**
+   - Progressive Web App (PWA) features
+   - Offline property browsing
+   - Push notifications for new listings
+
+4. **Local Partnerships**
+   - Real estate agencies integration
+   - HR company partnerships
+   - Business chamber memberships
+
+### G. 🎯 Success Metrics (6-month targets)
+
+- **Organic Traffic**: 50,000+ monthly visitors
+- **Keyword Rankings**: 100+ keywords in top 10
+- **Local Pack Rankings**: Top 3 for major city searches
+- **Conversion Rate**: 5%+ (inquiries/visits)
+- **Page Load Speed**: <2 seconds average
+- **Mobile Core Web Vitals**: All green scores
+
+**Budget Allocation Recommendation:**
+- Content Creation: 40%
+- Link Building: 30% 
+- Technical SEO: 20%
+- Tools & Analytics: 10%

@@ -1,3 +1,4 @@
+
 import { MetadataRoute } from 'next'
 import { createClient } from '@supabase/supabase-js'
 import { generatePropertySlug, generateBusinessSlug } from '@/utils/seo'
@@ -111,22 +112,24 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       }
     }) || []
 
-    // City-specific pages for properties
-    const propertyCities = [...new Set(properties?.map(p => p.city) || [])]
-    const propertyCityPages = propertyCities.map((city) => ({
-      url: `${baseUrl}/properties?city=${encodeURIComponent(city)}`,
+    // Major Kenyan cities - static pages
+    const majorCities = [
+      'nairobi', 'mombasa', 'kisumu', 'nakuru', 'eldoret', 'thika', 'malindi', 
+      'kitale', 'garissa', 'kakamega', 'machakos', 'meru', 'nyeri', 'kericho'
+    ];
+    
+    const propertyCityPages = majorCities.map((city) => ({
+      url: `${baseUrl}/properties/${city}`,
       lastModified: new Date(),
       changeFrequency: 'daily' as const,
-      priority: 0.6,
+      priority: 0.8,
     }))
 
-    // City-specific pages for businesses
-    const businessCities = [...new Set(businesses?.map(b => b.city) || [])]
-    const businessCityPages = businessCities.map((city) => ({
-      url: `${baseUrl}/business-directory?city=${encodeURIComponent(city)}`,
+    const businessCityPages = majorCities.map((city) => ({
+      url: `${baseUrl}/business-directory/${city}`,
       lastModified: new Date(),
       changeFrequency: 'daily' as const,
-      priority: 0.6,
+      priority: 0.7,
     }))
 
     return [

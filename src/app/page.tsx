@@ -194,20 +194,26 @@ export default function HomePage() {
           <div className="absolute inset-0">
             <Image
               src="/images/hero-kenya.jpg"
-              alt="Kenya Landscape"
+              alt="Beautiful Kenya landscape showing houses for rent and sale in Nairobi"
               fill
               className="object-cover opacity-60"
               priority
+              sizes="100vw"
+              quality={75}
             />
             <div className="absolute inset-0 bg-gray-900/40" />
           </div>
           
           <div className="relative container mx-auto px-4 text-center">
             <h1 className="text-5xl font-bold mb-6">
-              Houses for Rent & Sale in Nairobi Kenya | Jobs & Business Directory
+              Houses for Rent in Nairobi Kenya
             </h1>
             <p className="text-xl mb-8 max-w-2xl mx-auto">
-              Find affordable houses for rent, apartments for sale, job opportunities in Kenya, and business listings. Your trusted marketplace for real estate, jobs, and business directory in Nairobi.
+              Find affordable <Link href="/properties/nairobi" className="text-green-300 hover:text-white underline">houses for rent in Nairobi</Link>, 
+              <Link href="/properties" className="text-green-300 hover:text-white underline"> apartments for sale</Link>, 
+              <Link href="/jobs-in-kenya" className="text-green-300 hover:text-white underline"> job opportunities in Kenya</Link>, and 
+              <Link href="/business-directory" className="text-green-300 hover:text-white underline"> business listings</Link>. 
+              Your trusted marketplace for real estate, jobs, and business directory in Kenya.
             </p>
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center mb-12 px-4">
               <Button className="bg-green-600 hover:bg-green-700 text-white px-4 sm:px-8 py-3 text-base sm:text-lg w-full sm:w-auto" asChild>
@@ -259,7 +265,12 @@ export default function HomePage() {
             <div className="text-center mb-16">
               <h2 className="text-3xl font-bold mb-4">Find Houses for Rent, Jobs & Business Opportunities in Kenya</h2>
               <p className="text-gray-600 max-w-2xl mx-auto">
-                Browse affordable houses for rent in Nairobi, apartments for sale, job opportunities in Kenya, office space for rent, and registered companies in our comprehensive business directory.
+                Browse affordable <Link href="/properties/nairobi" className="text-green-600 hover:underline font-medium">houses for rent in Nairobi</Link>, 
+                <Link href="/properties/mombasa" className="text-green-600 hover:underline font-medium"> properties in Mombasa</Link>, 
+                <Link href="/properties/kisumu" className="text-green-600 hover:underline font-medium"> Kisumu real estate</Link>, 
+                <Link href="/jobs-in-kenya" className="text-green-600 hover:underline font-medium"> job opportunities in Kenya</Link>, 
+                <Link href="/properties" className="text-green-600 hover:underline font-medium"> office space for rent</Link>, and 
+                <Link href="/business-directory" className="text-green-600 hover:underline font-medium"> registered companies</Link> in our comprehensive business directory.
               </p>
             </div>
 
@@ -270,7 +281,7 @@ export default function HomePage() {
                   <div className="flex items-center justify-center w-10 h-10 bg-orange-100 rounded-lg">
                     <Home className="h-5 w-5 text-orange-600" />
                   </div>
-                  <h3 className="text-2xl font-bold">Houses for Sale & Rent in Nairobi - Featured Properties</h3>
+                  <h3 className="text-2xl font-bold">Featured Properties for Sale & Rent in Nairobi</h3>
                 </div>
                 <Button variant="outline" className="border-2 border-gray-300 hover:bg-gray-100" asChild>
                   <Link href="/properties" className="flex items-center">
@@ -322,7 +333,7 @@ export default function HomePage() {
                   <div className="flex items-center justify-center w-10 h-10 bg-green-100 rounded-lg">
                     <Building2 className="h-5 w-5 text-green-600" />
                   </div>
-                  <h3 className="text-2xl font-bold">Top Companies in Kenya - Business Directory</h3>
+                  <h3 className="text-2xl font-bold">Top Companies in Kenya Business Directory</h3>
                 </div>
                 <Button variant="outline" className="border-2 border-gray-300 hover:bg-gray-100" asChild>
                   <Link href="/business-directory" className="flex items-center">
@@ -440,7 +451,7 @@ export default function HomePage() {
                   <div className="flex items-center justify-center w-10 h-10 bg-purple-100 rounded-lg">
                     <BookOpen className="h-5 w-5 text-purple-600" />
                   </div>
-                  <h3 className="text-2xl font-bold">Business Daily Kenya - Latest News & Updates</h3>
+                  <h3 className="text-2xl font-bold">Latest Business News & Updates from Kenya</h3>
                 </div>
                 <Button variant="outline" className="border-2 border-gray-300 hover:bg-gray-100" asChild>
                   <Link href="/blog" className="flex items-center">
@@ -513,8 +524,55 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* Call to Action */}
+        {/* Popular Cities */}
         <section className="py-16 bg-white">
+          <div className="container mx-auto px-4">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-bold mb-4">Explore Properties & Businesses by City</h2>
+              <p className="text-gray-600 max-w-2xl mx-auto">
+                Find houses for rent, businesses, and job opportunities in Kenya's major cities
+              </p>
+            </div>
+            
+            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-12">
+              {[
+                { name: 'Nairobi', slug: 'nairobi' },
+                { name: 'Mombasa', slug: 'mombasa' },
+                { name: 'Kisumu', slug: 'kisumu' },
+                { name: 'Nakuru', slug: 'nakuru' },
+                { name: 'Eldoret', slug: 'eldoret' },
+                { name: 'Thika', slug: 'thika' },
+                { name: 'Machakos', slug: 'machakos' },
+                { name: 'Meru', slug: 'meru' },
+                { name: 'Nyeri', slug: 'nyeri' },
+                { name: 'Kitale', slug: 'kitale' },
+                { name: 'Kakamega', slug: 'kakamega' },
+                { name: 'Malindi', slug: 'malindi' }
+              ].map((city) => (
+                <div key={city.slug} className="bg-gray-50 rounded-lg p-4 text-center hover:bg-green-50 transition-colors">
+                  <h3 className="font-semibold text-gray-900 mb-2">{city.name}</h3>
+                  <div className="space-y-1">
+                    <Link 
+                      href={`/properties/${city.slug}`}
+                      className="block text-sm text-green-600 hover:underline"
+                    >
+                      Properties
+                    </Link>
+                    <Link 
+                      href={`/business-directory/${city.slug}`}
+                      className="block text-sm text-green-600 hover:underline"
+                    >
+                      Businesses
+                    </Link>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* Call to Action */}
+        <section className="py-16 bg-gray-100">
           <div className="container mx-auto px-4 text-center">
             <div className="max-w-2xl mx-auto">
               <h2 className="text-3xl font-bold mb-4">Ready to Find Your Dream Property or Job in Kenya?</h2>
