@@ -13,6 +13,7 @@ interface PropertyCardProps {
   bedrooms?: number;
   bathrooms?: number;
   location: string;
+  city: string;
   images: string[];
   amenities: string[];
   contactPhone: string;
@@ -27,6 +28,7 @@ const PropertyCard = ({
   bedrooms,
   bathrooms,
   location,
+  city,
   images,
   amenities,
   whatsappNumber,
@@ -35,8 +37,6 @@ const PropertyCard = ({
     return `KSh ${price.toLocaleString()}`;
   };
 
-  // Extract city from location (handle cases like "Nairobi, Kenya" or just "Nairobi")
-  const city = location.split(',')[0].trim();
   const slug = generatePropertySlug(title, type, city, bedrooms);
   
   return (

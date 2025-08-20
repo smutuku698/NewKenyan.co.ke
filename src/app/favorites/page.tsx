@@ -159,6 +159,7 @@ export default function FavoritesPage() {
                   bedrooms={property.bedrooms || undefined}
                   bathrooms={property.bathrooms || undefined}
                   location={`${property.city}${property.county ? `, ${property.county}` : ''}`}
+                  city={property.city}
                   images={property.images}
                   amenities={property.amenities}
                   contactPhone={property.contact_phone}

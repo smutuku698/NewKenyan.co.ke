@@ -234,6 +234,7 @@ export default function PropertiesPage() {
                   bedrooms={property.bedrooms}
                   bathrooms={property.bathrooms}
                   location={`${property.address}, ${property.city}`}
+                  city={property.city}
                   images={property.images || ['/images/sample-property-1.jpg']}
                   amenities={property.amenities || []}
                   contactPhone={property.contact_phone}

@@ -600,6 +600,7 @@ export default function PropertyDetailClient({ property, similarProperties }: Pr
                   bedrooms={similarProperty.bedrooms || undefined}
                   bathrooms={similarProperty.bathrooms || undefined}
                   location={`${similarProperty.city}${similarProperty.county ? `, ${similarProperty.county}` : ''}`}
+                  city={similarProperty.city}
                   images={similarProperty.images}
                   amenities={similarProperty.amenities}
                   contactPhone={similarProperty.contact_phone}
