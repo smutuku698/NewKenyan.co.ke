@@ -6,7 +6,31 @@ A modern, responsive platform connecting Kenyans with opportunities, businesses,
 
 ## 🔧 Recent Critical Fixes
 
-### ✅ RESOLVED: Property Listings 404 Error (Latest)
+### ✅ RESOLVED: Tools Pages Missing Navigation (Latest)
+
+**Problem**: Calculator pages (Mortgage & Net Pay) were missing Header and Footer navigation, trapping users without way to return to main site.
+
+**Root Cause**: Tools pages were standalone without consistent site navigation components.
+
+**Solution Implemented**:
+- Added Header component to both calculator pages for consistent navigation
+- Added Footer component to maintain site-wide consistency  
+- Users can now easily navigate to other sections while using tools
+- Improved user experience and engagement retention
+
+**Impact**: 
+- ✅ Consistent navigation across entire platform
+- ✅ Better user retention and site exploration
+- ✅ Professional and cohesive user experience
+- ✅ Improved discoverability of other site features
+
+**Technical Details**: Added `Header` and `Footer` imports and components to calculator page layouts.
+
+**Files Modified**: `mortgage-calculator-kenya/page.tsx`, `net-pay-calculator/page.tsx`
+
+---
+
+### ✅ RESOLVED: Property Listings 404 Error
 
 **Problem**: Users clicking on property listing cards were getting 404 errors instead of viewing property details.
 
