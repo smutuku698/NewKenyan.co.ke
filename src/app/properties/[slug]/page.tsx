@@ -59,8 +59,19 @@ async function getPropertyBySlug(slug: string): Promise<PropertyListing | null> 
         p.city, 
         p.bedrooms
       );
+      // Try exact slug match first, then ID fallback
       return expectedSlug === slug || p.id === slug;
     });
+
+    // If no property found, log for debugging (only in development)
+    if (!property && process.env.NODE_ENV === 'development') {
+      console.log('Property not found for slug:', slug);
+      console.log('Available properties:', data.map(p => ({
+        id: p.id,
+        title: p.property_title,
+        expectedSlug: generatePropertySlug(p.property_title, p.property_type, p.city, p.bedrooms)
+      })).slice(0, 3));
+    }
 
     return property || null;
   } catch (error) {
@@ -100,7 +111,8 @@ export async function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
-  const property = await getPropertyBySlug(params.slug);
+  const resolvedParams = await params;
+  const property = await getPropertyBySlug(resolvedParams.slug);
   
   if (!property) {
     return {
@@ -183,7 +195,8 @@ async function getSimilarProperties(currentPropertyId: string, city: string, pro
 }
 
 export default async function PropertyPage({ params }: PageProps) {
-  const property = await getPropertyBySlug(params.slug);
+  const resolvedParams = await params;
+  const property = await getPropertyBySlug(resolvedParams.slug);
 
   if (!property) {
     notFound();

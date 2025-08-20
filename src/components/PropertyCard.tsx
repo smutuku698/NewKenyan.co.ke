@@ -35,7 +35,9 @@ const PropertyCard = ({
     return `KSh ${price.toLocaleString()}`;
   };
 
-  const slug = generatePropertySlug(title, type, location.split(',')[0], bedrooms);
+  // Extract city from location (handle cases like "Nairobi, Kenya" or just "Nairobi")
+  const city = location.split(',')[0].trim();
+  const slug = generatePropertySlug(title, type, city, bedrooms);
   
   return (
     <Link href={`/properties/${slug}`}>
