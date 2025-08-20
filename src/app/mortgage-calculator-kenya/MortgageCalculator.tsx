@@ -234,16 +234,16 @@ export default function MortgageCalculator() {
                 
                 {/* Summary Cards */}
                 <div className="grid grid-cols-2 gap-4">
-                  <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                  <div className="bg-white p-4 sm:p-6 rounded-xl shadow-sm border border-gray-200">
                     <h4 className="text-sm font-medium text-gray-600 mb-2">Total Interest</h4>
-                    <div className="text-2xl font-bold text-red-600">
+                    <div className="text-lg sm:text-xl lg:text-2xl font-bold text-red-600 break-words">
                       {formatCurrency(calculation.totalInterest)}
                     </div>
                   </div>
                   
-                  <div className="bg-white p-6 rounded-xl shadow-sm border border-gray-200">
+                  <div className="bg-white p-4 sm:p-6 rounded-xl shadow-sm border border-gray-200">
                     <h4 className="text-sm font-medium text-gray-600 mb-2">Total Fees</h4>
-                    <div className="text-2xl font-bold text-orange-600">
+                    <div className="text-lg sm:text-xl lg:text-2xl font-bold text-orange-600 break-words">
                       {formatCurrency(calculation.totalFees)}
                     </div>
                   </div>

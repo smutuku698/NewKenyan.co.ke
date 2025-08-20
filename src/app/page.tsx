@@ -15,6 +15,36 @@ import {
   sampleBlogPosts, 
   heroStats 
 } from '@/data/sampleData';
+// Import only needed sample data to avoid memory issues
+const sampleJobs = [
+  {
+    id: 1,
+    job_title: "COOK",
+    nature_of_job: "CASUAL",
+    industry: "HOSPITALITY",
+    salary: "KSHS. 1,000 PER DAY",
+    job_location: "MAASAI MARA",
+    date: "11 August 2025"
+  },
+  {
+    id: 2,
+    job_title: "HOUSEKEEPER",
+    nature_of_job: "FULL TIME",
+    industry: "HOSPITALITY",
+    salary: "KSHS. 25,000 PER MONTH",
+    job_location: "NAIROBI",
+    date: "11 August 2025"
+  },
+  {
+    id: 3,
+    job_title: "SOFTWARE DEVELOPER",
+    nature_of_job: "FULL TIME",
+    industry: "TECHNOLOGY",
+    salary: "KSHS. 80,000 PER MONTH",
+    job_location: "NAIROBI",
+    date: "11 August 2025"
+  }
+];
 import { supabase } from '@/lib/supabase';
 import { Users, Briefcase, Home, ArrowRight, Building2, BookOpen, ChevronDown } from 'lucide-react';
 
@@ -106,13 +136,8 @@ export default function HomePage() {
           .limit(3);
 
         // Fetch featured jobs
-        const { data: jobData, error: jobError } = await supabase
-          .from('jobs')
-          .select('*')
-          .eq('status', 'approved')
-          .order('featured', { ascending: false })
-          .order('created_at', { ascending: false })
-          .limit(3);
+        // Skip jobs for now due to memory issues
+        const jobData = [];
 
         if (!businessError && businessData) {
           setFeaturedBusinesses(businessData);
@@ -122,7 +147,7 @@ export default function HomePage() {
           setFeaturedProperties(propertyData);
         }
 
-        if (!jobError && jobData) {
+        if (jobData) {
           setFeaturedJobs(jobData);
         }
 
@@ -206,15 +231,8 @@ export default function HomePage() {
           
           <div className="relative container mx-auto px-4 text-center">
             <h1 className="text-5xl font-bold mb-6">
-              Houses for Rent in Nairobi Kenya
+              Find Jobs, Businesses & Properties in Kenya
             </h1>
-            <p className="text-xl mb-8 max-w-2xl mx-auto">
-              Find affordable <Link href="/properties/city/nairobi" className="text-green-300 hover:text-white underline">houses for rent in Nairobi</Link>, 
-              <Link href="/properties" className="text-green-300 hover:text-white underline"> apartments for sale</Link>, 
-              <Link href="/jobs-in-kenya" className="text-green-300 hover:text-white underline"> job opportunities in Kenya</Link>, and 
-              <Link href="/business-directory" className="text-green-300 hover:text-white underline"> business listings</Link>. 
-              Your trusted marketplace for real estate, jobs, and business directory in Kenya.
-            </p>
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center mb-12 px-4">
               <Button className="bg-green-600 hover:bg-green-700 text-white px-4 sm:px-8 py-3 text-base sm:text-lg w-full sm:w-auto" asChild>
                 <Link href="/properties">Find Houses for Rent</Link>
@@ -262,17 +280,6 @@ export default function HomePage() {
         {/* Featured Content Sections */}
         <section className="py-16 bg-gray-50">
           <div className="container mx-auto px-4">
-            <div className="text-center mb-16">
-              <h2 className="text-3xl font-bold mb-4">Find Houses for Rent, Jobs & Business Opportunities in Kenya</h2>
-              <p className="text-gray-600 max-w-2xl mx-auto">
-                Browse affordable <Link href="/properties/city/nairobi" className="text-green-600 hover:underline font-medium">houses for rent in Nairobi</Link>, 
-                <Link href="/properties/city/mombasa" className="text-green-600 hover:underline font-medium"> properties in Mombasa</Link>, 
-                <Link href="/properties/city/kisumu" className="text-green-600 hover:underline font-medium"> Kisumu real estate</Link>, 
-                <Link href="/jobs-in-kenya" className="text-green-600 hover:underline font-medium"> job opportunities in Kenya</Link>, 
-                <Link href="/properties" className="text-green-600 hover:underline font-medium"> office space for rent</Link>, and 
-                <Link href="/business-directory" className="text-green-600 hover:underline font-medium"> registered companies</Link> in our comprehensive business directory.
-              </p>
-            </div>
 
             {/* Featured Properties */}
             <div className="mb-16">
@@ -471,59 +478,6 @@ export default function HomePage() {
           </div>
         </section>
 
-        {/* FAQ Section */}
-        <section className="py-16 bg-gray-50">
-          <div className="container mx-auto px-4">
-            <div className="max-w-3xl mx-auto">
-              <div className="text-center mb-12">
-                <h2 className="text-3xl font-bold mb-4">Frequently Asked Questions</h2>
-                <p className="text-gray-600">
-                  Get answers to common questions about finding houses for rent, apartments for sale, and job opportunities in Kenya
-                </p>
-              </div>
-
-              <div className="space-y-4">
-                {faqData.map((faq, index) => (
-                  <div key={index} className="bg-white rounded-lg shadow-sm border">
-                    <button
-                      onClick={() => toggleFAQ(index)}
-                      className="w-full px-6 py-4 text-left flex justify-between items-center hover:bg-gray-50 transition-colors"
-                    >
-                      <h3 className="font-semibold text-gray-900 pr-4">{faq.question}</h3>
-                      <ChevronDown 
-                        className={`h-5 w-5 text-gray-500 transform transition-transform ${
-                          openFAQ === index ? 'rotate-180' : ''
-                        }`} 
-                      />
-                    </button>
-                    {openFAQ === index && (
-                      <div className="px-6 pb-4">
-                        <div 
-                          className="text-gray-600 leading-relaxed"
-                          dangerouslySetInnerHTML={{ __html: faq.answer }}
-                        />
-                      </div>
-                    )}
-                  </div>
-                ))}
-              </div>
-
-              <div className="text-center mt-8">
-                <p className="text-gray-600 mb-4">
-                  Still have questions? We&apos;re here to help!
-                </p>
-                <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                  <Button variant="outline" className="border-2 border-gray-300 hover:bg-gray-100" asChild>
-                    <Link href="mailto:hr@newkenyan.com">Email Support</Link>
-                  </Button>
-                  <Button variant="outline" className="border-2 border-gray-300 hover:bg-gray-100" asChild>
-                    <Link href="tel:+254736407642">Call Us</Link>
-                  </Button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
 
         {/* Popular Cities */}
         <section className="py-16 bg-white">
@@ -591,6 +545,70 @@ export default function HomePage() {
               <div className="text-sm text-gray-600">
                 <p className="mb-2">Contact us: <a href="mailto:hr@newkenyan.com" className="text-green-600 hover:underline">hr@newkenyan.com</a> | <a href="tel:+254736407642" className="text-green-600 hover:underline">+254 736 407 642</a></p>
               </div>
+            </div>
+          </div>
+        </section>
+
+        {/* FAQ Section */}
+        <section className="py-16 bg-white">
+          <div className="container mx-auto px-4">
+            <div className="max-w-3xl mx-auto">
+              <div className="text-center mb-12">
+                <h2 className="text-3xl font-bold mb-4">Frequently Asked Questions</h2>
+                <p className="text-gray-600">
+                  Get answers to common questions about finding houses for rent, apartments for sale, and job opportunities in Kenya
+                </p>
+              </div>
+
+              <div className="space-y-4">
+                {faqData.map((faq, index) => (
+                  <div key={index} className="bg-white rounded-lg shadow-sm border">
+                    <button
+                      onClick={() => toggleFAQ(index)}
+                      className="w-full px-6 py-4 text-left flex justify-between items-center hover:bg-gray-50 transition-colors"
+                    >
+                      <h3 className="font-semibold text-gray-900 pr-4">{faq.question}</h3>
+                      <ChevronDown 
+                        className={`h-5 w-5 text-gray-500 transform transition-transform ${
+                          openFAQ === index ? 'rotate-180' : ''
+                        }`} 
+                      />
+                    </button>
+                    {openFAQ === index && (
+                      <div className="px-6 pb-4">
+                        <div 
+                          className="text-gray-600 leading-relaxed"
+                          dangerouslySetInnerHTML={{ __html: faq.answer }}
+                        />
+                      </div>
+                    )}
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* Additional Content & Links */}
+        <section className="py-16 bg-gray-50">
+          <div className="container mx-auto px-4">
+            <div className="max-w-4xl mx-auto text-center">
+              <h2 className="text-3xl font-bold mb-6">Find Houses for Rent, Jobs & Business Opportunities in Kenya</h2>
+              <p className="text-gray-600 mb-8 leading-relaxed">
+                Browse affordable <Link href="/properties/city/nairobi" className="text-green-600 hover:underline font-medium">houses for rent in Nairobi</Link>, 
+                <Link href="/properties/city/mombasa" className="text-green-600 hover:underline font-medium"> properties in Mombasa</Link>, 
+                <Link href="/properties/city/kisumu" className="text-green-600 hover:underline font-medium"> Kisumu real estate</Link>, 
+                <Link href="/jobs-in-kenya" className="text-green-600 hover:underline font-medium"> job opportunities in Kenya</Link>, 
+                <Link href="/properties" className="text-green-600 hover:underline font-medium"> office space for rent</Link>, and 
+                <Link href="/business-directory" className="text-green-600 hover:underline font-medium"> registered companies</Link> in our comprehensive business directory.
+              </p>
+              <p className="text-gray-600 leading-relaxed">
+                Find affordable <Link href="/properties/city/nairobi" className="text-green-600 hover:underline">houses for rent in Nairobi</Link>, 
+                <Link href="/properties" className="text-green-600 hover:underline"> apartments for sale</Link>, 
+                <Link href="/jobs-in-kenya" className="text-green-600 hover:underline"> job opportunities in Kenya</Link>, and 
+                <Link href="/business-directory" className="text-green-600 hover:underline"> business listings</Link>. 
+                Your trusted marketplace for real estate, jobs, and business directory in Kenya.
+              </p>
             </div>
           </div>
         </section>

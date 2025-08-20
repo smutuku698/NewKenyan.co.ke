@@ -313,6 +313,49 @@ NewKenyan.com features a robust Schema.org markup system designed to compete wit
 
 This comprehensive schema markup positions NewKenyan.com to compete effectively with established players in the Kenyan digital marketplace by providing maximum SEO authority and trust signals to search engines.
 
+## 🏗️ Homepage Structure & Layout
+
+### Clean Homepage Design (Latest Updates)
+
+The homepage has been restructured for optimal user experience and reduced clutter:
+
+#### Section Order:
+1. **Hero Section** - Clean with single focus message: "Find Jobs, Businesses & Properties in Kenya"
+2. **Featured Listings** - Property cards, business cards, job cards (if available)
+3. **Popular Cities** - Quick navigation to city-specific listings
+4. **Call to Action** - "Ready to Find Your Dream Property or Job in Kenya?"
+5. **FAQ Section** - Moved from top to after CTA for better flow
+6. **Additional Content & SEO Links** - All removed content moved to bottom for SEO value
+
+#### Visual Hierarchy:
+- **Removed clutter**: Eliminated redundant text blocks from hero and top sections
+- **Better flow**: FAQ placement after main conversion point
+- **Preserved SEO**: All internal links maintained at bottom of page
+- **Clean interface**: Focus on core functionality above the fold
+
+### Image Sizing Standards
+
+#### Property Card Images:
+- **Mobile**: `h-64` (256px height)
+- **Small screens**: `h-72` (288px height) 
+- **Medium+ screens**: `h-80` (320px height)
+- **Classes**: `h-64 sm:h-72 md:h-80`
+
+#### Property Detail Page Images:
+- **Main hero image**: Same as property cards (`h-64 sm:h-72 md:h-80`)
+- **Gallery thumbnails**: Smaller grid (`grid-cols-4 sm:grid-cols-6 lg:grid-cols-8`)
+- **Layout**: Photos first, then property details for better visual impact
+
+#### Mobile Optimization:
+- **Container margins**: `px-2 sm:px-4` for maximum screen usage
+- **Grid gaps**: `gap-4 sm:gap-6` for tight spacing on mobile
+- **Responsive text**: All typography scales properly across devices
+
+### Component Files:
+- **Homepage**: `src/app/page.tsx`
+- **Property Cards**: `src/components/PropertyCard.tsx`
+- **Property Details**: `src/app/properties/[slug]/PropertyDetailClient.tsx`
+
 ## 📞 Contact
 
 - **Website**: NewKenyan.com

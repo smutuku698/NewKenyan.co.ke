@@ -257,22 +257,83 @@ export default function PropertyDetailClient({ property, similarProperties }: Pr
   return (
     <>
       <main className="max-w-6xl mx-auto px-2 sm:px-4 py-8">
-        {/* Back Button */}
-        <div className="mb-6">
-          <Link href="/properties" className="inline-flex items-center text-green-600 hover:text-green-700">
-            <ArrowLeft className="h-4 w-4 mr-2" />
-            Back to Properties
-          </Link>
-        </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-8">
           {/* Main Content */}
           <div className="lg:col-span-2">
+            {/* Image Gallery */}
+            <div className="bg-white rounded-lg shadow-sm border p-3 sm:p-6 mb-6">
+              <h2 className="text-xl font-semibold mb-4">Property Photos</h2>
+              {property.images && property.images.length > 0 ? (
+                <div>
+                  <div 
+                    className="relative h-64 sm:h-72 md:h-80 mb-4 rounded-lg overflow-hidden cursor-pointer bg-gray-100"
+                    onClick={() => setIsGalleryOpen(true)}
+                  >
+                    <Image
+                      src={property.images[currentImageIndex]}
+                      alt={`${property.property_title} - ${property.city} property for ${property.price_type}`}
+                      fill
+                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 66vw, 50vw"
+                      className="object-cover hover:scale-105 transition-transform duration-300"
+                      priority
+                    />
+                    <div className="absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-10 transition-colors duration-300" />
+                    <div className="absolute top-4 right-4 bg-black bg-opacity-50 text-white px-3 py-1 rounded-full text-sm">
+                      {property.images.length} photo{property.images.length > 1 ? 's' : ''}
+                    </div>
+                  </div>
+
+                  {property.images.length > 1 && (
+                    <div className="grid grid-cols-4 sm:grid-cols-6 lg:grid-cols-8 gap-2">
+                      {property.images.slice(0, 5).map((image, index) => (
+                        <div
+                          key={index}
+                          className={`relative aspect-square rounded cursor-pointer overflow-hidden border-2 transition-colors ${
+                            index === currentImageIndex ? 'border-green-500' : 'border-gray-200 hover:border-gray-300'
+                          }`}
+                          onClick={() => {
+                            setCurrentImageIndex(index);
+                            setIsGalleryOpen(true);
+                          }}
+                        >
+                          <Image
+                            src={image}
+                            alt={`Property view ${index + 1}`}
+                            fill
+                            sizes="120px"
+                            className="object-cover"
+                          />
+                        </div>
+                      ))}
+                      {property.images.length > 5 && (
+                        <div
+                          className="relative aspect-square rounded cursor-pointer overflow-hidden border-2 border-gray-200 hover:border-gray-300 bg-gray-900 bg-opacity-75 flex items-center justify-center"
+                          onClick={() => setIsGalleryOpen(true)}
+                        >
+                          <span className="text-white font-semibold">
+                            +{property.images.length - 5}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <div className="aspect-video bg-gray-100 rounded-lg flex items-center justify-center">
+                  <div className="text-center text-gray-500">
+                    <Home className="h-12 w-12 mx-auto mb-2" />
+                    <p>No images available</p>
+                  </div>
+                </div>
+              )}
+            </div>
+
             {/* Property Header */}
             <div className="bg-white rounded-lg shadow-sm border p-3 sm:p-6 mb-6">
               <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-4">
                 <div className="flex-1 min-w-0">
-                  <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-3 leading-tight">{property.property_title}</h1>
+                  <h1 className="text-lg sm:text-xl lg:text-2xl font-bold text-gray-900 mb-3 leading-tight">{property.property_title}</h1>
                   <div className="flex items-center space-x-3 mb-3">
                     <Badge variant="secondary" className="text-sm">{property.property_type}</Badge>
                     {property.is_featured && (
@@ -352,74 +413,6 @@ export default function PropertyDetailClient({ property, similarProperties }: Pr
                   </div>
                 </div>
               </div>
-            </div>
-
-            {/* Image Gallery */}
-            <div className="bg-white rounded-lg shadow-sm border p-3 sm:p-6 mb-6">
-              <h2 className="text-xl font-semibold mb-4">Property Photos</h2>
-              {property.images && property.images.length > 0 ? (
-                <div>
-                  <div 
-                    className="relative h-64 sm:h-72 md:h-80 mb-4 rounded-lg overflow-hidden cursor-pointer bg-gray-100"
-                    onClick={() => setIsGalleryOpen(true)}
-                  >
-                    <Image
-                      src={property.images[currentImageIndex]}
-                      alt={`${property.property_title} - ${property.city} property for ${property.price_type}`}
-                      fill
-                      sizes="(max-width: 768px) 100vw, (max-width: 1200px) 66vw, 50vw"
-                      className="object-cover hover:scale-105 transition-transform duration-300"
-                      priority
-                    />
-                    <div className="absolute inset-0 bg-black bg-opacity-0 hover:bg-opacity-10 transition-colors duration-300" />
-                    <div className="absolute top-4 right-4 bg-black bg-opacity-50 text-white px-3 py-1 rounded-full text-sm">
-                      {property.images.length} photo{property.images.length > 1 ? 's' : ''}
-                    </div>
-                  </div>
-
-                  {property.images.length > 1 && (
-                    <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 gap-1 sm:gap-2">
-                      {property.images.slice(0, 5).map((image, index) => (
-                        <div
-                          key={index}
-                          className={`relative aspect-square rounded cursor-pointer overflow-hidden border-2 transition-colors ${
-                            index === currentImageIndex ? 'border-green-500' : 'border-gray-200 hover:border-gray-300'
-                          }`}
-                          onClick={() => {
-                            setCurrentImageIndex(index);
-                            setIsGalleryOpen(true);
-                          }}
-                        >
-                          <Image
-                            src={image}
-                            alt={`Property view ${index + 1}`}
-                            fill
-                            sizes="120px"
-                            className="object-cover"
-                          />
-                        </div>
-                      ))}
-                      {property.images.length > 5 && (
-                        <div
-                          className="relative aspect-square rounded cursor-pointer overflow-hidden border-2 border-gray-200 hover:border-gray-300 bg-gray-900 bg-opacity-75 flex items-center justify-center"
-                          onClick={() => setIsGalleryOpen(true)}
-                        >
-                          <span className="text-white font-semibold">
-                            +{property.images.length - 5}
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <div className="aspect-video bg-gray-100 rounded-lg flex items-center justify-center">
-                  <div className="text-center text-gray-500">
-                    <Home className="h-12 w-12 mx-auto mb-2" />
-                    <p>No images available</p>
-                  </div>
-                </div>
-              )}
             </div>
 
             {/* Property Details */}

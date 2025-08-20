@@ -230,10 +230,10 @@ export default async function PropertyPage({ params }: PageProps) {
         
         {/* SEO-optimized headings */}
         <div className="mb-8">
-          <h1 className="text-4xl font-bold text-gray-900 mb-4">
+          <h1 className="text-2xl font-bold text-gray-900 mb-3">
             {headings.h1}
           </h1>
-          <h2 className="text-xl text-gray-600 mb-6">
+          <h2 className="text-lg text-gray-600 mb-4">
             {headings.h2}
           </h2>
         </div>
