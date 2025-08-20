@@ -53,7 +53,7 @@ const Footer = () => {
 
       {/* Main Footer Content */}
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-8">
           {/* Logo and Description */}
           <div className="lg:col-span-2">
             <div className="flex items-center space-x-2 mb-4">
@@ -103,6 +103,15 @@ const Footer = () => {
               <li><Link href="/blog" className="text-gray-400 hover:text-white transition-colors flex items-center group">Blog <ArrowRight className="h-4 w-4 ml-1 opacity-0 group-hover:opacity-100 transition-opacity" /></Link></li>
               <li><Link href="/jobs-in-kenya/post" className="text-gray-400 hover:text-white transition-colors flex items-center group">Post a Job <ArrowRight className="h-4 w-4 ml-1 opacity-0 group-hover:opacity-100 transition-opacity" /></Link></li>
               <li><Link href="/add-listing" className="text-gray-400 hover:text-white transition-colors flex items-center group">List Your Business <ArrowRight className="h-4 w-4 ml-1 opacity-0 group-hover:opacity-100 transition-opacity" /></Link></li>
+            </ul>
+          </div>
+
+          {/* Tools Section */}
+          <div>
+            <h3 className="text-lg font-semibold mb-4">Tools & Calculators</h3>
+            <ul className="space-y-2">
+              <li><Link href="/mortgage-calculator-kenya" className="text-gray-400 hover:text-white transition-colors flex items-center group">Mortgage Calculator Kenya <ArrowRight className="h-4 w-4 ml-1 opacity-0 group-hover:opacity-100 transition-opacity" /></Link></li>
+              <li><Link href="/net-pay-calculator" className="text-gray-400 hover:text-white transition-colors flex items-center group">Net Pay Calculator Kenya <ArrowRight className="h-4 w-4 ml-1 opacity-0 group-hover:opacity-100 transition-opacity" /></Link></li>
             </ul>
           </div>
 

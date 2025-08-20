@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { Bed, Bath, MapPin, Phone, MessageCircle, Heart, Share2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { generatePropertySlug } from '@/lib/utils';
 
 interface PropertyCardProps {
   id: string;
@@ -34,8 +35,10 @@ const PropertyCard = ({
     return `KSh ${price.toLocaleString()}`;
   };
 
+  const slug = generatePropertySlug(title, type, location.split(',')[0], bedrooms);
+  
   return (
-    <Link href={`/properties/${id}`}>
+    <Link href={`/properties/${slug}`}>
       <div className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow cursor-pointer">
       {/* Image */}
       <div className="relative h-48">

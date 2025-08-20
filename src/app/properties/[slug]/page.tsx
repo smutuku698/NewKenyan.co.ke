@@ -74,6 +74,31 @@ interface PageProps {
   params: { slug: string };
 }
 
+// Generate static params for all approved properties
+export async function generateStaticParams() {
+  try {
+    const { data: properties } = await supabase
+      .from('property_listings')
+      .select('id, property_title, property_type, city, bedrooms')
+      .eq('is_approved', true)
+      .limit(100); // Limit for build performance, adjust as needed
+
+    if (!properties) return [];
+
+    return properties.map((property) => ({
+      slug: generatePropertySlug(
+        property.property_title,
+        property.property_type,
+        property.city,
+        property.bedrooms
+      ),
+    }));
+  } catch (error) {
+    console.error('Error generating static params for properties:', error);
+    return [];
+  }
+}
+
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const property = await getPropertyBySlug(params.slug);
   
@@ -135,12 +160,37 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   };
 }
 
+async function getSimilarProperties(currentPropertyId: string, city: string, propertyType: string): Promise<PropertyListing[]> {
+  try {
+    const { data, error } = await supabase
+      .from('property_listings')
+      .select('*')
+      .eq('is_approved', true)
+      .neq('id', currentPropertyId)
+      .ilike('city', `%${city}%`)
+      .limit(3);
+
+    if (error) {
+      console.error('Error fetching similar properties:', error);
+      return [];
+    }
+
+    return data || [];
+  } catch (error) {
+    console.error('Error fetching similar properties:', error);
+    return [];
+  }
+}
+
 export default async function PropertyPage({ params }: PageProps) {
   const property = await getPropertyBySlug(params.slug);
 
   if (!property) {
     notFound();
   }
+
+  // Fetch similar properties
+  const similarProperties = await getSimilarProperties(property.id, property.city, property.property_type);
 
   // Generate SEO-optimized headings
   const headings = generatePropertyHeadings(
@@ -175,7 +225,7 @@ export default async function PropertyPage({ params }: PageProps) {
         </div>
 
         {/* Property details component */}
-        <PropertyDetailClient property={property} />
+        <PropertyDetailClient property={property} similarProperties={similarProperties} />
 
         {/* Local SEO content */}
         <div className="mt-12 bg-gray-50 p-8 rounded-lg">

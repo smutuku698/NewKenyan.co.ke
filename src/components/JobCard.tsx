@@ -4,7 +4,7 @@ import { Clock, MapPin, DollarSign, Heart, Share2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
-import { generateJobSlug } from '@/lib/slugify';
+import { generateJobSlug } from '@/lib/utils';
 
 interface JobCardProps {
   id: number;
@@ -104,7 +104,7 @@ Best regards,`);
 
       {/* Actions */}
       <div className="flex gap-2">
-        <Link href={`/jobs-in-kenya/${generateJobSlug(job_title, job_location, id)}`} className="flex-1">
+        <Link href={`/jobs-in-kenya/${generateJobSlug(job_title, 'NewKenyan', job_location)}`} className="flex-1">
           <Button variant="outline" className="w-full border-gray-300 hover:bg-gray-100 text-sm min-w-0">
             <span className="truncate">Learn More</span>
           </Button>
