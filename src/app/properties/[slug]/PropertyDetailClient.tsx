@@ -256,7 +256,7 @@ export default function PropertyDetailClient({ property, similarProperties }: Pr
 
   return (
     <>
-      <main className="max-w-6xl mx-auto px-4 py-8">
+      <main className="max-w-6xl mx-auto px-2 sm:px-4 py-8">
         {/* Back Button */}
         <div className="mb-6">
           <Link href="/properties" className="inline-flex items-center text-green-600 hover:text-green-700">
@@ -265,11 +265,11 @@ export default function PropertyDetailClient({ property, similarProperties }: Pr
           </Link>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4 lg:gap-8">
           {/* Main Content */}
           <div className="lg:col-span-2">
             {/* Property Header */}
-            <div className="bg-white rounded-lg shadow-sm border p-4 sm:p-6 mb-6">
+            <div className="bg-white rounded-lg shadow-sm border p-3 sm:p-6 mb-6">
               <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4 mb-4">
                 <div className="flex-1 min-w-0">
                   <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-3 leading-tight">{property.property_title}</h1>
@@ -355,7 +355,7 @@ export default function PropertyDetailClient({ property, similarProperties }: Pr
             </div>
 
             {/* Image Gallery */}
-            <div className="bg-white rounded-lg shadow-sm border p-6 mb-6">
+            <div className="bg-white rounded-lg shadow-sm border p-3 sm:p-6 mb-6">
               <h2 className="text-xl font-semibold mb-4">Property Photos</h2>
               {property.images && property.images.length > 0 ? (
                 <div>
@@ -378,7 +378,7 @@ export default function PropertyDetailClient({ property, similarProperties }: Pr
                   </div>
 
                   {property.images.length > 1 && (
-                    <div className="grid grid-cols-4 sm:grid-cols-6 gap-2">
+                    <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 gap-1 sm:gap-2">
                       {property.images.slice(0, 5).map((image, index) => (
                         <div
                           key={index}
@@ -423,15 +423,15 @@ export default function PropertyDetailClient({ property, similarProperties }: Pr
             </div>
 
             {/* Property Details */}
-            <div className="bg-white rounded-lg shadow-sm border p-6 mb-6">
+            <div className="bg-white rounded-lg shadow-sm border p-3 sm:p-6 mb-6">
               <h2 className="text-xl font-semibold mb-4">Property Description</h2>
               <p className="text-gray-700 leading-relaxed whitespace-pre-line">{property.description}</p>
             </div>
 
             {/* Property Features */}
-            <div className="bg-white rounded-lg shadow-sm border p-6 mb-6">
+            <div className="bg-white rounded-lg shadow-sm border p-3 sm:p-6 mb-6">
               <h2 className="text-xl font-semibold mb-4">Property Features & Details</h2>
-              <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4">
                 <div className="flex items-center">
                   <CheckCircle className="h-4 w-4 mr-2 text-green-600" />
                   <span className="text-sm">
@@ -463,9 +463,9 @@ export default function PropertyDetailClient({ property, similarProperties }: Pr
 
             {/* Amenities */}
             {property.amenities && property.amenities.length > 0 && (
-              <div className="bg-white rounded-lg shadow-sm border p-6 mb-6">
+              <div className="bg-white rounded-lg shadow-sm border p-3 sm:p-6 mb-6">
                 <h2 className="text-xl font-semibold mb-4">Amenities & Features</h2>
-                <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3">
                   {property.amenities.map((amenity, index) => (
                     <div key={index} className="flex items-center">
                       <CheckCircle className="h-4 w-4 mr-2 text-green-600" />
@@ -570,7 +570,7 @@ export default function PropertyDetailClient({ property, similarProperties }: Pr
               </Link>
             </div>
             
-            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+            <div className="grid gap-4 sm:gap-6 md:grid-cols-2 lg:grid-cols-3">
               {similarProperties.map((similarProperty) => (
                 <PropertyCard 
                   key={similarProperty.id} 

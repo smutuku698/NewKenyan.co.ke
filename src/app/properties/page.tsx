@@ -104,7 +104,7 @@ export default function PropertiesPage() {
       <div className="min-h-screen bg-white">
         <Header />
         <main className="py-8">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="container mx-auto px-2 sm:px-4 lg:px-6">
             <div className="text-center py-12">
               <p className="text-gray-600">Loading properties...</p>
             </div>
@@ -120,7 +120,7 @@ export default function PropertiesPage() {
       <div className="min-h-screen bg-white">
         <Header />
         <main className="py-8">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="container mx-auto px-2 sm:px-4 lg:px-6">
             <div className="text-center py-12">
               <p className="text-red-600">{error}</p>
             </div>
@@ -148,7 +148,7 @@ export default function PropertiesPage() {
           <div className="absolute inset-0 bg-gray-900/50" />
         </div>
         
-        <div className="relative container mx-auto px-4 text-center">
+        <div className="relative container mx-auto px-2 sm:px-4 text-center">
           <h1 className="text-5xl font-bold mb-6">
             Find Your Perfect Home
           </h1>
@@ -205,7 +205,7 @@ export default function PropertiesPage() {
       </section>
       
       <main className="py-8">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="container mx-auto px-2 sm:px-4 lg:px-6">
 
           {/* Results Header */}
           <div className="flex justify-between items-center mb-8">

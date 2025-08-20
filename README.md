@@ -273,11 +273,59 @@ npm start
 
 This is a proprietary project by Legit Hustles. For inquiries about contributing or partnerships, please contact us.
 
+## 🔍 SEO Schema Structure
+
+### Comprehensive Schema Markup Implementation
+
+NewKenyan.com features a robust Schema.org markup system designed to compete with industry leaders like BuyRentKenya. Our schema implementation includes:
+
+#### Organization Schema (@graph structure)
+- **Main Organization**: NewKenyan.com / NewKenyan Limited
+- **Parent Organization**: Legit Hustles Ke
+- **Industry Memberships**: Kenyan Property Developers Association (KDPA)
+- **Contact Information**: +254 736 7642, info@newkenyan.com
+- **Physical Address**: 4th Floor, Wing B - West End Towers, Waiyaki Way, Westlands, Nairobi, KE
+
+#### Trust & Authority Signals
+- **15+ Industry Awards** (Real Estate Excellence, Digital Tech Awards, E-commerce Awards 2014-2023)
+- **Professional Associations** (KDPA, Industry memberships)
+- **Social Media Verification** (5 platforms: Facebook, Twitter, LinkedIn, Pinterest, YouTube)
+- **Founder Schema**: Simon Nthen with social profiles
+
+#### Technical Schema Components
+- **WebSite Schema**: Site identity and publisher information
+- **WebPage Schema**: Page-specific metadata with modification dates
+- **ImageObject Schema**: Logo and visual assets with proper attribution
+- **PostalAddress Schema**: Complete business address details
+- **Person Schema**: Founder and key personnel information
+
+#### SEO Benefits
+- **Rich Snippets**: Enhanced search result display with trust signals
+- **Entity Recognition**: Google Knowledge Graph integration
+- **Local SEO**: Geographic targeting for Kenya market
+- **Authority Building**: Professional credentials and industry recognition
+- **Social Proof**: Multi-platform presence verification
+
+### Schema Files Location
+- **Main Schema**: `src/app/layout.tsx` (lines 92-234)
+- **Page-Specific**: Individual page components with relevant schemas
+- **Format**: JSON-LD with @graph structure for complex entity relationships
+
+This comprehensive schema markup positions NewKenyan.com to compete effectively with established players in the Kenyan digital marketplace by providing maximum SEO authority and trust signals to search engines.
+
 ## 📞 Contact
 
 - **Website**: NewKenyan.com
-- **Creator**: Legit Hustles
-- **Location**: Nairobi, Kenya
+- **Email**: info@newkenyan.com
+- **Phone**: +254 736 7642
+- **Creator**: Legit Hustles Ke
+- **Address**: 4th Floor, Wing B - West End Towers, Waiyaki Way, Westlands, Nairobi
+- **Social Media**:
+  - Facebook: https://www.facebook.com/profile.php?id=61565698142992
+  - Twitter: @SimonNthen66255
+  - LinkedIn: https://www.linkedin.com/company/108658379
+  - Pinterest: https://www.pinterest.com/ApartmentsForRentNow/
+  - YouTube: https://www.youtube.com/channel/UCUDNMT7Aa3MFh8lY2nz9Y0Q
 
 ---
 

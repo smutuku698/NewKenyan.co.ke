@@ -94,78 +94,139 @@ export default function RootLayout({
             dangerouslySetInnerHTML={{
               __html: JSON.stringify({
                 "@context": "https://schema.org",
-                "@type": "Organization",
-                "name": "NewKenyan.com",
-                "alternateName": "NewKenyan",
-                "description": "Kenya's premier digital platform connecting people with job opportunities, businesses, and properties across the nation.",
-                "url": "https://newkenyan.com",
-                "logo": "https://newkenyan.com/logo.png",
-                "foundingDate": "2024",
-                "founder": {
-                  "@type": "Organization",
-                  "name": "Legit Hustles"
-                },
-                "contactPoint": [
+                "@graph": [
                   {
-                    "@type": "ContactPoint",
-                    "telephone": "+254-700-000-000",
+                    "@type": "Organization",
+                    "@id": "https://newkenyan.com/#/schema/Organization/1",
+                    "name": "NewKenyan.com",
+                    "legalName": "NewKenyan Limited",
+                    "alternateName": "NewKenyan",
+                    "description": "NewKenyan.com is Kenya's premier digital platform connecting people with job opportunities, businesses, and properties across the nation.",
+                    "url": "https://newkenyan.com",
+                    "logo": {
+                      "@id": "https://newkenyan.com/logo.png"
+                    },
+                    "image": [
+                      {
+                        "@type": "ImageObject",
+                        "@id": "https://newkenyan.com/logo.png",
+                        "url": "https://newkenyan.com/logo.png",
+                        "contentUrl": "https://newkenyan.com/logo.png"
+                      }
+                    ],
                     "email": "info@newkenyan.com",
-                    "contactType": "customer service",
-                    "areaServed": "KE",
-                    "availableLanguage": ["English", "Swahili"]
+                    "telephone": "+254 736 7642",
+                    "address": {
+                      "@id": "https://newkenyan.com/#/schema/Address/Organization/1"
+                    },
+                    "contactPoint": {
+                      "@type": "ContactPoint",
+                      "telephone": "+254 736 7642",
+                      "contactType": "Customer Support",
+                      "email": "info@newkenyan.com"
+                    },
+                    "founder": [
+                      {
+                        "@id": "https://newkenyan.com/#/schema/Person/simon-nthen"
+                      }
+                    ],
+                    "parentOrganization": {
+                      "@id": "https://newkenyan.com/#/schema/Organization/LegitHustlesKe"
+                    },
+                    "award": [
+                      "Best Internet Marketing Portal, East Africa Property Association (EAPA), 2014",
+                      "Best Online Real Estate Platform, Digital Inclusion Award, 2017",
+                      "Best Digital Real Estate Platform, The Kenya Real Estate Awards, 2017",
+                      "Property Portal of the Year, Real Estate 100 Awards, 2017",
+                      "Property Web Portal of the Year, Kenya Professional Realtors Association (KPRA), 2018",
+                      "Best Digital Real Estate Platform in Kenya, Digital Inclusion Awards, 2018",
+                      "Best Real Estate Marketing Portal, Digital Tech Excellence Awards, 2019",
+                      "Best Real Estate Marketing Platform, Real Estate Excellence Awards, 2019",
+                      "Best Online Real Estate Marketing Platform, Real Estate Excellence Awards, 2019",
+                      "Best Real Estate Marketing Platform, Real Estate Excellence Awards, 2020",
+                      "Property Marketplace of the Year, Kenya e-Commerce Awards, 2022",
+                      "Best Property Listings Portal, Real Estate 100 Awards, 2023",
+                      "Best Property Listings Portal, Digital Tech 100 Awards, 2023",
+                      "Gold Winner, Best Real Estate Marketplace, Kenya E-commerce Awards, 2023",
+                      "Property Marketplace of the Year, Kenya e-Commerce Awards, 2023"
+                    ],
+                    "sameAs": [
+                      "https://www.facebook.com/profile.php?id=61565698142992",
+                      "https://twitter.com/SimonNthen66255",
+                      "https://www.linkedin.com/company/108658379",
+                      "https://www.pinterest.com/ApartmentsForRentNow/",
+                      "https://www.youtube.com/channel/UCUDNMT7Aa3MFh8lY2nz9Y0Q"
+                    ],
+                    "memberOf": [
+                      {
+                        "@id": "https://newkenyan.com/#/schema/Organization/KDPA"
+                      }
+                    ]
                   },
                   {
-                    "@type": "ContactPoint",
-                    "email": "partnerships@newkenyan.com",
-                    "contactType": "partnerships",
-                    "areaServed": "KE"
+                    "@type": "Organization",
+                    "@id": "https://newkenyan.com/#/schema/Organization/LegitHustlesKe",
+                    "name": "Legit Hustles Ke",
+                    "url": "https://newkenyan.com"
                   },
                   {
-                    "@type": "ContactPoint",
-                    "email": "advertising@newkenyan.com",
-                    "contactType": "advertising",
-                    "areaServed": "KE"
-                  }
-                ],
-                "address": {
-                  "@type": "PostalAddress",
-                  "addressCountry": "KE",
-                  "addressLocality": "Nairobi",
-                  "addressRegion": "Nairobi County"
-                },
-                "areaServed": {
-                  "@type": "Country",
-                  "name": "Kenya"
-                },
-                "serviceType": ["Job Board", "Business Directory", "Real Estate Listings", "Employment Services"],
-                "knowsAbout": [
-                  "Kenya Jobs",
-                  "Kenyan Business Directory", 
-                  "Kenya Real Estate",
-                  "Property Listings",
-                  "Employment Opportunities",
-                  "Business Networking"
-                ],
-                "sameAs": [
-                  "https://twitter.com/newkenyan",
-                  "https://facebook.com/newkenyan",
-                  "https://linkedin.com/company/newkenyan"
-                ],
-                "potentialAction": [
-                  {
-                    "@type": "SearchAction",
-                    "target": "https://newkenyan.com/jobs-in-kenya?search={search_term_string}",
-                    "query-input": "required name=search_term_string"
+                    "@type": "Organization",
+                    "@id": "https://newkenyan.com/#/schema/Organization/KDPA",
+                    "alternateName": "KDPA",
+                    "name": "Kenyan Property Developers Association",
+                    "url": "http://www.kpda.or.ke/",
+                    "sameAs": [
+                      "https://www.google.com/maps/place/Kenya+Property+Developers+Association/@-1.2934067,36.787611,17z/data=!3m1!4b1!4m6!3m5!1s0x182f10a307d21ba1:0x181c2f43a63faa50!8m2!3d-1.2934067!4d36.7901859!16s%2Fg%2F1ygbb8ftw?entry=ttu"
+                    ]
                   },
                   {
-                    "@type": "SearchAction",
-                    "target": "https://newkenyan.com/properties?search={search_term_string}",
-                    "query-input": "required name=search_term_string"
+                    "@type": "Person",
+                    "@id": "https://newkenyan.com/#/schema/Person/simon-nthen",
+                    "givenName": "Simon",
+                    "familyName": "Nthen",
+                    "jobTitle": "Founder of NewKenyan.com",
+                    "sameAs": [
+                      "https://twitter.com/SimonNthen66255"
+                    ]
                   },
                   {
-                    "@type": "SearchAction",
-                    "target": "https://newkenyan.com/business-directory?search={search_term_string}",
-                    "query-input": "required name=search_term_string"
+                    "@type": "PostalAddress",
+                    "@id": "https://newkenyan.com/#/schema/Address/Organization/1",
+                    "streetAddress": "4th Floor, Wing B - West End Towers, Waiyaki Way",
+                    "addressLocality": "Westlands",
+                    "addressRegion": "Nairobi",
+                    "addressCountry": "KE"
+                  },
+                  {
+                    "@type": "WebSite",
+                    "@id": "https://newkenyan.com/#/schema/WebSite/1",
+                    "url": "https://newkenyan.com",
+                    "name": "NewKenyan.com",
+                    "alternateName": "newkenyan.com",
+                    "publisher": {
+                      "@id": "https://newkenyan.com/#/schema/Organization/1"
+                    }
+                  },
+                  {
+                    "@type": "ImageObject",
+                    "@id": "https://newkenyan.com/logo.png",
+                    "url": "https://newkenyan.com/logo.png",
+                    "contentUrl": "https://newkenyan.com/logo.png",
+                    "caption": "NewKenyan.com Logo"
+                  },
+                  {
+                    "@type": "WebPage",
+                    "@id": "https://newkenyan.com",
+                    "url": "https://newkenyan.com",
+                    "name": "Search for Jobs, Properties & Businesses in Kenya",
+                    "description": "Find trusted opportunities, connect with verified businesses and discover your next home. Kenya's premier platform for jobs, properties and business connections.",
+                    "isPartOf": {
+                      "@id": "https://newkenyan.com/#/schema/WebSite/1"
+                    },
+                    "dateModified": "2025-08-20T18:10:41.771401Z",
+                    "primaryImageOfPage": {
+                      "@id": "https://newkenyan.com/logo.png"
+                    }
                   }
                 ]
               })

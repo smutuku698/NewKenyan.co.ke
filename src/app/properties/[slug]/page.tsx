@@ -47,7 +47,8 @@ async function getPropertyBySlug(slug: string): Promise<PropertyListing | null> 
     const { data, error } = await supabase
       .from('property_listings')
       .select('*')
-      .eq('is_approved', true);
+      .eq('is_approved', true)
+      .limit(1000); // Ensure we get enough properties to find matches
 
     if (error || !data) return null;
 
