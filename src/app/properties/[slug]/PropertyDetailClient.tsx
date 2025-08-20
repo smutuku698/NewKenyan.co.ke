@@ -3,8 +3,6 @@
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import Header from '@/components/Header';
-import Footer from '@/components/Footer';
 import PropertyCard from '@/components/PropertyCard';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -257,24 +255,7 @@ export default function PropertyDetailClient({ property, similarProperties }: Pr
   }, [isGalleryOpen, property.images.length]);
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Header />
-      
-      {/* Breadcrumb Navigation */}
-      <div className="bg-white border-b">
-        <div className="max-w-6xl mx-auto px-4 py-3">
-          <nav className="flex items-center space-x-2 text-sm text-gray-600">
-            <Link href="/" className="hover:text-green-600">Home</Link>
-            <ChevronRight className="h-4 w-4" />
-            <Link href="/properties" className="hover:text-green-600">Properties</Link>
-            <ChevronRight className="h-4 w-4" />
-            <Link href={`/properties?city=${property.city}`} className="hover:text-green-600">{property.city}</Link>
-            <ChevronRight className="h-4 w-4" />
-            <span className="text-gray-900 truncate">{property.property_title}</span>
-          </nav>
-        </div>
-      </div>
-      
+    <>
       <main className="max-w-6xl mx-auto px-4 py-8">
         {/* Back Button */}
         <div className="mb-6">
@@ -778,8 +759,6 @@ export default function PropertyDetailClient({ property, similarProperties }: Pr
           </div>
         </div>
       )}
-      
-      <Footer />
-    </div>
+    </>
   );
 }
