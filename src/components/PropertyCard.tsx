@@ -43,7 +43,7 @@ const PropertyCard = ({
     <Link href={`/properties/${slug}`}>
       <div className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow cursor-pointer">
       {/* Image */}
-      <div className="relative h-48">
+      <div className="relative h-64 sm:h-72 md:h-80">
         {images[0] ? (
           <Image
             src={images[0]}
