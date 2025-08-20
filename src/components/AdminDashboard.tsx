@@ -112,6 +112,10 @@ export default function AdminDashboard() {
   const [selectedBusinessListing, setSelectedBusinessListing] = useState<BusinessListing | null>(null);
   const [selectedPropertyListing, setSelectedPropertyListing] = useState<PropertyListing | null>(null);
   const [selectedJobListing, setSelectedJobListing] = useState<JobListing | null>(null);
+  
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 20;
   const [actionLoading, setActionLoading] = useState<string | null>(null);
 
   const isAdmin = true; // Allow any signed-in user for testing - change this in production
@@ -596,6 +600,16 @@ export default function AdminDashboard() {
   };
 
   const filteredListings = getFilteredListings();
+  
+  // Pagination logic
+  const totalPages = Math.ceil(filteredListings.length / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const paginatedListings = filteredListings.slice(startIndex, startIndex + itemsPerPage);
+  
+  // Reset to page 1 when changing tabs or view mode
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [activeTab, viewMode]);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -801,10 +815,15 @@ export default function AdminDashboard() {
             <div className="space-y-6">
               <h2 className="text-base sm:text-lg font-semibold">
                 {viewMode === 'pending' ? 'Pending' : 'All'} {activeTab === 'business' ? 'Business' : activeTab === 'property' ? 'Property' : 'Job'} Listings ({filteredListings.length})
+                {filteredListings.length > itemsPerPage && (
+                  <span className="text-sm text-gray-500 ml-2">
+                    (Page {currentPage} of {totalPages})
+                  </span>
+                )}
               </h2>
               
               <div className="space-y-4">
-                {filteredListings.map((listing) => (
+                {paginatedListings.map((listing) => (
                   <div
                     key={listing.id}
                     className={`border border-gray-200 rounded-lg p-4 sm:p-6 transition-all hover:shadow-md ${
@@ -1100,6 +1119,64 @@ export default function AdminDashboard() {
                   </div>
                 ))}
               </div>
+              
+              {/* Pagination Controls */}
+              {totalPages > 1 && (
+                <div className="flex justify-center items-center space-x-2 mt-8 pt-6 border-t">
+                  <Button
+                    onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                    disabled={currentPage === 1}
+                    variant="outline"
+                    size="sm"
+                  >
+                    Previous
+                  </Button>
+                  
+                  <div className="flex space-x-1">
+                    {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                      let pageNum;
+                      if (totalPages <= 5) {
+                        pageNum = i + 1;
+                      } else if (currentPage <= 3) {
+                        pageNum = i + 1;
+                      } else if (currentPage >= totalPages - 2) {
+                        pageNum = totalPages - 4 + i;
+                      } else {
+                        pageNum = currentPage - 2 + i;
+                      }
+                      
+                      return (
+                        <Button
+                          key={pageNum}
+                          onClick={() => setCurrentPage(pageNum)}
+                          variant={currentPage === pageNum ? "default" : "outline"}
+                          size="sm"
+                          className={`w-8 h-8 p-0 ${
+                            currentPage === pageNum 
+                              ? "bg-green-600 hover:bg-green-700 text-white" 
+                              : ""
+                          }`}
+                        >
+                          {pageNum}
+                        </Button>
+                      );
+                    })}
+                  </div>
+                  
+                  <Button
+                    onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                    disabled={currentPage === totalPages}
+                    variant="outline"
+                    size="sm"
+                  >
+                    Next
+                  </Button>
+                  
+                  <span className="text-sm text-gray-500 ml-4">
+                    Showing {startIndex + 1}-{Math.min(startIndex + itemsPerPage, filteredListings.length)} of {filteredListings.length}
+                  </span>
+                </div>
+              )}
             </div>
           )}
         </div>
