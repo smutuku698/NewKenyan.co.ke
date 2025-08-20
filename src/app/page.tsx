@@ -209,7 +209,7 @@ export default function HomePage() {
               Houses for Rent in Nairobi Kenya
             </h1>
             <p className="text-xl mb-8 max-w-2xl mx-auto">
-              Find affordable <Link href="/properties/nairobi" className="text-green-300 hover:text-white underline">houses for rent in Nairobi</Link>, 
+              Find affordable <Link href="/properties/city/nairobi" className="text-green-300 hover:text-white underline">houses for rent in Nairobi</Link>, 
               <Link href="/properties" className="text-green-300 hover:text-white underline"> apartments for sale</Link>, 
               <Link href="/jobs-in-kenya" className="text-green-300 hover:text-white underline"> job opportunities in Kenya</Link>, and 
               <Link href="/business-directory" className="text-green-300 hover:text-white underline"> business listings</Link>. 
@@ -265,9 +265,9 @@ export default function HomePage() {
             <div className="text-center mb-16">
               <h2 className="text-3xl font-bold mb-4">Find Houses for Rent, Jobs & Business Opportunities in Kenya</h2>
               <p className="text-gray-600 max-w-2xl mx-auto">
-                Browse affordable <Link href="/properties/nairobi" className="text-green-600 hover:underline font-medium">houses for rent in Nairobi</Link>, 
-                <Link href="/properties/mombasa" className="text-green-600 hover:underline font-medium"> properties in Mombasa</Link>, 
-                <Link href="/properties/kisumu" className="text-green-600 hover:underline font-medium"> Kisumu real estate</Link>, 
+                Browse affordable <Link href="/properties/city/nairobi" className="text-green-600 hover:underline font-medium">houses for rent in Nairobi</Link>, 
+                <Link href="/properties/city/mombasa" className="text-green-600 hover:underline font-medium"> properties in Mombasa</Link>, 
+                <Link href="/properties/city/kisumu" className="text-green-600 hover:underline font-medium"> Kisumu real estate</Link>, 
                 <Link href="/jobs-in-kenya" className="text-green-600 hover:underline font-medium"> job opportunities in Kenya</Link>, 
                 <Link href="/properties" className="text-green-600 hover:underline font-medium"> office space for rent</Link>, and 
                 <Link href="/business-directory" className="text-green-600 hover:underline font-medium"> registered companies</Link> in our comprehensive business directory.
@@ -553,13 +553,13 @@ export default function HomePage() {
                   <h3 className="font-semibold text-gray-900 mb-2">{city.name}</h3>
                   <div className="space-y-1">
                     <Link 
-                      href={`/properties/${city.slug}`}
+                      href={`/properties/city/${city.slug}`}
                       className="block text-sm text-green-600 hover:underline"
                     >
                       Properties
                     </Link>
                     <Link 
-                      href={`/business-directory/${city.slug}`}
+                      href={`/business-directory/city/${city.slug}`}
                       className="block text-sm text-green-600 hover:underline"
                     >
                       Businesses

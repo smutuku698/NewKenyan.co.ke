@@ -119,14 +119,14 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     ];
     
     const propertyCityPages = majorCities.map((city) => ({
-      url: `${baseUrl}/properties/${city}`,
+      url: `${baseUrl}/properties/city/${city}`,
       lastModified: new Date(),
       changeFrequency: 'daily' as const,
       priority: 0.8,
     }))
 
     const businessCityPages = majorCities.map((city) => ({
-      url: `${baseUrl}/business-directory/${city}`,
+      url: `${baseUrl}/business-directory/city/${city}`,
       lastModified: new Date(),
       changeFrequency: 'daily' as const,
       priority: 0.7,

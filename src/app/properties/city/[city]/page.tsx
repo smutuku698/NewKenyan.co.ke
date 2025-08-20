@@ -39,11 +39,12 @@ interface PageProps {
   params: { city: string };
 }
 
-export async function generateStaticParams() {
-  return kenyanCities.map((city) => ({
-    city: city,
-  }));
-}
+// Temporarily disable static generation to fix build
+// export async function generateStaticParams() {
+//   return kenyanCities.map((city) => ({
+//     city: city,
+//   }));
+// }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const cityName = decodeURIComponent(params.city).replace(/-/g, ' ');

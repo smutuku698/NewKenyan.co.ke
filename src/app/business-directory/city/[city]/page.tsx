@@ -36,11 +36,12 @@ interface PageProps {
   params: { city: string };
 }
 
-export async function generateStaticParams() {
-  return kenyanCities.map((city) => ({
-    city: city,
-  }));
-}
+// Temporarily disable static generation to fix build
+// export async function generateStaticParams() {
+//   return kenyanCities.map((city) => ({
+//     city: city,
+//   }));
+// }
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const cityName = decodeURIComponent(params.city).replace(/-/g, ' ');
@@ -189,9 +190,12 @@ export default async function CityBusinessPage({ params }: PageProps) {
             </div>
             {categoryBusinesses.length > 9 && (
               <div className="text-center mt-6">
-                <button className="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors">
+                <a 
+                  href={`/business-directory?category=${category}&city=${capitalizedCity}`}
+                  className="inline-block px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+                >
                   View All {category} Businesses
-                </button>
+                </a>
               </div>
             )}
           </div>
