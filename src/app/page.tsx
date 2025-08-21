@@ -18,36 +18,6 @@ import {
   sampleBlogPosts, 
   heroStats 
 } from '@/data/sampleData';
-// Import only needed sample data to avoid memory issues
-const sampleJobs = [
-  {
-    id: 1,
-    job_title: "COOK",
-    nature_of_job: "CASUAL",
-    industry: "HOSPITALITY",
-    salary: "KSHS. 1,000 PER DAY",
-    job_location: "MAASAI MARA",
-    date: "11 August 2025"
-  },
-  {
-    id: 2,
-    job_title: "HOUSEKEEPER",
-    nature_of_job: "FULL TIME",
-    industry: "HOSPITALITY",
-    salary: "KSHS. 25,000 PER MONTH",
-    job_location: "NAIROBI",
-    date: "11 August 2025"
-  },
-  {
-    id: 3,
-    job_title: "SOFTWARE DEVELOPER",
-    nature_of_job: "FULL TIME",
-    industry: "TECHNOLOGY",
-    salary: "KSHS. 80,000 PER MONTH",
-    job_location: "NAIROBI",
-    date: "11 August 2025"
-  }
-];
 import { supabase } from '@/lib/supabase';
 import { Users, Briefcase, Home, ArrowRight, Building2, BookOpen, ChevronDown } from 'lucide-react';
 
@@ -121,7 +91,7 @@ export default function HomePage() {
       setLoading(true);
       try {
         // Run all queries in parallel for better performance
-        const [businessQuery, propertyQuery, jobsQuery] = await Promise.allSettled([
+        const [businessQuery, propertyQuery, jobsResponse] = await Promise.allSettled([
           supabase
             .from('business_listings')
             .select('id, business_name, category, description, address, city, phone, email, website, image_url, rating, review_count, is_approved, is_verified, whatsapp_number')
@@ -138,13 +108,8 @@ export default function HomePage() {
             .order('created_at', { ascending: false })
             .limit(3),
 
-          supabase
-            .from('jobs')
-            .select('id, job_title, nature_of_job, industry, salary, job_location, duties_and_responsibilities, company_name, contact_email, status, featured, slug')
-            .eq('status', 'approved')
-            .order('featured', { ascending: false })
-            .order('created_at', { ascending: false })
-            .limit(3)
+          fetch('/api/jobs?limit=3&status=approved')
+            .then(res => res.json())
         ]);
 
         // Handle business data
@@ -158,8 +123,8 @@ export default function HomePage() {
         }
 
         // Handle jobs data
-        if (jobsQuery.status === 'fulfilled' && !jobsQuery.value.error) {
-          setFeaturedJobs(jobsQuery.value.data || []);
+        if (jobsResponse.status === 'fulfilled' && jobsResponse.value.success) {
+          setFeaturedJobs(jobsResponse.value.data || []);
         }
 
       } catch (error) {

@@ -50,7 +50,7 @@ async function uploadJobsData() {
           how_to_apply: job.how_to_apply,
           
           // Default values for required fields missing in JSON
-          company_name: null,
+          company_name: 'Job Vacancy Co',
           contact_email: job.how_to_apply.includes('@') ? 
             job.how_to_apply.match(/[\w\.-]+@[\w\.-]+\.\w+/)?.[0] || null : null,
           contact_phone: '0736 407642',
@@ -70,10 +70,7 @@ async function uploadJobsData() {
           approved_at: new Date().toISOString(),
           
           // Admin notes
-          admin_notes: `Uploaded from jobs.json - Original ID: ${job.id}`,
-          
-          // No user association for bulk upload
-          user_id: null
+          admin_notes: `Uploaded from jobs.json - Original ID: ${job.id}`
         };
 
         console.log(`Uploading: ${job.job_title} (${job.job_location})`);
