@@ -388,15 +388,16 @@ export default function HomePage() {
                   featuredJobs.map((job) => (
                     <JobCard 
                       key={job.id} 
-                      id={job.id}
-                      title={job.job_title}
-                      company={job.company_name}
-                      location={job.job_location}
-                      salary={job.salary}
-                      type={job.nature_of_job}
-                      slug={job.slug}
-                      description={job.duties_and_responsibilities}
+                      id={parseInt(job.id) || 0}
+                      date={job.created_at ? new Date(job.created_at).toLocaleDateString() : 'Recent'}
+                      job_title={job.job_title}
+                      nature_of_job={job.nature_of_job}
                       industry={job.industry}
+                      salary={job.salary}
+                      job_location={job.job_location}
+                      duties_and_responsibilities={job.duties_and_responsibilities || ''}
+                      key_requirements_skills_qualification={job.key_requirements_skills_qualification || ''}
+                      how_to_apply={job.how_to_apply || ''}
                     />
                   ))
                 ) : (

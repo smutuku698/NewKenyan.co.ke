@@ -43,6 +43,7 @@ Best regards,`);
   };
 
   const getShortDescription = (text: string) => {
+    if (!text) return 'No description available';
     const firstSentence = text.split('\n')[0];
     return firstSentence.length > 150 ? firstSentence.substring(0, 150) + '...' : firstSentence;
   };
