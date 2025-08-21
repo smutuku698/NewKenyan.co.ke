@@ -8,6 +8,7 @@ import { Button } from '@/components/ui/button';
 import { sampleBlogPosts } from '@/data/sampleData';
 import { getBlogPost, getAllBlogPosts, BlogPost } from '@/lib/blog';
 import ShareButton from './ShareButtons';
+import RelatedPostCard from './RelatedPostCard';
 import { 
   Calendar, 
   Clock, 
@@ -253,31 +254,7 @@ export default async function BlogPostPage({ params }: PageProps) {
                     <h2 className="text-2xl font-bold text-gray-900 mb-6">Related Articles</h2>
                     <div className="grid md:grid-cols-3 gap-6">
                       {relatedPosts.map((relatedPost) => (
-                        <article key={relatedPost.id} className="bg-white rounded-lg shadow-sm border overflow-hidden hover:shadow-md transition-shadow">
-                          <Image
-                            src={relatedPost.featuredImage || '/images/default-blog.svg'}
-                            alt={relatedPost.title}
-                            width={300}
-                            height={200}
-                            className="w-full h-40 object-cover"
-                            onError={(e) => {
-                              const target = e.target as HTMLImageElement;
-                              target.src = '/images/default-blog.svg';
-                            }}
-                          />
-                          <div className="p-4">
-                            <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2">
-                              <Link href={`/blog/${relatedPost.slug}`} className="hover:text-green-600 transition-colors">
-                                {relatedPost.title}
-                              </Link>
-                            </h3>
-                            <p className="text-sm text-gray-600 mb-3 line-clamp-2">{relatedPost.excerpt}</p>
-                            <div className="flex items-center justify-between text-xs text-gray-500">
-                              <span>{relatedPost.author}</span>
-                              <span>{relatedPost.readTime} min read</span>
-                            </div>
-                          </div>
-                        </article>
+                        <RelatedPostCard key={relatedPost.id} post={relatedPost} />
                       ))}
                     </div>
                   </div>
