@@ -49,7 +49,7 @@ export default function ContactPage() {
       contactPoint: [
         {
           '@type': 'ContactPoint',
-          telephone: '+254-700-000-000',
+          telephone: '+254-736-407-642',
           contactType: 'customer service',
           email: 'info@newkenyan.com',
           availableLanguage: ['English', 'Swahili'],
@@ -132,8 +132,8 @@ export default function ContactPage() {
                         </p>
                         <p className="text-gray-700">
                           <strong>Phone:</strong>{' '}
-                          <a href="tel:+254700000000" className="text-green-600 hover:underline">
-                            +254 700 000 000
+                          <a href="tel:+254736407642" className="text-green-600 hover:underline">
+                            +254 736 407 642
                           </a>
                         </p>
                       </div>
@@ -272,7 +272,7 @@ export default function ContactPage() {
                           id="phone"
                           name="phone"
                           className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                          placeholder="+254 700 000 000"
+                          placeholder="+254 736 407 642"
                         />
                       </div>
 
