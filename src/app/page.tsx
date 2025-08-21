@@ -121,7 +121,7 @@ export default function HomePage() {
       setLoading(true);
       try {
         // Run all queries in parallel for better performance
-        const [businessQuery, propertyQuery] = await Promise.allSettled([
+        const [businessQuery, propertyQuery, jobsQuery] = await Promise.allSettled([
           supabase
             .from('business_listings')
             .select('id, business_name, category, description, address, city, phone, email, website, image_url, rating, review_count, is_approved, is_verified, whatsapp_number')
@@ -136,6 +136,14 @@ export default function HomePage() {
             .eq('is_approved', true)
             .order('is_featured', { ascending: false })
             .order('created_at', { ascending: false })
+            .limit(3),
+
+          supabase
+            .from('jobs')
+            .select('id, job_title, nature_of_job, industry, salary, job_location, duties_and_responsibilities, company_name, contact_email, status, featured, slug')
+            .eq('status', 'active')
+            .order('featured', { ascending: false })
+            .order('created_at', { ascending: false })
             .limit(3)
         ]);
 
@@ -149,8 +157,10 @@ export default function HomePage() {
           setFeaturedProperties(propertyQuery.value.data || []);
         }
 
-        // Skip jobs for now but keep empty array
-        setFeaturedJobs([]);
+        // Handle jobs data
+        if (jobsQuery.status === 'fulfilled' && !jobsQuery.value.error) {
+          setFeaturedJobs(jobsQuery.value.data || []);
+        }
 
       } catch (error) {
         console.error('Error fetching featured listings:', error);
