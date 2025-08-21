@@ -323,6 +323,241 @@ The site uses a Kenya-inspired color palette:
 - **Properties** (`/properties`) - Property listings with images and details
 - **Blog** (`/blog`) - Articles and news about Kenya
 
+## 📝 Blog Content Management System
+
+### File-Based Blog System
+
+NewKenyan.com features a flexible file-based blog system that supports multiple content formats:
+
+#### Supported File Types
+- **HTML files** (`.html`) - For rich HTML content
+- **Markdown files** (`.md`) - For simple text formatting
+- **MDX files** (`.mdx`) - For advanced React components in markdown
+
+#### How to Add Blog Posts
+
+1. **Create your content file** in the `src/content/blog/` directory
+2. **Add frontmatter** at the top with post metadata
+3. **Save and deploy** - Posts automatically appear on the blog
+
+#### File Structure Example
+
+```
+src/
+├── content/
+│   └── blog/
+│       ├── my-first-post.md
+│       ├── business-tips.html
+│       └── tech-trends.mdx
+```
+
+#### Frontmatter Format
+
+**For HTML Files:**
+```html
+---
+title: "Your Blog Post Title"
+excerpt: "Brief description for previews and SEO"
+category: "Business" 
+author: "Your Name"
+date: "2024-01-15"
+readTime: 5
+featuredImage: "/images/your-image.jpg"
+trending: false
+---
+
+<h1>Your HTML Content</h1>
+<p>All your HTML content goes here...</p>
+```
+
+**For Markdown Files:**
+```markdown
+---
+title: "Your Blog Post Title"
+excerpt: "Brief description for previews and SEO"
+category: "Technology"
+author: "Your Name" 
+date: "2024-01-15"
+readTime: 8
+featuredImage: "/images/your-image.jpg"
+trending: true
+---
+
+# Your Markdown Content
+
+Your markdown content with **formatting** and [links](https://example.com).
+```
+
+#### Categories
+Common categories include:
+- `Business`
+- `Technology` 
+- `Lifestyle`
+- `Career`
+- `Real Estate`
+- `Finance`
+
+#### URL Structure
+- File: `my-blog-post.md` → URL: `/blog/my-blog-post`
+- File: `business-tips.html` → URL: `/blog/business-tips`
+
+#### Features
+- **Automatic listing** - All posts appear on `/blog` page
+- **Category filtering** - Users can filter by category
+- **Search functionality** - Full-text search across all posts
+- **Related posts** - Automatic related post suggestions
+- **Social sharing** - Built-in share buttons
+- **SEO optimization** - Meta tags and schema markup
+- **Mobile responsive** - Works perfectly on all devices
+
+#### Adding Images to Blog Posts
+
+**Featured Images (Blog Cards):**
+1. Upload your image to `public/images/` folder
+2. Reference in frontmatter: `featuredImage: "/images/your-blog-image.jpg"`
+3. Image appears on blog listing cards automatically
+
+**Images Within Blog Content:**
+
+**For HTML Posts:**
+```html
+<!-- Simple image -->
+<img src="/images/content-image.jpg" alt="Description" style="width: 100%; height: auto;" />
+
+<!-- Image with caption -->
+<figure>
+  <img src="/images/chart.png" alt="Sales Chart" style="width: 100%;" />
+  <figcaption>Monthly sales performance for 2024</figcaption>
+</figure>
+```
+
+**For Markdown Posts:**
+```markdown
+<!-- Simple image -->
+![Alt text](/images/content-image.jpg)
+
+<!-- Image with custom sizing -->
+<img src="/images/chart.png" alt="Sales Chart" width="600" />
+```
+
+#### Adding YouTube Videos
+
+**For HTML Posts:**
+```html
+<!-- Responsive YouTube embed -->
+<div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden;">
+  <iframe 
+    style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" 
+    src="https://www.youtube.com/embed/VIDEO_ID" 
+    title="YouTube video" 
+    frameborder="0" 
+    allowfullscreen>
+  </iframe>
+</div>
+```
+
+**For Markdown Posts:**
+```markdown
+<!-- YouTube embed -->
+<iframe width="100%" height="315" src="https://www.youtube.com/embed/VIDEO_ID" 
+title="YouTube video" frameborder="0" allowfullscreen></iframe>
+```
+
+#### Rich Content Examples
+
+**HTML Post with Rich Content:**
+```html
+---
+title: "Complete Guide to Kenyan Business Registration"
+excerpt: "Step-by-step guide with videos and downloadable forms"
+category: "Business"
+author: "Business Expert"
+date: "2024-01-15"
+featuredImage: "/images/business-registration.jpg"
+---
+
+<h1>Complete Guide to Kenyan Business Registration</h1>
+
+<img src="/images/business-steps.png" alt="Registration Steps" style="width: 100%; margin: 20px 0;" />
+
+<p>Starting a business in Kenya requires several steps...</p>
+
+<!-- YouTube tutorial -->
+<h2>Video Tutorial</h2>
+<div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; margin: 20px 0;">
+  <iframe 
+    style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;" 
+    src="https://www.youtube.com/embed/YOUR_VIDEO_ID" 
+    title="Business Registration Tutorial" 
+    frameborder="0" 
+    allowfullscreen>
+  </iframe>
+</div>
+
+<!-- Download section -->
+<div style="background: #f3f4f6; padding: 20px; border-radius: 8px; margin: 20px 0;">
+  <h3>Download Required Forms</h3>
+  <ul>
+    <li><a href="/downloads/form-1.pdf">Business Registration Form</a></li>
+    <li><a href="/downloads/checklist.pdf">Requirements Checklist</a></li>
+  </ul>
+</div>
+```
+
+#### Image Best Practices
+
+**Image Optimization:**
+- **File sizes**: Keep under 500KB for fast loading
+- **Formats**: Use JPEG for photos, PNG for graphics with transparency
+- **Dimensions**: Blog cards work best with 800x600px or 16:9 ratio
+- **File naming**: Use descriptive names: `kenyan-startup-tips.jpg` not `img1.jpg`
+
+**SEO-Friendly Images:**
+- Always include `alt` attributes with descriptive text
+- Use relevant keywords in file names and alt text
+- Compress images before uploading
+
+#### Content Structure Tips
+
+**Professional Blog Layout:**
+```html
+<!-- Header with featured image -->
+<img src="/images/hero-image.jpg" alt="Article topic" style="width: 100%; height: 300px; object-fit: cover; border-radius: 8px;" />
+
+<!-- Introduction -->
+<p><strong>Introduction paragraph with key points...</strong></p>
+
+<!-- Table of contents -->
+<div style="background: #f9fafb; padding: 15px; border-left: 4px solid #10b981; margin: 20px 0;">
+  <h3>What You'll Learn</h3>
+  <ul>
+    <li>Key concept 1</li>
+    <li>Key concept 2</li>
+    <li>Key concept 3</li>
+  </ul>
+</div>
+
+<!-- Main content with subheadings -->
+<h2>Section 1: Getting Started</h2>
+<p>Content...</p>
+
+<img src="/images/section1-image.jpg" alt="Section 1 illustration" style="width: 100%; margin: 15px 0;" />
+
+<!-- Call-to-action boxes -->
+<div style="background: #dcfce7; padding: 20px; border-radius: 8px; text-align: center; margin: 30px 0;">
+  <h3>Ready to Start Your Business?</h3>
+  <p>Contact our business consultants for personalized guidance</p>
+  <a href="/contact" style="background: #16a34a; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px;">Get Started Today</a>
+</div>
+```
+
+#### Blog Management Files
+- **Blog listing page**: `src/app/blog/page.tsx`
+- **Individual post page**: `src/app/blog/[slug]/page.tsx`
+- **Content processor**: `src/lib/blog.ts`
+- **Content directory**: `src/content/blog/`
+- **Images directory**: `public/images/`
+
 ## 🚀 Deployment
 
 ### Deploy to Vercel (Recommended)
