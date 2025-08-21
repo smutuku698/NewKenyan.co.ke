@@ -141,7 +141,7 @@ export default function HomePage() {
           supabase
             .from('jobs')
             .select('id, job_title, nature_of_job, industry, salary, job_location, duties_and_responsibilities, company_name, contact_email, status, featured, slug')
-            .eq('status', 'active')
+            .eq('status', 'approved')
             .order('featured', { ascending: false })
             .order('created_at', { ascending: false })
             .limit(3)
