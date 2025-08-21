@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
+import { OptimizedImage } from '@/components/OptimizedImage';
 import { Button } from '@/components/ui/button';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -10,6 +11,8 @@ import JobCard from '@/components/JobCard';
 import BusinessCard from '@/components/BusinessCard';
 import PropertyCard from '@/components/PropertyCard';
 import BlogCard from '@/components/BlogCard';
+import { GridLoadingSkeleton } from '@/components/LoadingSkeleton';
+import { LazySection } from '@/components/LazySection';
 import { 
   sampleBusinesses, 
   sampleBlogPosts, 
@@ -117,39 +120,37 @@ export default function HomePage() {
     const fetchFeaturedListings = async () => {
       setLoading(true);
       try {
-        // Fetch featured businesses (using is_verified as featured flag)
-        const { data: businessData, error: businessError } = await supabase
-          .from('business_listings')
-          .select('*')
-          .eq('is_approved', true)
-          .order('is_verified', { ascending: false })
-          .order('created_at', { ascending: false })
-          .limit(3);
+        // Run all queries in parallel for better performance
+        const [businessQuery, propertyQuery] = await Promise.allSettled([
+          supabase
+            .from('business_listings')
+            .select('id, business_name, category, description, address, city, phone, email, website, image_url, rating, review_count, is_approved, is_verified, whatsapp_number')
+            .eq('is_approved', true)
+            .order('is_verified', { ascending: false })
+            .order('created_at', { ascending: false })
+            .limit(3),
+          
+          supabase
+            .from('property_listings')
+            .select('id, property_title, property_type, description, price, price_type, bedrooms, bathrooms, address, city, county, contact_phone, contact_email, whatsapp_number, amenities, images, is_approved, is_featured')
+            .eq('is_approved', true)
+            .order('is_featured', { ascending: false })
+            .order('created_at', { ascending: false })
+            .limit(3)
+        ]);
 
-        // Fetch featured properties
-        const { data: propertyData, error: propertyError } = await supabase
-          .from('property_listings')
-          .select('*')
-          .eq('is_approved', true)
-          .order('is_featured', { ascending: false })
-          .order('created_at', { ascending: false })
-          .limit(3);
-
-        // Fetch featured jobs
-        // Skip jobs for now due to memory issues
-        const jobData = [];
-
-        if (!businessError && businessData) {
-          setFeaturedBusinesses(businessData);
+        // Handle business data
+        if (businessQuery.status === 'fulfilled' && !businessQuery.value.error) {
+          setFeaturedBusinesses(businessQuery.value.data || []);
         }
 
-        if (!propertyError && propertyData) {
-          setFeaturedProperties(propertyData);
+        // Handle property data
+        if (propertyQuery.status === 'fulfilled' && !propertyQuery.value.error) {
+          setFeaturedProperties(propertyQuery.value.data || []);
         }
 
-        if (jobData) {
-          setFeaturedJobs(jobData);
-        }
+        // Skip jobs for now but keep empty array
+        setFeaturedJobs([]);
 
       } catch (error) {
         console.error('Error fetching featured listings:', error);
@@ -300,14 +301,7 @@ export default function HomePage() {
               
               <div className="grid gap-4 sm:gap-6 md:grid-cols-2 lg:grid-cols-3">
                 {loading ? (
-                  // Loading skeleton
-                  Array.from({ length: 3 }).map((_, index) => (
-                    <div key={index} className="bg-white rounded-lg shadow-sm border p-6 animate-pulse">
-                      <div className="h-4 bg-gray-200 rounded mb-3"></div>
-                      <div className="h-3 bg-gray-200 rounded mb-2"></div>
-                      <div className="h-3 bg-gray-200 rounded w-2/3"></div>
-                    </div>
-                  ))
+                  <GridLoadingSkeleton type="property" count={3} />
                 ) : featuredProperties.length > 0 ? (
                   featuredProperties.map((property) => (
                     <PropertyCard 
@@ -353,14 +347,7 @@ export default function HomePage() {
               
               <div className="grid gap-4 sm:gap-6 md:grid-cols-2 lg:grid-cols-3">
                 {loading ? (
-                  // Loading skeleton
-                  Array.from({ length: 3 }).map((_, index) => (
-                    <div key={index} className="bg-white rounded-lg shadow-sm border p-6 animate-pulse">
-                      <div className="h-4 bg-gray-200 rounded mb-3"></div>
-                      <div className="h-3 bg-gray-200 rounded mb-2"></div>
-                      <div className="h-3 bg-gray-200 rounded w-2/3"></div>
-                    </div>
-                  ))
+                  <GridLoadingSkeleton type="business" count={3} />
                 ) : featuredBusinesses.length > 0 ? (
                   featuredBusinesses.map((business) => (
                     <BusinessCard 
@@ -421,14 +408,7 @@ export default function HomePage() {
               
               <div className="grid gap-4 sm:gap-6 md:grid-cols-2 lg:grid-cols-3">
                 {loading ? (
-                  // Loading skeleton
-                  Array.from({ length: 3 }).map((_, index) => (
-                    <div key={index} className="bg-white rounded-lg shadow-sm border p-6 animate-pulse">
-                      <div className="h-4 bg-gray-200 rounded mb-3"></div>
-                      <div className="h-3 bg-gray-200 rounded mb-2"></div>
-                      <div className="h-3 bg-gray-200 rounded w-2/3"></div>
-                    </div>
-                  ))
+                  <GridLoadingSkeleton type="job" count={3} />
                 ) : featuredJobs.length > 0 ? (
                   featuredJobs.map((job) => (
                     <JobCard 
@@ -480,6 +460,7 @@ export default function HomePage() {
 
 
         {/* Popular Cities */}
+        <LazySection>
         <section className="py-16 bg-white">
           <div className="container mx-auto px-4">
             <div className="text-center mb-12">
@@ -525,8 +506,10 @@ export default function HomePage() {
             </div>
           </div>
         </section>
+        </LazySection>
 
         {/* Call to Action */}
+        <LazySection>
         <section className="py-16 bg-gray-100">
           <div className="container mx-auto px-4 text-center">
             <div className="max-w-2xl mx-auto">
@@ -548,8 +531,10 @@ export default function HomePage() {
             </div>
           </div>
         </section>
+        </LazySection>
 
         {/* FAQ Section */}
+        <LazySection>
         <section className="py-16 bg-white">
           <div className="container mx-auto px-4">
             <div className="max-w-3xl mx-auto">
@@ -588,8 +573,10 @@ export default function HomePage() {
             </div>
           </div>
         </section>
+        </LazySection>
 
         {/* Additional Content & Links */}
+        <LazySection>
         <section className="py-16 bg-gray-50">
           <div className="container mx-auto px-4">
             <div className="max-w-4xl mx-auto text-center">
@@ -612,6 +599,7 @@ export default function HomePage() {
             </div>
           </div>
         </section>
+        </LazySection>
       </main>
       
       <Footer />
