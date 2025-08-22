@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import matter from 'gray-matter';
+import { marked } from 'marked';
 
 const blogDirectory = path.join(process.cwd(), 'src/content/blog');
 
@@ -17,6 +18,7 @@ export interface BlogPost {
   content: string;
   slug: string;
   format: 'html' | 'md' | 'mdx';
+  htmlContent?: string;
   seoTitle?: string;
   seoDescription?: string;
   keywords?: string;
@@ -74,6 +76,23 @@ export function getAllBlogPosts(): BlogPost[] {
     const title = frontMatter.title || 'Untitled Post';
     const slug = frontMatter.slug || generateSlugFromTitle(title);
     
+    // Process markdown content to HTML
+    let htmlContent = content;
+    let format: 'html' | 'md' | 'mdx' = 'html';
+    
+    if (fileName.endsWith('.md') || fileName.endsWith('.mdx')) {
+      format = fileName.endsWith('.mdx') ? 'mdx' : 'md';
+      
+      // Configure marked for better rendering
+      marked.setOptions({
+        breaks: true,
+        gfm: true,
+      });
+      
+      // Convert markdown to HTML
+      htmlContent = marked(content);
+    }
+    
     const post: BlogPost = {
       id: slug,
       slug: slug,
@@ -86,6 +105,8 @@ export function getAllBlogPosts(): BlogPost[] {
       featuredImage: frontMatter.featuredImage || frontMatter.image || '/images/default-blog.svg',
       isTrending: frontMatter.trending === true || frontMatter.trending === 'true',
       content: content,
+      format: format,
+      htmlContent: htmlContent,
       seoTitle: frontMatter.seoTitle,
       seoDescription: frontMatter.seoDescription,
       keywords: frontMatter.keywords,

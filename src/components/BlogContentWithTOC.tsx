@@ -6,18 +6,20 @@ import TableOfContents from './TableOfContents';
 interface BlogContentWithTOCProps {
   content: string;
   format: 'html' | 'md' | 'mdx';
+  htmlContent?: string;
 }
 
-export default function BlogContentWithTOC({ content, format }: BlogContentWithTOCProps) {
+export default function BlogContentWithTOC({ content, format, htmlContent }: BlogContentWithTOCProps) {
   const contentRef = useRef<HTMLDivElement>(null);
   const [processedContent, setProcessedContent] = useState<string>('');
   const [showTOC, setShowTOC] = useState<boolean>(false);
 
   useEffect(() => {
     const processContent = () => {
-      let processed = content;
+      // Use HTML content if available (for markdown files), otherwise use raw content
+      let processed = htmlContent || content;
       
-      if (format === 'html') {
+      if (format === 'html' || htmlContent) {
         // For HTML content, find the first paragraph and insert TOC placeholder after it
         const paragraphMatch = processed.match(/(<p[^>]*>.*?<\/p>)/i);
         if (paragraphMatch) {
@@ -51,7 +53,7 @@ export default function BlogContentWithTOC({ content, format }: BlogContentWithT
     };
 
     processContent();
-  }, [content, format]);
+  }, [content, format, htmlContent]);
 
   useEffect(() => {
     if (contentRef.current && showTOC) {
@@ -77,7 +79,7 @@ export default function BlogContentWithTOC({ content, format }: BlogContentWithT
         <div 
           ref={contentRef}
           dangerouslySetInnerHTML={{ __html: processedContent }}
-          className="prose prose-lg max-w-none prose-headings:text-gray-900 prose-a:text-green-600 prose-strong:text-gray-900"
+          className="prose prose-lg max-w-none prose-headings:text-gray-900 prose-a:text-green-600 prose-strong:text-gray-900 prose-img:rounded-lg prose-img:shadow-lg prose-img:w-full prose-img:h-auto"
         />
       );
     }
@@ -88,7 +90,7 @@ export default function BlogContentWithTOC({ content, format }: BlogContentWithT
         <div 
           ref={contentRef}
           dangerouslySetInnerHTML={{ __html: processedContent }}
-          className="prose prose-lg max-w-none prose-headings:text-gray-900 prose-a:text-green-600 prose-strong:text-gray-900"
+          className="prose prose-lg max-w-none prose-headings:text-gray-900 prose-a:text-green-600 prose-strong:text-gray-900 prose-img:rounded-lg prose-img:shadow-lg prose-img:w-full prose-img:h-auto"
         />
       );
     }

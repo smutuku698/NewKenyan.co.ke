@@ -239,7 +239,8 @@ export default async function BlogPostPage({ params }: PageProps) {
                     {post.content ? (
                       <BlogContentWithTOC 
                         content={post.content} 
-                        format="html"
+                        format={post.format || "html"}
+                        htmlContent={post.htmlContent}
                       />
                     ) : (
                       <div className="prose prose-lg max-w-none prose-headings:text-gray-900 prose-a:text-green-600 prose-strong:text-gray-900">
