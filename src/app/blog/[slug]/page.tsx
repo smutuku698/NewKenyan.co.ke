@@ -222,17 +222,6 @@ export default async function BlogPostPage({ params }: PageProps) {
                           <ShareButton post={post} />
                         </div>
                       </div>
-                      
-                      {/* Social Follow Section */}
-                      <div className="mt-6 pt-6 border-t border-gray-200">
-                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                          <div>
-                            <h3 className="text-sm font-semibold text-gray-900 mb-2">Follow NewKenyan.com</h3>
-                            <p className="text-xs text-gray-600">Stay updated with our latest articles and insights</p>
-                          </div>
-                          <SocialFollowLinks size="sm" className="flex-shrink-0" />
-                        </div>
-                      </div>
                     </div>
 
                     {/* Article Content */}
