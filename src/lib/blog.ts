@@ -3,6 +3,40 @@ import path from 'path';
 import matter from 'gray-matter';
 import { marked } from 'marked';
 
+// Function to extract FAQ from markdown content
+function extractFAQFromMarkdown(content: string): Array<{question: string; answer: string}> {
+  const faqItems: Array<{question: string; answer: string}> = [];
+  
+  // Look for FAQ section in markdown
+  const faqSectionMatch = content.match(/##\s*(?:Frequently Asked Questions|FAQ|FAQs?)\s*\n([\s\S]*?)(?=\n##|$)/i);
+  
+  if (faqSectionMatch) {
+    const faqContent = faqSectionMatch[1];
+    
+    // Extract Q&A pairs using ### headings as questions
+    const qaMatches = faqContent.match(/###\s*(.+?)\n([\s\S]*?)(?=\n###|$)/g);
+    
+    if (qaMatches) {
+      qaMatches.forEach(match => {
+        const qaPair = match.match(/###\s*(.+?)\n([\s\S]*?)$/);
+        if (qaPair) {
+          const question = qaPair[1].trim();
+          const answer = qaPair[2].trim();
+          
+          if (question && answer) {
+            faqItems.push({
+              question: question,
+              answer: answer
+            });
+          }
+        }
+      });
+    }
+  }
+  
+  return faqItems;
+}
+
 const blogDirectory = path.join(process.cwd(), 'src/content/blog');
 
 export interface BlogPost {
@@ -94,6 +128,9 @@ export function getAllBlogPosts(): BlogPost[] {
       htmlContent = marked(content);
     }
     
+    // Extract FAQ from markdown content
+    const extractedFAQ = extractFAQFromMarkdown(content);
+    
     const post: BlogPost = {
       id: slug,
       slug: slug,
@@ -112,7 +149,7 @@ export function getAllBlogPosts(): BlogPost[] {
       seoDescription: frontMatter.seoDescription,
       keywords: frontMatter.keywords,
       schema: frontMatter.schema,
-      faq: frontMatter.faq
+      faq: extractedFAQ.length > 0 ? extractedFAQ : frontMatter.faq
     };
 
     posts.push(post);
