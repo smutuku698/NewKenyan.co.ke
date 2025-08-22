@@ -8,6 +8,34 @@
   }
 }
 
+@layer components {
+  /* Mobile-first full-width container for specific cases */
+  .container-mobile-full {
+    @apply w-full px-4;
+  }
+  
+  /* Responsive container with minimal mobile padding */
+  .container-responsive {
+    @apply container mx-auto px-4 sm:px-6 lg:px-8;
+  }
+}
+
+/* Mobile optimizations */
+@media (max-width: 640px) {
+  .container {
+    padding-left: 0.75rem !important;
+    padding-right: 0.75rem !important;
+  }
+  
+  /* Ensure content uses full width on mobile */
+  .mobile-full-width {
+    margin-left: -0.75rem;
+    margin-right: -0.75rem;
+    padding-left: 0.75rem;
+    padding-right: 0.75rem;
+  }
+}
+
 @layer utilities {
   .line-clamp-2 {
     overflow: hidden;
