@@ -168,6 +168,25 @@ export default function DirectoryPage() {
             })
           }}
         />
+        
+        {/* FAQ Schema */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "FAQPage",
+              "mainEntity": faqData.map(faq => ({
+                "@type": "Question",
+                "name": faq.question,
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": faq.answer.replace(/<[^>]*>/g, '')
+                }
+              }))
+            })
+          }}
+        />
       </Head>
       
       <div className="min-h-screen bg-white">
@@ -187,7 +206,7 @@ export default function DirectoryPage() {
         </div>
         
         <div className="relative container mx-auto px-4 text-center">
-          <h1 className="text-5xl font-bold mb-6">
+          <h1 className="text-5xl font-bold mb-6 !text-white">
             Kenya Business Directory - Companies in Kenya
           </h1>
           <p className="text-xl mb-8 max-w-2xl mx-auto">

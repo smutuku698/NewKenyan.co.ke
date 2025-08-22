@@ -149,7 +149,7 @@ export default function PropertiesPage() {
         </div>
         
         <div className="relative container mx-auto px-2 sm:px-4 text-center">
-          <h1 className="text-5xl font-bold mb-6">
+          <h1 className="text-5xl font-bold mb-6 !text-white">
             Find Your Perfect Home
           </h1>
           <p className="text-xl mb-8 max-w-2xl mx-auto">
