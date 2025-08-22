@@ -4,11 +4,98 @@
 
 @layer base {
   body {
-    @apply bg-white text-gray-900 font-sans;
+    @apply bg-white text-gray-900 font-body text-base;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+  
+  /* Professional heading styles */
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-heading font-semibold text-gray-900;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+  
+  h1 {
+    @apply text-h1-mobile lg:text-h1-desktop;
+  }
+  
+  h2 {
+    @apply text-h2-mobile lg:text-h2-desktop;
+  }
+  
+  h3 {
+    @apply text-h3-mobile lg:text-h3-desktop;
+  }
+  
+  h4 {
+    @apply text-xl lg:text-2xl;
+  }
+  
+  h5 {
+    @apply text-lg lg:text-xl;
+  }
+  
+  h6 {
+    @apply text-base lg:text-lg;
+  }
+  
+  /* Better reading experience */
+  p {
+    @apply text-gray-700 leading-relaxed;
+  }
+  
+  /* Links */
+  a {
+    @apply text-green-600 hover:text-green-700 transition-colors;
   }
 }
 
 @layer components {
+  /* Typography Components */
+  .display-title {
+    @apply font-heading font-bold text-h1-mobile lg:text-5xl text-gray-900 leading-tight;
+  }
+  
+  .section-title {
+    @apply font-heading font-semibold text-h2-mobile lg:text-h2-desktop text-gray-900;
+  }
+  
+  .subsection-title {
+    @apply font-heading font-medium text-h3-mobile lg:text-h3-desktop text-gray-900;
+  }
+  
+  .card-title {
+    @apply font-heading font-semibold text-lg lg:text-xl text-gray-900;
+  }
+  
+  .body-large {
+    @apply font-body text-lg leading-relaxed text-gray-700;
+  }
+  
+  .body-medium {
+    @apply font-body text-base leading-relaxed text-gray-700;
+  }
+  
+  .body-small {
+    @apply font-body text-sm leading-relaxed text-gray-600;
+  }
+  
+  .label-text {
+    @apply font-body text-sm font-medium text-gray-700;
+  }
+  
+  .caption-text {
+    @apply font-body text-xs text-gray-500;
+  }
+  
+  /* Button typography */
+  .btn-text {
+    @apply font-body font-medium text-sm;
+  }
+  
+  .btn-text-lg {
+    @apply font-body font-medium text-base;
+  }
+
   /* Mobile-first full-width container for specific cases */
   .container-mobile-full {
     @apply w-full px-4;

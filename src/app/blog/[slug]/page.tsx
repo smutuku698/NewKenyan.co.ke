@@ -182,7 +182,7 @@ export default async function BlogPostPage({ params }: PageProps) {
 
                   {/* Article Header */}
                   <div className="p-6 md:p-8">
-                    <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-6 leading-tight">
+                    <h1 className="display-title mb-6">
                       {post.title}
                     </h1>
                     
@@ -266,7 +266,7 @@ export default async function BlogPostPage({ params }: PageProps) {
                 {/* Related Posts */}
                 {relatedPosts.length > 0 && (
                   <div className="mt-16">
-                    <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-8 text-center">Related Articles</h2>
+                    <h2 className="section-title mb-8 text-center">Related Articles</h2>
                     <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
                       {relatedPosts.map((relatedPost) => (
                         <RelatedPostCard key={relatedPost.id} post={relatedPost} />
@@ -281,7 +281,7 @@ export default async function BlogPostPage({ params }: PageProps) {
                 <div className="lg:sticky lg:top-8 space-y-6">
                   {/* Author Bio */}
                   <div className="bg-white rounded-xl shadow-sm border p-6">
-                    <h3 className="text-lg font-bold text-gray-900 mb-4">About the Author</h3>
+                    <h3 className="subsection-title mb-4">About the Author</h3>
                     <div className="flex items-center gap-3 mb-4">
                       <div className="w-14 h-14 bg-gradient-to-r from-green-600 to-green-700 rounded-full flex items-center justify-center">
                         <User className="h-7 w-7 text-white" />
@@ -304,7 +304,7 @@ export default async function BlogPostPage({ params }: PageProps) {
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 4.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                         </svg>
                       </div>
-                      <h3 className="text-lg font-bold text-gray-900 mb-2">Stay Updated</h3>
+                      <h3 className="subsection-title mb-2">Stay Updated</h3>
                       <p className="text-sm text-gray-600 mb-4">
                         Get the latest business news and insights delivered to your inbox.
                       </p>
@@ -316,7 +316,7 @@ export default async function BlogPostPage({ params }: PageProps) {
 
                   {/* Quick Links */}
                   <div className="bg-white rounded-xl shadow-sm border p-6">
-                    <h3 className="text-lg font-bold text-gray-900 mb-4">Quick Links</h3>
+                    <h3 className="subsection-title mb-4">Quick Links</h3>
                     <div className="space-y-3">
                       <Link href="/jobs-in-kenya" className="flex items-center gap-2 text-green-600 hover:text-green-700 transition-colors text-sm font-medium">
                         <span>Jobs in Kenya</span>

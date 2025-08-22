@@ -30,10 +30,10 @@ const Header = () => {
               <MapPin className="h-7 w-7 text-white drop-shadow-md" />
             </div>
             <div className="flex flex-col">
-              <span className="text-2xl font-bold text-white drop-shadow-md tracking-wide">
+              <span className="text-xl lg:text-2xl font-heading font-bold text-white drop-shadow-md">
                 NewKenyan.com
               </span>
-              <span className="text-xs text-green-100 font-medium tracking-wider">
+              <span className="text-xs text-green-100 font-body font-medium tracking-wider">
                 KENYA&apos;S BUSINESS HUB
               </span>
             </div>
@@ -45,7 +45,7 @@ const Header = () => {
               <Link
                 key={item.path}
                 href={item.path}
-                className={`text-sm font-semibold transition-all duration-200 hover:scale-105 whitespace-nowrap ${
+                className={`btn-text font-semibold transition-all duration-200 hover:scale-105 whitespace-nowrap ${
                   currentPath === item.path
                     ? 'text-white bg-white/20 px-3 py-2 rounded-lg backdrop-blur-sm shadow-lg'
                     : 'text-green-50 hover:text-white hover:bg-white/10 px-3 py-2 rounded-lg'
@@ -211,7 +211,7 @@ const Header = () => {
                   <Link
                     key={item.path}
                     href={item.path}
-                    className={`block px-4 py-3 text-lg font-semibold transition-all duration-200 rounded-lg ${
+                    className={`block px-4 py-3 body-large font-semibold transition-all duration-200 rounded-lg ${
                       currentPath === item.path
                         ? 'text-white bg-gradient-to-r from-green-600 to-green-700 shadow-lg'
                         : 'text-gray-700 hover:text-white hover:bg-gradient-to-r hover:from-green-500 hover:to-green-600 hover:shadow-md'

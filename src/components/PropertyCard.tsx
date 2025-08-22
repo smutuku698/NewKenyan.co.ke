@@ -73,11 +73,11 @@ const PropertyCard = ({
       <div className="p-6">
         {/* Header */}
         <div className="mb-4">
-          <h3 className="font-semibold text-lg text-gray-900 mb-2 line-clamp-2">
+          <h3 className="card-title mb-2 line-clamp-2">
             {title}
           </h3>
-          <p className="text-2xl font-bold text-green-600">{formatPrice(price)}</p>
-          <p className="text-sm text-gray-600">per month</p>
+          <p className="text-xl lg:text-2xl font-heading font-bold text-green-600">{formatPrice(price)}</p>
+          <p className="body-small">per month</p>
         </div>
 
         {/* Property Details */}

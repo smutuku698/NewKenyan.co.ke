@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter, Manrope, Source_Sans_3 } from "next/font/google";
 import { ClerkProvider } from '@clerk/nextjs';
 import GoogleAnalytics from '@/components/GoogleAnalytics';
 import CookieConsent from '@/components/CookieConsent';
@@ -7,9 +7,25 @@ import GoogleTagManager, { GoogleTagManagerNoScript } from '@/components/GoogleT
 import SEOOptimizations from '@/components/SEOOptimizations';
 import "./globals.css";
 
+// Primary font for headings - Modern and professional
+const manrope = Manrope({
+  subsets: ["latin"],
+  variable: "--font-heading",
+  display: 'swap',
+});
+
+// Body font - Highly readable
+const sourceSans = Source_Sans_3({
+  subsets: ["latin"],
+  variable: "--font-body",
+  display: 'swap',
+});
+
+// Fallback font
 const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
+  display: 'swap',
 });
 
 export const metadata: Metadata = {
@@ -338,7 +354,7 @@ export default function RootLayout({
           />
         </head>
         <body
-          className={`${inter.variable} font-sans antialiased`}
+          className={`${manrope.variable} ${sourceSans.variable} ${inter.variable} font-body antialiased`}
         >
           <GoogleTagManagerNoScript />
           <GoogleAnalytics />
