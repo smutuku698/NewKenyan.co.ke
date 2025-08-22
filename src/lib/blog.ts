@@ -23,6 +23,7 @@ export interface BlogPost {
   seoDescription?: string;
   keywords?: string;
   schema?: Record<string, unknown>;
+  faq?: Array<{question: string; answer: string}>;
 }
 
 function generateSlugFromTitle(title: string): string {
@@ -110,7 +111,8 @@ export function getAllBlogPosts(): BlogPost[] {
       seoTitle: frontMatter.seoTitle,
       seoDescription: frontMatter.seoDescription,
       keywords: frontMatter.keywords,
-      schema: frontMatter.schema
+      schema: frontMatter.schema,
+      faq: frontMatter.faq
     };
 
     posts.push(post);

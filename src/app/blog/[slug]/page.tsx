@@ -143,6 +143,27 @@ export default async function BlogPostPage({ params }: PageProps) {
         }}
       />
 
+      {/* FAQ Schema - if blog post has FAQ data */}
+      {post.faq && post.faq.length > 0 && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "FAQPage",
+              "mainEntity": post.faq.map(faqItem => ({
+                "@type": "Question",
+                "name": faqItem.question,
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": faqItem.answer
+                }
+              }))
+            })
+          }}
+        />
+      )}
+
       <div className="min-h-screen bg-gray-50">
         <Header />
         
@@ -237,6 +258,24 @@ export default async function BlogPostPage({ params }: PageProps) {
                         <p className="text-gray-700 mb-4">
                           This is where your blog post content will appear. You can add your HTML content here and it will be displayed properly.
                         </p>
+                      </div>
+                    )}
+
+                    {/* FAQ Section - if blog post has FAQ data */}
+                    {post.faq && post.faq.length > 0 && (
+                      <div className="mt-12 pt-8 border-t">
+                        <h2 className="text-2xl font-bold text-gray-900 mb-6">Frequently Asked Questions</h2>
+                        <div className="space-y-4">
+                          {post.faq.map((faqItem, index) => (
+                            <div key={index} className="bg-gray-50 rounded-lg p-6">
+                              <h3 className="font-semibold text-gray-900 mb-3">{faqItem.question}</h3>
+                              <div 
+                                className="text-gray-700 prose prose-sm max-w-none"
+                                dangerouslySetInnerHTML={{ __html: faqItem.answer }}
+                              />
+                            </div>
+                          ))}
+                        </div>
                       </div>
                     )}
 
