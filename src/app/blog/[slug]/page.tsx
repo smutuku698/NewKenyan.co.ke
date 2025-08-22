@@ -6,7 +6,7 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { sampleBlogPosts } from '@/data/sampleData';
-import { getBlogPost, getAllBlogPosts, BlogPost } from '@/lib/blog';
+import { getBlogPost, getAllBlogPosts } from '@/lib/blog';
 import ShareButton from './ShareButtons';
 import RelatedPostCard from './RelatedPostCard';
 import BlogContentWithTOC from '@/components/BlogContentWithTOC';
@@ -16,7 +16,6 @@ import {
   Clock, 
   User, 
   ArrowLeft,
-  Eye,
   BookOpen
 } from 'lucide-react';
 

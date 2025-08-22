@@ -20,7 +20,7 @@ export interface BlogPost {
   seoTitle?: string;
   seoDescription?: string;
   keywords?: string;
-  schema?: any;
+  schema?: Record<string, unknown>;
 }
 
 function generateSlugFromTitle(title: string): string {
@@ -45,7 +45,7 @@ export function getAllBlogPosts(): BlogPost[] {
     const fileContents = fs.readFileSync(filePath, 'utf8');
     
     let content = '';
-    let frontMatter: any = {};
+    let frontMatter: Record<string, unknown> = {};
     
     if (fileName.endsWith('.md') || fileName.endsWith('.mdx')) {
       const matterResult = matter(fileContents);

@@ -30,7 +30,7 @@ export default function ShareButton({ post }: ShareButtonProps) {
       } else {
         await handleCopyToClipboard();
       }
-    } catch (error) {
+    } catch {
       await handleCopyToClipboard();
     }
     setShowShareOptions(false);

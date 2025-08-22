@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
@@ -36,17 +36,17 @@ export default function BlogPageClient({ initialPosts }: BlogPageClientProps) {
   const trendingPosts = initialPosts.filter(post => post.isTrending);
   
   // Get random posts for internal linking
-  const getRandomPosts = (currentPostId?: string, count: number = 3) => {
+  const getRandomPosts = useCallback((currentPostId?: string, count: number = 3) => {
     const availablePosts = initialPosts.filter(post => post.id !== currentPostId);
     const shuffled = [...availablePosts].sort(() => 0.5 - Math.random());
     return shuffled.slice(0, count);
-  };
+  }, [initialPosts]);
 
   useEffect(() => {
     if (initialPosts.length > 0) {
       setRandomPosts(getRandomPosts(undefined, 6));
     }
-  }, [initialPosts]);
+  }, [initialPosts, getRandomPosts]);
 
   useEffect(() => {
     let filtered = initialPosts;
