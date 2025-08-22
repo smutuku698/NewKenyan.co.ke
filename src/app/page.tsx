@@ -193,7 +193,7 @@ export default function HomePage() {
         <section className="relative bg-gray-900 text-white py-20">
           <div className="absolute inset-0">
             <Image
-              src="/images/hero-kenya.jpg"
+              src="/images/hero-kenya.webp"
               alt="Beautiful Kenya landscape showing houses for rent and sale in Nairobi"
               fill
               className="object-cover opacity-60"
@@ -205,7 +205,7 @@ export default function HomePage() {
           </div>
           
           <div className="relative container mx-auto px-4 text-center">
-            <h1 className="display-title mb-6">
+            <h1 className="display-title mb-6 text-white">
               Find Jobs, Businesses & Properties in Kenya
             </h1>
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center mb-12 px-4">
