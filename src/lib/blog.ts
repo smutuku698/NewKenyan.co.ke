@@ -16,77 +16,20 @@ export interface BlogPost {
   isTrending: boolean;
   content: string;
   slug: string;
+  format: 'html' | 'md' | 'mdx';
   seoTitle?: string;
   seoDescription?: string;
   keywords?: string;
   schema?: any;
 }
 
-function generateSEOData(post: any, content: string): any {
-  const seoTitle = post.seoTitle || `${post.title} | NewKenyan.com Blog`;
-  
-  const cleanContent = content.replace(/<[^>]*>/g, '').replace(/[#*\-]/g, '');
-  const seoDescription = post.seoDescription || post.excerpt || cleanContent.substring(0, 160) + '...';
-  
-  const autoKeywords = [
-    post.category.toLowerCase(),
-    'kenya',
-    'business',
-    'newkenyan',
-    ...post.title.toLowerCase().split(' ').filter(word => word.length > 3)
-  ].join(', ');
-  
-  const keywords = post.keywords || autoKeywords;
-  
-  const schema = {
-    "@context": "https://schema.org",
-    "@type": "BlogPosting",
-    "headline": post.title,
-    "description": post.excerpt,
-    "image": {
-      "@type": "ImageObject",
-      "url": `https://newkenyan.com${post.featuredImage}`,
-      "width": 1200,
-      "height": 630
-    },
-    "author": {
-      "@type": "Person",
-      "name": post.author,
-      "url": "https://newkenyan.com/about"
-    },
-    "publisher": {
-      "@type": "Organization",
-      "name": "NewKenyan.com",
-      "logo": {
-        "@type": "ImageObject",
-        "url": "https://newkenyan.com/logo.png",
-        "width": 200,
-        "height": 60
-      }
-    },
-    "datePublished": post.publishedAt.toISOString(),
-    "dateModified": post.publishedAt.toISOString(),
-    "mainEntityOfPage": {
-      "@type": "WebPage",
-      "@id": `https://newkenyan.com/blog/${post.slug}`
-    },
-    "articleSection": post.category,
-    "keywords": keywords,
-    "wordCount": cleanContent.split(' ').filter(word => word.length > 0).length,
-    "timeRequired": `PT${post.readTime}M`,
-    "inLanguage": "en-KE",
-    "about": {
-      "@type": "Thing",
-      "name": post.category
-    }
-  };
-
-  return {
-    seoTitle,
-    seoDescription,
-    keywords,
-    schema
-  };
+function generateSlugFromTitle(title: string): string {
+  return title
+    .toLowerCase()
+    .replace(/[^a-z0-9\s-]/g, '')
+    .replace(/\s+/g, '-')
+    .replace(/-+/g, '-')
+    .trim();
 }
 
 export function getAllBlogPosts(): BlogPost[] {
@@ -128,12 +71,13 @@ export function getAllBlogPosts(): BlogPost[] {
       }
     }
 
-    const slug = fileName.replace(/\.(md|mdx|html)$/, '');
+    const title = frontMatter.title || 'Untitled Post';
+    const slug = frontMatter.slug || generateSlugFromTitle(title);
     
-    const basePost = {
+    const post: BlogPost = {
       id: slug,
       slug: slug,
-      title: frontMatter.title || 'Untitled Post',
+      title: title,
       excerpt: frontMatter.excerpt || frontMatter.description || content.substring(0, 150).replace(/<[^>]*>/g, '') + '...',
       category: frontMatter.category || 'General',
       author: frontMatter.author || 'Anonymous',
@@ -141,17 +85,11 @@ export function getAllBlogPosts(): BlogPost[] {
       readTime: frontMatter.readTime || Math.ceil(content.split(' ').filter(word => word.length > 0).length / 200),
       featuredImage: frontMatter.featuredImage || frontMatter.image || '/images/default-blog.svg',
       isTrending: frontMatter.trending === true || frontMatter.trending === 'true',
-      content: content
-    };
-
-    const seoData = generateSEOData(basePost, content);
-    
-    const post: BlogPost = {
-      ...basePost,
-      seoTitle: seoData.seoTitle,
-      seoDescription: seoData.seoDescription,
-      keywords: seoData.keywords,
-      schema: seoData.schema
+      content: content,
+      seoTitle: frontMatter.seoTitle,
+      seoDescription: frontMatter.seoDescription,
+      keywords: frontMatter.keywords,
+      schema: frontMatter.schema
     };
 
     posts.push(post);
