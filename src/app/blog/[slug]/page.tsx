@@ -143,6 +143,27 @@ export default async function BlogPostPage({ params }: PageProps) {
         }}
       />
 
+      {/* FAQ Schema - if blog post has FAQ data */}
+      {post.faq && post.faq.length > 0 && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "FAQPage",
+              "mainEntity": post.faq.map(faqItem => ({
+                "@type": "Question",
+                "name": faqItem.question,
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": faqItem.answer
+                }
+              }))
+            })
+          }}
+        />
+      )}
+
       <div className="min-h-screen bg-gray-50">
         <Header />
         
@@ -222,17 +243,6 @@ export default async function BlogPostPage({ params }: PageProps) {
                           <ShareButton post={post} />
                         </div>
                       </div>
-                      
-                      {/* Social Follow Section */}
-                      <div className="mt-6 pt-6 border-t border-gray-200">
-                        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-                          <div>
-                            <h3 className="text-sm font-semibold text-gray-900 mb-2">Follow NewKenyan.com</h3>
-                            <p className="text-xs text-gray-600">Stay updated with our latest articles and insights</p>
-                          </div>
-                          <SocialFollowLinks size="sm" className="flex-shrink-0" />
-                        </div>
-                      </div>
                     </div>
 
                     {/* Article Content */}
@@ -250,6 +260,7 @@ export default async function BlogPostPage({ params }: PageProps) {
                         </p>
                       </div>
                     )}
+
 
                     {/* Enhanced Follow Us Section */}
                     <div className="mt-12 pt-8 border-t bg-gradient-to-r from-green-50 to-blue-50 rounded-lg p-6">
