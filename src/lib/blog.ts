@@ -140,7 +140,7 @@ export function getAllBlogPosts(): BlogPost[] {
       author: frontMatter.author || 'Anonymous',
       publishedAt: frontMatter.date ? new Date(frontMatter.date) : new Date(),
       readTime: frontMatter.readTime || Math.ceil(content.split(' ').filter(word => word.length > 0).length / 200),
-      featuredImage: frontMatter.featuredImage || frontMatter.image || '/images/default-blog.svg',
+      featuredImage: frontMatter.featured_image || frontMatter.featuredImage || frontMatter.image || '/images/default-blog.svg',
       isTrending: frontMatter.trending === true || frontMatter.trending === 'true',
       content: content,
       format: format,

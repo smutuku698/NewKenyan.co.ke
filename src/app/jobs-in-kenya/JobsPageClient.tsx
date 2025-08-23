@@ -82,10 +82,10 @@ export default function JobsPageClient() {
         </div>
         
         <div className="relative container mx-auto px-4 text-center">
-          <h1 className="text-5xl font-bold mb-6">
+          <h1 className="text-5xl font-bold mb-6 !text-white">
             Jobs in Kenya - Find Job Vacancies in Nairobi, Mombasa & NGO Jobs
           </h1>
-          <p className="text-xl mb-8 max-w-3xl mx-auto">
+          <p className="text-xl mb-8 max-w-3xl mx-auto !text-white">
             Discover thousands of job opportunities in Kenya. Find jobs in Nairobi, Mombasa, Nakuru, online jobs in Kenya, NGO jobs, and career opportunities across all industries.
           </p>
           

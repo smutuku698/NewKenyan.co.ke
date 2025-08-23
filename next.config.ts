@@ -18,6 +18,12 @@ const nextConfig: NextConfig = {
         port: '',
         pathname: '/storage/v1/object/public/**',
       },
+      {
+        protocol: 'https',
+        hostname: 'v3.fal.media',
+        port: '',
+        pathname: '/files/**',
+      },
     ],
     unoptimized: false,
     formats: ['image/webp', 'image/avif'],

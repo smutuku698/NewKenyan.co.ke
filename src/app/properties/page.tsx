@@ -152,7 +152,7 @@ export default function PropertiesPage() {
           <h1 className="text-5xl font-bold mb-6 !text-white">
             Find Your Perfect Home
           </h1>
-          <p className="text-xl mb-8 max-w-2xl mx-auto">
+          <p className="text-xl mb-8 max-w-2xl mx-auto !text-white">
             Discover apartments, houses, and commercial properties for sale or rent across Kenya
           </p>
           

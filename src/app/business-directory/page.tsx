@@ -209,7 +209,7 @@ export default function DirectoryPage() {
           <h1 className="text-5xl font-bold mb-6 !text-white">
             Kenya Business Directory - Companies in Kenya
           </h1>
-          <p className="text-xl mb-8 max-w-2xl mx-auto">
+          <p className="text-xl mb-8 max-w-2xl mx-auto !text-white">
             Find registered companies in Kenya, business listings, corporate directory, and business daily services. Connect with top businesses and companies across all industries in Kenya.
           </p>
           
