@@ -33,7 +33,7 @@ export default function BlogContentWithTOC({ content, format, htmlContent }: Blo
     <div 
       ref={contentRef}
       dangerouslySetInnerHTML={{ __html: htmlContent || content }}
-      className="prose prose-lg max-w-none prose-headings:text-gray-900 prose-a:text-green-600 prose-strong:text-gray-900 prose-img:rounded-lg prose-img:shadow-lg prose-img:w-full prose-img:h-auto"
+      className="prose prose-lg max-w-none prose-headings:text-gray-900 prose-a:text-green-600 prose-strong:text-gray-900 prose-img:rounded-lg prose-img:shadow-lg prose-img:w-full prose-img:h-auto prose-h1:text-h1-mobile prose-h1:lg:text-h1-desktop prose-h1:font-heading prose-h1:font-semibold"
     />
   );
 }

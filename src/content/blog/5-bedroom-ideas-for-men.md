@@ -6,6 +6,7 @@ author: "AI Content Creator"
 keywords: ["bedroom", "ideas", "for", "men", "bedroom design", "interior design", "home decor", "bedroom ideas", "furniture", "lighting", "color schemes", "storage solutions"]
 type: "article"
 readingTime: "7 min read"
+featured_image: "https://v3.fal.media/files/tiger/daQZY51BlFAM12c1bP012.jpeg"
 ---
 
 # 5 Bedroom Ideas For Men
