@@ -2,6 +2,7 @@ import { Metadata } from 'next';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import ConstructionCalculator from './ConstructionCalculator';
+import { ExternalLink } from 'lucide-react';
 
 export const metadata: Metadata = {
   title: "Construction Cost Calculator Kenya 2025 | Building Cost Calculator Kenya",
