@@ -116,6 +116,7 @@ const Footer = () => {
           <div>
             <h3 className="text-lg font-semibold mb-4 text-white">Tools & Calculators</h3>
             <ul className="space-y-2">
+              <li><Link href="/construction-cost-calculator-kenya" className="text-gray-400 hover:text-white transition-colors flex items-center group">Construction Cost Calculator <ArrowRight className="h-4 w-4 ml-1 opacity-0 group-hover:opacity-100 transition-opacity" /></Link></li>
               <li><Link href="/mortgage-calculator-kenya" className="text-gray-400 hover:text-white transition-colors flex items-center group">Mortgage Calculator Kenya <ArrowRight className="h-4 w-4 ml-1 opacity-0 group-hover:opacity-100 transition-opacity" /></Link></li>
               <li><Link href="/net-pay-calculator" className="text-gray-400 hover:text-white transition-colors flex items-center group">Net Pay Calculator Kenya <ArrowRight className="h-4 w-4 ml-1 opacity-0 group-hover:opacity-100 transition-opacity" /></Link></li>
             </ul>
