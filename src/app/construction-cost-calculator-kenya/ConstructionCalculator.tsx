@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Calculator, Home, MapPin, Settings, FileText, AlertCircle, Info, Edit3 } from 'lucide-react';
+import { Calculator, Home, MapPin, Settings, FileText, AlertCircle, Info, Edit3, HelpCircle, Plus, X } from 'lucide-react';
 
 // Material price interfaces
 interface MaterialPrices {
@@ -30,6 +30,14 @@ interface LabourRates {
   plumber: { rate: number; description: string };
 }
 
+interface CustomItem {
+  id: string;
+  name: string;
+  price: number;
+  unit: string;
+  quantity: number;
+}
+
 interface ConstructionEstimate {
   totalCost: number;
   costPerSqm: number;
@@ -37,6 +45,7 @@ interface ConstructionEstimate {
   labourCosts: number;
   permitCosts: number;
   contingency: number;
+  customItemsCost: number;
   breakdown: {
     foundation: number;
     walling: number;
@@ -98,7 +107,7 @@ const defaultLabourRates: LabourRates = {
 };
 
 export default function ConstructionCalculator() {
-  const [activeTab, setActiveTab] = useState<'calculator' | 'breakdown' | 'customize'>('calculator');
+  const [activeTab, setActiveTab] = useState<'calculator' | 'breakdown' | 'customize' | 'howto'>('calculator');
   const [showCustomPricing, setShowCustomPricing] = useState(false);
   
   // Main calculator inputs
@@ -113,6 +122,13 @@ export default function ConstructionCalculator() {
   // Customizable pricing states
   const [materialPrices, setMaterialPrices] = useState<MaterialPrices>(defaultMaterialPrices);
   const [labourRates, setLabourRates] = useState<LabourRates>(defaultLabourRates);
+  
+  // Custom items state
+  const [customItems, setCustomItems] = useState<CustomItem[]>([]);
+  const [newItemName, setNewItemName] = useState('');
+  const [newItemPrice, setNewItemPrice] = useState('');
+  const [newItemUnit, setNewItemUnit] = useState('');
+  const [newItemQuantity, setNewItemQuantity] = useState('');
   
   // Results
   const [estimate, setEstimate] = useState<ConstructionEstimate | null>(null);
@@ -218,10 +234,16 @@ export default function ConstructionCalculator() {
       const subtotal = adjustedMaterialCosts + adjustedLabourCosts;
       const permitCosts = subtotal * 0.005;
 
-      // Contingency
-      const contingencyCost = subtotal * contingency;
+      // Custom items cost
+      const customItemsCost = customItems.reduce((total, item) => {
+        return total + (item.price * item.quantity * regionalMultiplier);
+      }, 0);
 
-      const totalCost = subtotal + permitCosts + contingencyCost;
+      // Contingency
+      const adjustedSubtotal = subtotal + customItemsCost;
+      const contingencyCost = adjustedSubtotal * contingency;
+
+      const totalCost = adjustedSubtotal + permitCosts + contingencyCost;
       const costPerSqm = totalCost / size;
 
       // Calculate breakdown percentages
@@ -253,11 +275,12 @@ export default function ConstructionCalculator() {
         labourCosts: adjustedLabourCosts,
         permitCosts,
         contingency: contingencyCost,
+        customItemsCost,
         breakdown,
         materialBreakdown,
       });
     }
-  }, [houseSize, location, buildStandard, roofingType, flooringType, contingencyPercent, materialPrices, labourRates]);
+  }, [houseSize, location, buildStandard, roofingType, flooringType, contingencyPercent, materialPrices, labourRates, customItems]);
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-KE', {
@@ -285,6 +308,33 @@ export default function ConstructionCalculator() {
   const resetToDefaults = () => {
     setMaterialPrices(defaultMaterialPrices);
     setLabourRates(defaultLabourRates);
+  };
+
+  const addCustomItem = () => {
+    if (newItemName && newItemPrice && newItemUnit && newItemQuantity) {
+      const newItem: CustomItem = {
+        id: Date.now().toString(),
+        name: newItemName,
+        price: parseFloat(newItemPrice),
+        unit: newItemUnit,
+        quantity: parseFloat(newItemQuantity)
+      };
+      setCustomItems([...customItems, newItem]);
+      setNewItemName('');
+      setNewItemPrice('');
+      setNewItemUnit('');
+      setNewItemQuantity('');
+    }
+  };
+
+  const removeCustomItem = (id: string) => {
+    setCustomItems(customItems.filter(item => item.id !== id));
+  };
+
+  const updateCustomItem = (id: string, field: keyof CustomItem, value: string | number) => {
+    setCustomItems(customItems.map(item => 
+      item.id === id ? { ...item, [field]: value } : item
+    ));
   };
 
   return (
@@ -323,6 +373,17 @@ export default function ConstructionCalculator() {
         >
           <Settings className="w-4 h-4" />
           Customize Prices
+        </button>
+        <button
+          onClick={() => setActiveTab('howto')}
+          className={`px-6 py-3 rounded-lg font-medium transition-all duration-200 flex items-center gap-2 ${
+            activeTab === 'howto'
+              ? 'bg-orange-100 text-orange-700 shadow-sm'
+              : 'text-gray-600 hover:text-orange-600'
+          }`}
+        >
+          <HelpCircle className="w-4 h-4" />
+          How to Use
         </button>
       </div>
 
@@ -499,6 +560,14 @@ export default function ConstructionCalculator() {
                       {formatCurrency(estimate.permitCosts)}
                     </span>
                   </div>
+                  {estimate.customItemsCost > 0 && (
+                    <div className="flex justify-between items-center py-3 border-b border-gray-100">
+                      <span className="text-gray-600">Custom Items</span>
+                      <span className="font-semibold text-gray-900">
+                        {formatCurrency(estimate.customItemsCost)}
+                      </span>
+                    </div>
+                  )}
                   <div className="flex justify-between items-center py-3">
                     <span className="text-gray-600">Contingency ({contingencyPercent}%)</span>
                     <span className="font-semibold text-gray-900">
@@ -675,7 +744,7 @@ export default function ConstructionCalculator() {
             </button>
           </div>
 
-          <div className="grid md:grid-cols-2 gap-8">
+          <div className="grid lg:grid-cols-3 gap-8">
             {/* Material Prices */}
             <div>
               <h4 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
@@ -731,6 +800,112 @@ export default function ConstructionCalculator() {
                 ))}
               </div>
             </div>
+
+            {/* Custom Items */}
+            <div>
+              <h4 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                <Plus className="w-5 h-5" />
+                Custom Items
+              </h4>
+              
+              {/* Add New Item Form */}
+              <div className="border border-gray-200 rounded-lg p-4 mb-4 bg-gray-50">
+                <h5 className="text-sm font-medium text-gray-700 mb-3">Add Custom Item</h5>
+                <div className="space-y-3">
+                  <input
+                    type="text"
+                    placeholder="Item name (e.g., Security system, Garden)"
+                    value={newItemName}
+                    onChange={(e) => setNewItemName(e.target.value)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-sm"
+                  />
+                  <div className="grid grid-cols-3 gap-2">
+                    <input
+                      type="number"
+                      placeholder="Price"
+                      value={newItemPrice}
+                      onChange={(e) => setNewItemPrice(e.target.value)}
+                      className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-sm"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Unit"
+                      value={newItemUnit}
+                      onChange={(e) => setNewItemUnit(e.target.value)}
+                      className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-sm"
+                    />
+                    <input
+                      type="number"
+                      placeholder="Qty"
+                      value={newItemQuantity}
+                      onChange={(e) => setNewItemQuantity(e.target.value)}
+                      className="px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-sm"
+                    />
+                  </div>
+                  <button
+                    onClick={addCustomItem}
+                    className="w-full px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors text-sm font-medium"
+                  >
+                    Add Item
+                  </button>
+                </div>
+              </div>
+
+              {/* Custom Items List */}
+              <div className="space-y-3">
+                {customItems.map((item) => (
+                  <div key={item.id} className="border border-gray-200 rounded-lg p-4">
+                    <div className="flex justify-between items-start mb-2">
+                      <input
+                        type="text"
+                        value={item.name}
+                        onChange={(e) => updateCustomItem(item.id, 'name', e.target.value)}
+                        className="font-medium text-gray-700 bg-transparent border-none p-0 text-sm focus:ring-0 focus:outline-none"
+                      />
+                      <button
+                        onClick={() => removeCustomItem(item.id)}
+                        className="text-red-500 hover:text-red-700 p-1"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                    <div className="grid grid-cols-3 gap-2">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs text-gray-600">KES</span>
+                        <input
+                          type="number"
+                          value={item.price}
+                          onChange={(e) => updateCustomItem(item.id, 'price', parseFloat(e.target.value) || 0)}
+                          className="flex-1 px-2 py-1 border border-gray-300 rounded text-xs focus:ring-1 focus:ring-orange-500 focus:border-orange-500"
+                        />
+                      </div>
+                      <input
+                        type="text"
+                        value={item.unit}
+                        onChange={(e) => updateCustomItem(item.id, 'unit', e.target.value)}
+                        className="px-2 py-1 border border-gray-300 rounded text-xs focus:ring-1 focus:ring-orange-500 focus:border-orange-500"
+                        placeholder="unit"
+                      />
+                      <input
+                        type="number"
+                        value={item.quantity}
+                        onChange={(e) => updateCustomItem(item.id, 'quantity', parseFloat(e.target.value) || 0)}
+                        className="px-2 py-1 border border-gray-300 rounded text-xs focus:ring-1 focus:ring-orange-500 focus:border-orange-500"
+                        placeholder="qty"
+                      />
+                    </div>
+                    <div className="text-xs text-gray-500 mt-2">
+                      Total: {formatCurrency(item.price * item.quantity)}
+                    </div>
+                  </div>
+                ))}
+                {customItems.length === 0 && (
+                  <p className="text-gray-500 text-sm text-center py-4">
+                    No custom items added yet. Use the form above to add items like security systems, landscaping, etc.
+                  </p>
+                )}
+              </div>
+            </div>
           </div>
 
           <div className="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
@@ -743,8 +918,164 @@ export default function ConstructionCalculator() {
                   <li>• Consider transport costs for remote locations</li>
                   <li>• Higher quality materials may cost 20-50% more</li>
                   <li>• Labour rates vary significantly by region and skill level</li>
+                  <li>• Use custom items for extras like security, landscaping, solar panels</li>
                   <li>• Always add a contingency buffer for unexpected costs</li>
                 </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* How to Use Tab */}
+      {activeTab === 'howto' && (
+        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
+          <h3 className="text-2xl font-semibold text-gray-900 mb-8">
+            How to Use the Construction Calculator
+          </h3>
+
+          <div className="space-y-8">
+            {/* Quick Start Guide */}
+            <div className="bg-green-50 border border-green-200 rounded-lg p-6">
+              <h4 className="text-lg font-semibold text-green-800 mb-4 flex items-center gap-2">
+                <Calculator className="w-5 h-5" />
+                Quick Start Guide
+              </h4>
+              <div className="space-y-3 text-sm text-green-700">
+                <div className="flex items-start gap-3">
+                  <span className="bg-green-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-semibold flex-shrink-0 mt-0.5">1</span>
+                  <div>
+                    <strong>Select House Size:</strong> Choose number of bedrooms or enter custom square meters
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <span className="bg-green-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-semibold flex-shrink-0 mt-0.5">2</span>
+                  <div>
+                    <strong>Choose Location:</strong> Select your region to get accurate local pricing
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <span className="bg-green-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-semibold flex-shrink-0 mt-0.5">3</span>
+                  <div>
+                    <strong>Set Build Standard:</strong> Choose between Budget, Standard, or Luxury finish
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <span className="bg-green-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-semibold flex-shrink-0 mt-0.5">4</span>
+                  <div>
+                    <strong>Select Materials:</strong> Choose roofing and flooring options
+                  </div>
+                </div>
+                <div className="flex items-start gap-3">
+                  <span className="bg-green-600 text-white rounded-full w-6 h-6 flex items-center justify-center text-xs font-semibold flex-shrink-0 mt-0.5">5</span>
+                  <div>
+                    <strong>Get Estimate:</strong> View your total cost breakdown instantly
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Features Guide */}
+            <div className="grid md:grid-cols-2 gap-8">
+              <div>
+                <h4 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                  <FileText className="w-5 h-5 text-blue-600" />
+                  Calculator Features
+                </h4>
+                <div className="space-y-4 text-sm text-gray-600">
+                  <div>
+                    <strong className="text-gray-900">Regional Pricing:</strong>
+                    <p>Automatically adjusts material and labor costs based on your selected region across Kenya.</p>
+                  </div>
+                  <div>
+                    <strong className="text-gray-900">Build Standards:</strong>
+                    <p>Budget (-25%), Standard (baseline), Luxury (+80%) - affects material quality and finishes.</p>
+                  </div>
+                  <div>
+                    <strong className="text-gray-900">Material Options:</strong>
+                    <p>Choose between different roofing (iron sheets, clay/concrete tiles) and flooring options.</p>
+                  </div>
+                  <div>
+                    <strong className="text-gray-900">Contingency Buffer:</strong>
+                    <p>Recommended 12% buffer for unexpected costs, adjustable from 8-20%.</p>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <h4 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                  <Settings className="w-5 h-5 text-purple-600" />
+                  Customization Options
+                </h4>
+                <div className="space-y-4 text-sm text-gray-600">
+                  <div>
+                    <strong className="text-gray-900">Custom Pricing:</strong>
+                    <p>Edit material prices and labor rates based on your local supplier quotes.</p>
+                  </div>
+                  <div>
+                    <strong className="text-gray-900">Custom Items:</strong>
+                    <p>Add extra items like security systems, landscaping, solar panels, water tanks, etc.</p>
+                  </div>
+                  <div>
+                    <strong className="text-gray-900">Detailed Breakdown:</strong>
+                    <p>View costs by construction phases and material quantities needed.</p>
+                  </div>
+                  <div>
+                    <strong className="text-gray-900">Export & Save:</strong>
+                    <p>Use browser bookmarks to save your customized settings and estimates.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Tips for Accuracy */}
+            <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6">
+              <h4 className="text-lg font-semibold text-yellow-800 mb-4 flex items-center gap-2">
+                <AlertCircle className="w-5 h-5" />
+                Tips for Accurate Estimates
+              </h4>
+              <div className="grid md:grid-cols-2 gap-6 text-sm text-yellow-700">
+                <div className="space-y-2">
+                  <p>• <strong>Get Local Quotes:</strong> Update material prices with current supplier quotes from your area</p>
+                  <p>• <strong>Site Visit:</strong> Factor in site accessibility, terrain, and utilities availability</p>
+                  <p>• <strong>Professional Consultation:</strong> Consult with local contractors for labor rate validation</p>
+                </div>
+                <div className="space-y-2">
+                  <p>• <strong>Seasonal Pricing:</strong> Material costs vary by season - cement is cheaper during dry season</p>
+                  <p>• <strong>Quality Standards:</strong> Higher grades of materials can increase costs by 30-50%</p>
+                  <p>• <strong>Custom Features:</strong> Use custom items for unique requirements like swimming pools, generators</p>
+                </div>
+              </div>
+            </div>
+
+            {/* Example Usage */}
+            <div>
+              <h4 className="text-lg font-semibold text-gray-900 mb-4">Example: 3-Bedroom House in Nairobi</h4>
+              <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 text-sm">
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div>
+                    <p><strong>Basic Settings:</strong></p>
+                    <ul className="text-gray-600 mt-2 space-y-1">
+                      <li>• Size: 120 m² (3 bedrooms)</li>
+                      <li>• Location: Nairobi/Central</li>
+                      <li>• Standard: Standard Quality</li>
+                      <li>• Roofing: Iron Sheets</li>
+                      <li>• Flooring: Ceramic Tiles</li>
+                    </ul>
+                  </div>
+                  <div>
+                    <p><strong>Custom Additions:</strong></p>
+                    <ul className="text-gray-600 mt-2 space-y-1">
+                      <li>• Security system: KES 150,000</li>
+                      <li>• Solar water heater: KES 80,000</li>
+                      <li>• Landscaping: KES 100,000</li>
+                      <li>• Water tank (5000L): KES 45,000</li>
+                    </ul>
+                  </div>
+                </div>
+                <div className="mt-4 pt-4 border-t border-gray-300">
+                  <p className="text-gray-900"><strong>Estimated Total: KES 3.8M - 4.2M</strong> (including 12% contingency)</p>
+                </div>
               </div>
             </div>
           </div>
