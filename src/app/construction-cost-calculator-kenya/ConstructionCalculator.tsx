@@ -830,6 +830,20 @@ export default function ConstructionCalculator() {
               </div>
             </div>
           </div>
+
+          {/* Customize Materials Button */}
+          <div className="mt-6 pt-6 border-t border-gray-300 text-center">
+            <p className="text-gray-600 mb-4">Want to adjust material prices or add custom items to your estimate?</p>
+            <button 
+              onClick={() => {
+                setActiveTab('customize');
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+              }}
+              className="px-6 py-3 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors font-medium"
+            >
+              Customize Materials & Prices →
+            </button>
+          </div>
         </div>
       )}
 
@@ -1500,7 +1514,10 @@ export default function ConstructionCalculator() {
             <div className="mt-6 pt-6 border-t border-gray-300 text-center">
               <p className="text-gray-600 mb-4">Every single cost component is accounted for above. For material quantities and construction phases analysis:</p>
               <button 
-                onClick={() => setActiveTab('breakdown')}
+                onClick={() => {
+                  setActiveTab('breakdown');
+                  window.scrollTo({ top: 0, behavior: 'smooth' });
+                }}
                 className="px-6 py-3 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors font-medium"
               >
                 View Technical Breakdown Tab →
