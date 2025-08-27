@@ -193,8 +193,16 @@ const WebsiteServicesPage = () => {
                   className="border-white text-white hover:bg-white hover:text-blue-600 font-semibold"
                   onClick={() => window.open('mailto:info@newkenyan.com?subject=Free Consultation Request&body=Hi, I would like to schedule a free consultation for web services.', '_blank')}
                 >
-                  <MessageCircle className="mr-2 h-4 w-4" />
+                  <Mail className="mr-2 h-4 w-4" />
                   Get Free Consultation
+                </Button>
+                <Button 
+                  size="lg" 
+                  className="bg-green-700 text-white hover:bg-green-800 font-semibold"
+                  onClick={() => window.open('https://wa.me/254736407642?text=' + encodeURIComponent('Hi, I would like to schedule a free consultation for web services.'), '_blank')}
+                >
+                  <MessageCircle className="mr-2 h-4 w-4" />
+                  WhatsApp Consultation
                 </Button>
               </div>
             </div>
@@ -365,7 +373,7 @@ const WebsiteServicesPage = () => {
                   <div className="space-y-3">
                     <Button 
                       variant="outline" 
-                      className="w-full font-semibold"
+                      className="w-full font-semibold border-gray-300 text-gray-700 hover:bg-gray-50"
                       onClick={() => window.open('mailto:hr@jobvacancy.co.ke?subject=' + encodeURIComponent('SEO Service Inquiry - ' + service.name) + '&body=' + encodeURIComponent('Hi, I am interested in your ' + service.name + ' service (' + service.price + '). Please provide more details and next steps.'), '_blank')}
                     >
                       <Mail className="w-4 h-4 mr-2" />

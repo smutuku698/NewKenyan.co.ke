@@ -319,7 +319,7 @@ const RealEstateServicesPage = () => {
                   <div className="space-y-3">
                     <Button 
                       variant="outline" 
-                      className="w-full font-semibold"
+                      className="w-full font-semibold border-gray-300 text-gray-700 hover:bg-gray-50"
                       onClick={() => window.open('mailto:hr@jobvacancy.co.ke?subject=' + encodeURIComponent('Real Estate Service Inquiry - ' + service.name) + '&body=' + encodeURIComponent('Hi, I am interested in your ' + service.name + ' service (' + service.price + '). Please provide more details.'), '_blank')}
                     >
                       <Mail className="w-4 h-4 mr-2" />
