@@ -38,6 +38,16 @@ interface CustomItem {
   quantity: number;
 }
 
+interface MaterialItem {
+  id: string;
+  name: string;
+  price: number;
+  unit: string;
+  description: string;
+  category: 'material' | 'labour';
+  selected: boolean;
+}
+
 interface ConstructionEstimate {
   totalCost: number;
   costPerSqm: number;
@@ -130,6 +140,10 @@ export default function ConstructionCalculator() {
   const [newItemUnit, setNewItemUnit] = useState('');
   const [newItemQuantity, setNewItemQuantity] = useState('');
   
+  // Material selection state
+  const [selectedMaterials, setSelectedMaterials] = useState<Set<string>>(new Set(Object.keys(defaultMaterialPrices)));
+  const [selectedLabour, setSelectedLabour] = useState<Set<string>>(new Set(Object.keys(defaultLabourRates)));
+  
   // Results
   const [estimate, setEstimate] = useState<ConstructionEstimate | null>(null);
 
@@ -185,13 +199,13 @@ export default function ConstructionCalculator() {
         windows: Math.ceil(size / 20), // windows based on size
       };
 
-      // Material costs
-      const cementCost = quantities.cement * adjustedMaterialPrices.cement.price;
-      const sandCost = quantities.sand * adjustedMaterialPrices.sand.price;
-      const ballastCost = quantities.ballast * adjustedMaterialPrices.ballast.price;
-      const steelCost = quantities.steel * adjustedMaterialPrices.steel.price;
-      const timberCost = quantities.timber * adjustedMaterialPrices.timber.price;
-      const bricksCost = quantities.bricks * adjustedMaterialPrices.bricks.price;
+      // Material costs (only for selected materials)
+      const cementCost = selectedMaterials.has('cement') ? quantities.cement * adjustedMaterialPrices.cement.price : 0;
+      const sandCost = selectedMaterials.has('sand') ? quantities.sand * adjustedMaterialPrices.sand.price : 0;
+      const ballastCost = selectedMaterials.has('ballast') ? quantities.ballast * adjustedMaterialPrices.ballast.price : 0;
+      const steelCost = selectedMaterials.has('steel') ? quantities.steel * adjustedMaterialPrices.steel.price : 0;
+      const timberCost = selectedMaterials.has('timber') ? quantities.timber * adjustedMaterialPrices.timber.price : 0;
+      const bricksCost = selectedMaterials.has('bricks') ? quantities.bricks * adjustedMaterialPrices.bricks.price : 0;
       
       // Roofing costs based on type
       let roofingCost = 0;
@@ -233,6 +247,14 @@ export default function ConstructionCalculator() {
       // Permit costs (0.5% of project value)
       const subtotal = adjustedMaterialCosts + adjustedLabourCosts;
       const permitCosts = subtotal * 0.005;
+
+      // Filter selected materials and labour for calculations
+      const selectedMaterialPrices = Object.fromEntries(
+        Object.entries(adjustedMaterialPrices).filter(([key]) => selectedMaterials.has(key))
+      );
+      const selectedLabourRates = Object.fromEntries(
+        Object.entries(adjustedLabourRates).filter(([key]) => selectedLabour.has(key))
+      );
 
       // Custom items cost
       const customItemsCost = customItems.reduce((total, item) => {
@@ -280,7 +302,7 @@ export default function ConstructionCalculator() {
         materialBreakdown,
       });
     }
-  }, [houseSize, location, buildStandard, roofingType, flooringType, contingencyPercent, materialPrices, labourRates, customItems]);
+  }, [houseSize, location, buildStandard, roofingType, flooringType, contingencyPercent, materialPrices, labourRates, customItems, selectedMaterials, selectedLabour]);
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-KE', {
@@ -308,6 +330,9 @@ export default function ConstructionCalculator() {
   const resetToDefaults = () => {
     setMaterialPrices(defaultMaterialPrices);
     setLabourRates(defaultLabourRates);
+    setSelectedMaterials(new Set(Object.keys(defaultMaterialPrices)));
+    setSelectedLabour(new Set(Object.keys(defaultLabourRates)));
+    setCustomItems([]);
   };
 
   const addCustomItem = () => {
@@ -335,6 +360,30 @@ export default function ConstructionCalculator() {
     setCustomItems(customItems.map(item => 
       item.id === id ? { ...item, [field]: value } : item
     ));
+  };
+
+  const toggleMaterial = (materialKey: string) => {
+    const newSelected = new Set(selectedMaterials);
+    if (newSelected.has(materialKey)) {
+      newSelected.delete(materialKey);
+    } else {
+      newSelected.add(materialKey);
+    }
+    setSelectedMaterials(newSelected);
+  };
+
+  const toggleLabour = (labourKey: string) => {
+    const newSelected = new Set(selectedLabour);
+    if (newSelected.has(labourKey)) {
+      newSelected.delete(labourKey);
+    } else {
+      newSelected.add(labourKey);
+    }
+    setSelectedLabour(newSelected);
+  };
+
+  const getIncludedItemsCount = () => {
+    return selectedMaterials.size + selectedLabour.size + customItems.length;
   };
 
   return (
@@ -576,27 +625,36 @@ export default function ConstructionCalculator() {
                   </div>
                 </div>
 
-                {/* Quick Comparison */}
+                {/* Included Items Summary */}
                 <div className="bg-gray-50 rounded-lg p-4">
-                  <h4 className="font-medium text-gray-900 mb-3">Quick Comparison</h4>
+                  <h4 className="font-medium text-gray-900 mb-3">Included in Calculation ({getIncludedItemsCount()} items)</h4>
                   <div className="space-y-2 text-sm">
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">2BR House (80m²)</span>
-                      <span className="text-gray-900">
-                        {formatCurrency((estimate.costPerSqm * 80))}
-                      </span>
+                    <div>
+                      <span className="font-medium text-gray-700">Materials ({selectedMaterials.size}):</span>
+                      <div className="text-gray-600 mt-1">
+                        {Array.from(selectedMaterials).map(key => 
+                          materialPrices[key as keyof MaterialPrices]?.description || key
+                        ).join(', ')}
+                      </div>
                     </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">3BR House (120m²)</span>
-                      <span className="text-gray-900">
-                        {formatCurrency((estimate.costPerSqm * 120))}
-                      </span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-gray-600">4BR House (160m²)</span>
-                      <span className="text-gray-900">
-                        {formatCurrency((estimate.costPerSqm * 160))}
-                      </span>
+                    {customItems.length > 0 && (
+                      <div>
+                        <span className="font-medium text-gray-700">Custom Items ({customItems.length}):</span>
+                        <div className="text-gray-600 mt-1">
+                          {customItems.map(item => item.name).join(', ')}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                  <div className="mt-3 pt-3 border-t border-gray-300">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-gray-600">Want to customize?</span>
+                      <button 
+                        onClick={() => setActiveTab('customize')}
+                        className="text-orange-600 hover:text-orange-700 font-medium"
+                      >
+                        Manage Items →
+                      </button>
                     </div>
                   </div>
                 </div>
@@ -744,68 +802,160 @@ export default function ConstructionCalculator() {
             </button>
           </div>
 
-          <div className="grid lg:grid-cols-3 gap-8">
-            {/* Material Prices */}
-            <div>
-              <h4 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
-                <Edit3 className="w-5 h-5" />
-                Material Prices
-              </h4>
-              <div className="space-y-4">
-                {Object.entries(materialPrices).map(([material, details]) => (
-                  <div key={material} className="border border-gray-200 rounded-lg p-4">
-                    <label className="block text-sm font-medium text-gray-700 mb-1 capitalize">
-                      {material.replace(/([A-Z])/g, ' $1').trim()}
-                    </label>
-                    <p className="text-xs text-gray-500 mb-2">{details.description}</p>
-                    <div className="flex items-center gap-3">
-                      <span className="text-sm text-gray-600">KES</span>
-                      <input
-                        type="number"
-                        value={details.price}
-                        onChange={(e) => updateMaterialPrice(material as keyof MaterialPrices, parseFloat(e.target.value) || 0)}
-                        className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-sm"
-                      />
-                      <span className="text-sm text-gray-600">per {details.unit}</span>
-                    </div>
+          <div className="space-y-8">
+            {/* Item Selection Panel */}
+            <div className="bg-gray-50 rounded-xl p-6">
+              <h4 className="text-lg font-semibold text-gray-900 mb-4">Select Items to Include in Calculation</h4>
+              <p className="text-sm text-gray-600 mb-6">Choose which materials and services to include in your cost estimate. Move items between Available and Selected.</p>
+              
+              <div className="grid lg:grid-cols-2 gap-8">
+                {/* Available Materials */}
+                <div>
+                  <h5 className="font-medium text-gray-800 mb-3 flex items-center justify-between">
+                    Available Materials
+                    <span className="text-xs bg-gray-200 px-2 py-1 rounded-full">
+                      {Object.keys(materialPrices).length - selectedMaterials.size} available
+                    </span>
+                  </h5>
+                  <div className="space-y-2 max-h-80 overflow-y-auto">
+                    {Object.entries(materialPrices).map(([key, details]) => (
+                      <div 
+                        key={key}
+                        className={`p-3 rounded-lg border cursor-pointer transition-all ${
+                          selectedMaterials.has(key) 
+                            ? 'bg-green-50 border-green-300 shadow-sm' 
+                            : 'bg-white border-gray-200 hover:border-gray-300'
+                        }`}
+                        onClick={() => toggleMaterial(key)}
+                      >
+                        <div className="flex items-center justify-between">
+                          <div className="flex-1">
+                            <h6 className="font-medium text-sm capitalize text-gray-800">
+                              {key.replace(/([A-Z])/g, ' $1').trim()}
+                            </h6>
+                            <p className="text-xs text-gray-500">{details.description}</p>
+                            <p className="text-xs text-gray-700 font-medium">KES {details.price.toLocaleString()} per {details.unit}</p>
+                          </div>
+                          <div className="ml-3">
+                            {selectedMaterials.has(key) ? (
+                              <div className="w-5 h-5 bg-green-500 rounded-full flex items-center justify-center">
+                                <span className="text-white text-xs">✓</span>
+                              </div>
+                            ) : (
+                              <div className="w-5 h-5 border-2 border-gray-300 rounded-full"></div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                ))}
+                </div>
+
+                {/* Selected Items Summary */}
+                <div>
+                  <h5 className="font-medium text-gray-800 mb-3 flex items-center justify-between">
+                    Selected Items
+                    <span className="text-xs bg-green-100 text-green-700 px-2 py-1 rounded-full">
+                      {selectedMaterials.size + customItems.length} selected
+                    </span>
+                  </h5>
+                  <div className="space-y-2 max-h-80 overflow-y-auto">
+                    {/* Selected Materials */}
+                    {Array.from(selectedMaterials).map((key) => {
+                      const details = materialPrices[key as keyof MaterialPrices];
+                      return (
+                        <div key={key} className="p-3 bg-green-50 border border-green-200 rounded-lg">
+                          <div className="flex items-center justify-between">
+                            <div className="flex-1">
+                              <h6 className="font-medium text-sm capitalize text-green-800">
+                                {key.replace(/([A-Z])/g, ' $1').trim()}
+                              </h6>
+                              <p className="text-xs text-green-600">KES {details.price.toLocaleString()} per {details.unit}</p>
+                            </div>
+                            <button
+                              onClick={() => toggleMaterial(key)}
+                              className="text-red-500 hover:text-red-700 text-xs font-medium"
+                            >
+                              Remove
+                            </button>
+                          </div>
+                        </div>
+                      );
+                    })}
+                    
+                    {/* Selected Custom Items */}
+                    {customItems.map((item) => (
+                      <div key={item.id} className="p-3 bg-blue-50 border border-blue-200 rounded-lg">
+                        <div className="flex items-center justify-between">
+                          <div className="flex-1">
+                            <h6 className="font-medium text-sm text-blue-800">{item.name}</h6>
+                            <p className="text-xs text-blue-600">
+                              KES {item.price.toLocaleString()} × {item.quantity} {item.unit} = {formatCurrency(item.price * item.quantity)}
+                            </p>
+                          </div>
+                          <button
+                            onClick={() => removeCustomItem(item.id)}
+                            className="text-red-500 hover:text-red-700 text-xs font-medium"
+                          >
+                            Remove
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+                    
+                    {selectedMaterials.size === 0 && customItems.length === 0 && (
+                      <div className="p-4 text-center text-gray-500 text-sm border-2 border-dashed border-gray-300 rounded-lg">
+                        No items selected. Click on available materials or add custom items below.
+                      </div>
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
 
-            {/* Labour Rates */}
+            <div className="grid lg:grid-cols-2 gap-8">
+            {/* Edit Prices for Selected Items */}
             <div>
               <h4 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
                 <Edit3 className="w-5 h-5" />
-                Labour Rates
+                Edit Prices (Selected Items Only)
               </h4>
               <div className="space-y-4">
-                {Object.entries(labourRates).map(([role, details]) => (
-                  <div key={role} className="border border-gray-200 rounded-lg p-4">
-                    <label className="block text-sm font-medium text-gray-700 mb-1 capitalize">
-                      {role.replace(/([A-Z])/g, ' $1').trim()}
-                    </label>
-                    <p className="text-xs text-gray-500 mb-2">{details.description}</p>
-                    <div className="flex items-center gap-3">
-                      <span className="text-sm text-gray-600">KES</span>
-                      <input
-                        type="number"
-                        value={details.rate}
-                        onChange={(e) => updateLabourRate(role as keyof LabourRates, parseFloat(e.target.value) || 0)}
-                        className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-sm"
-                      />
-                      <span className="text-sm text-gray-600">per day</span>
+                {Array.from(selectedMaterials).map((material) => {
+                  const details = materialPrices[material as keyof MaterialPrices];
+                  return (
+                    <div key={material} className="border border-green-200 bg-green-50 rounded-lg p-4">
+                      <label className="block text-sm font-medium text-green-800 mb-1 capitalize">
+                        {material.replace(/([A-Z])/g, ' $1').trim()} ✓
+                      </label>
+                      <p className="text-xs text-green-600 mb-2">{details.description}</p>
+                      <div className="flex items-center gap-3">
+                        <span className="text-sm text-green-700">KES</span>
+                        <input
+                          type="number"
+                          value={details.price}
+                          onChange={(e) => updateMaterialPrice(material as keyof MaterialPrices, parseFloat(e.target.value) || 0)}
+                          className="flex-1 px-3 py-2 border border-green-300 bg-white rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-sm"
+                        />
+                        <span className="text-sm text-green-700">per {details.unit}</span>
+                      </div>
                     </div>
+                  );
+                })}
+                
+                {selectedMaterials.size === 0 && (
+                  <div className="p-4 text-center text-gray-500 text-sm border border-gray-300 rounded-lg">
+                    No materials selected. Select materials from the panel above to edit their prices.
                   </div>
-                ))}
+                )}
               </div>
             </div>
 
-            {/* Custom Items */}
+            {/* Add Custom Items */}
             <div>
               <h4 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
                 <Plus className="w-5 h-5" />
-                Custom Items
+                Add Custom Items
               </h4>
               
               {/* Add New Item Form */}
@@ -851,61 +1001,48 @@ export default function ConstructionCalculator() {
                 </div>
               </div>
 
-              {/* Custom Items List */}
-              <div className="space-y-3">
-                {customItems.map((item) => (
-                  <div key={item.id} className="border border-gray-200 rounded-lg p-4">
-                    <div className="flex justify-between items-start mb-2">
-                      <input
-                        type="text"
-                        value={item.name}
-                        onChange={(e) => updateCustomItem(item.id, 'name', e.target.value)}
-                        className="font-medium text-gray-700 bg-transparent border-none p-0 text-sm focus:ring-0 focus:outline-none"
-                      />
-                      <button
-                        onClick={() => removeCustomItem(item.id)}
-                        className="text-red-500 hover:text-red-700 p-1"
-                      >
-                        <X className="w-4 h-4" />
-                      </button>
-                    </div>
-                    <div className="grid grid-cols-3 gap-2">
-                      <div className="flex items-center gap-2">
-                        <span className="text-xs text-gray-600">KES</span>
-                        <input
-                          type="number"
-                          value={item.price}
-                          onChange={(e) => updateCustomItem(item.id, 'price', parseFloat(e.target.value) || 0)}
-                          className="flex-1 px-2 py-1 border border-gray-300 rounded text-xs focus:ring-1 focus:ring-orange-500 focus:border-orange-500"
-                        />
-                      </div>
-                      <input
-                        type="text"
-                        value={item.unit}
-                        onChange={(e) => updateCustomItem(item.id, 'unit', e.target.value)}
-                        className="px-2 py-1 border border-gray-300 rounded text-xs focus:ring-1 focus:ring-orange-500 focus:border-orange-500"
-                        placeholder="unit"
-                      />
-                      <input
-                        type="number"
-                        value={item.quantity}
-                        onChange={(e) => updateCustomItem(item.id, 'quantity', parseFloat(e.target.value) || 0)}
-                        className="px-2 py-1 border border-gray-300 rounded text-xs focus:ring-1 focus:ring-orange-500 focus:border-orange-500"
-                        placeholder="qty"
-                      />
-                    </div>
-                    <div className="text-xs text-gray-500 mt-2">
-                      Total: {formatCurrency(item.price * item.quantity)}
-                    </div>
-                  </div>
-                ))}
-                {customItems.length === 0 && (
-                  <p className="text-gray-500 text-sm text-center py-4">
-                    No custom items added yet. Use the form above to add items like security systems, landscaping, etc.
-                  </p>
-                )}
+              <p className="text-sm text-gray-600 mb-4">
+                Custom items will automatically appear in the "Selected Items" panel above once added.
+              </p>
+            </div>
+          </div>
+
+          {/* Action Buttons */}
+          <div className="flex justify-between items-center pt-6 border-t border-gray-200">
+            <button
+              onClick={resetToDefaults}
+              className="px-4 py-2 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+            >
+              Reset All to Defaults
+            </button>
+            <div className="flex items-center gap-4 text-sm text-gray-600">
+              <span>
+                {selectedMaterials.size + customItems.length} items selected
+              </span>
+              <button 
+                onClick={() => setActiveTab('calculator')}
+                className="px-4 py-2 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors font-medium"
+              >
+                View Updated Estimate
+              </button>
+            </div>
+          </div>
+
+          <div className="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
+            <div className="flex items-start gap-3">
+              <AlertCircle className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
+              <div>
+                <h5 className="font-semibold text-blue-800 mb-2">Smart Item Management</h5>
+                <ul className="text-sm text-blue-700 space-y-1">
+                  <li>• <strong>Select Only What You Need:</strong> Uncheck materials you won't use to get accurate estimates</li>
+                  <li>• <strong>Custom Items:</strong> Add security systems, landscaping, solar panels, water tanks</li>
+                  <li>• <strong>Regional Pricing:</strong> All selected items automatically adjust for your location</li>
+                  <li>• <strong>Easy Editing:</strong> Edit prices for selected items only - cleaner interface</li>
+                  <li>• <strong>Real-time Updates:</strong> See changes instantly in your cost estimate</li>
+                </ul>
               </div>
             </div>
+          </div>
           </div>
 
           <div className="mt-8 bg-blue-50 border border-blue-200 rounded-lg p-6">
