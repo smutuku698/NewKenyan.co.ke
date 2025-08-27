@@ -139,6 +139,7 @@ export default function ConstructionCalculator() {
   const [newItemPrice, setNewItemPrice] = useState('');
   const [newItemUnit, setNewItemUnit] = useState('');
   const [newItemQuantity, setNewItemQuantity] = useState('');
+  const [itemAddedMessage, setItemAddedMessage] = useState('');
   
   // Material selection state
   const [selectedMaterials, setSelectedMaterials] = useState<Set<string>>(new Set(Object.keys(defaultMaterialPrices)));
@@ -349,6 +350,20 @@ export default function ConstructionCalculator() {
       setNewItemPrice('');
       setNewItemUnit('');
       setNewItemQuantity('');
+      
+      // Show success message
+      const totalCost = parseFloat(newItemPrice) * parseFloat(newItemQuantity);
+      setItemAddedMessage(`✅ "${newItem.name}" added successfully! Cost: ${formatCurrency(totalCost)}`);
+      
+      // Clear message after 4 seconds
+      setTimeout(() => {
+        setItemAddedMessage('');
+      }, 4000);
+    } else {
+      setItemAddedMessage('❌ Please fill in all fields: Name, Price, Unit, and Quantity');
+      setTimeout(() => {
+        setItemAddedMessage('');
+      }, 3000);
     }
   };
 
@@ -625,9 +640,24 @@ export default function ConstructionCalculator() {
                   </div>
                 </div>
 
-                {/* Included Items Summary */}
-                <div className="bg-gray-50 rounded-lg p-4">
-                  <h4 className="font-medium text-gray-900 mb-3">Included in Calculation ({getIncludedItemsCount()} items)</h4>
+                {/* Included Items Summary - Enhanced */}
+                <div className="bg-gray-50 rounded-lg p-6 border border-gray-300">
+                  <h4 className="font-medium text-gray-900 mb-4 flex items-center justify-between">
+                    Items Included in Your Calculation
+                    <span className="text-sm bg-green-100 text-green-700 px-3 py-1 rounded-full font-semibold">
+                      {getIncludedItemsCount()} items
+                    </span>
+                  </h4>
+                  
+                  {/* Custom Items Alert */}
+                  {customItems.length > 0 && (
+                    <div className="mb-4 p-3 bg-blue-100 border border-blue-200 rounded-lg">
+                      <div className="flex items-center justify-between">
+                        <span className="text-blue-700 font-medium">✨ {customItems.length} Custom Item{customItems.length > 1 ? 's' : ''} Added & Included!</span>
+                        <span className="text-blue-700 font-bold">{formatCurrency(estimate.customItemsCost)}</span>
+                      </div>
+                    </div>
+                  )}
                   <div className="space-y-2 text-sm">
                     <div>
                       <span className="font-medium text-gray-700">Materials ({selectedMaterials.size}):</span>
@@ -638,10 +668,26 @@ export default function ConstructionCalculator() {
                       </div>
                     </div>
                     {customItems.length > 0 && (
-                      <div>
-                        <span className="font-medium text-gray-700">Custom Items ({customItems.length}):</span>
-                        <div className="text-gray-600 mt-1">
-                          {customItems.map(item => item.name).join(', ')}
+                      <div className="mt-4">
+                        <span className="font-medium text-purple-700 text-base">Custom Items ({customItems.length}) - INCLUDED IN TOTAL:</span>
+                        <div className="mt-3 space-y-2">
+                          {customItems.map(item => {
+                            const regionalPrice = item.price * (regionalMultipliers[location as keyof typeof regionalMultipliers] || 1.0);
+                            const totalCost = regionalPrice * item.quantity;
+                            return (
+                              <div key={item.id} className="bg-purple-50 border border-purple-200 rounded-lg p-3">
+                                <div className="flex justify-between items-center">
+                                  <div>
+                                    <div className="font-medium text-purple-900">{item.name}</div>
+                                    <div className="text-sm text-purple-600">
+                                      {item.quantity} {item.unit} @ {formatCurrency(regionalPrice)} each
+                                    </div>
+                                  </div>
+                                  <div className="font-bold text-purple-700">{formatCurrency(totalCost)}</div>
+                                </div>
+                              </div>
+                            );
+                          })}
                         </div>
                       </div>
                     )}
@@ -961,6 +1007,17 @@ export default function ConstructionCalculator() {
               {/* Add New Item Form */}
               <div className="border border-gray-200 rounded-lg p-4 mb-4 bg-gray-50">
                 <h5 className="text-sm font-medium text-gray-700 mb-3">Add Custom Item</h5>
+                
+                {/* Success/Error Message */}
+                {itemAddedMessage && (
+                  <div className={`mb-4 p-3 rounded-lg text-sm font-medium ${
+                    itemAddedMessage.includes('✅') 
+                      ? 'bg-green-100 text-green-800 border border-green-200'
+                      : 'bg-red-100 text-red-800 border border-red-200'
+                  }`}>
+                    {itemAddedMessage}
+                  </div>
+                )}
                 <div className="space-y-3">
                   <input
                     type="text"
