@@ -17,6 +17,7 @@
       "Bash(git checkout:*)",
       "WebSearch",
       "Bash(git pull:*)",
+      "Bash(git log:*)",
       "Bash(git log:*)"
     ],
     "deny": [],

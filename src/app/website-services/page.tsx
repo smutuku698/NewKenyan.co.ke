@@ -27,16 +27,24 @@ const WebsiteServicesPage = () => {
       price: 'KSh 25,000',
       description: 'Perfect for small businesses getting started online',
       features: [
-        '5-page responsive website',
-        'Mobile-friendly design',
-        'Basic SEO setup',
-        'Contact form',
+        '50+ pages (Main pages, Blog posts, SEO pages)',
+        'Lightning-fast Next.js & React technology',
+        '90+ Google PageSpeed score guaranteed',
+        'Mobile-first responsive design',
+        'Advanced SEO setup & optimization',
+        'Contact forms & lead capture',
         'Social media integration',
-        '3 months free hosting',
-        'Basic analytics setup'
+        '6 months premium hosting included',
+        'Google Analytics & tracking setup',
+        'WhatsApp business integration',
+        'SSL certificate & security',
+        'Professional onboarding meeting',
+        'Site management training session',
+        '30-day revision guarantee'
       ],
       popular: false,
-      delivery: '7-10 business days'
+      delivery: '7-10 business days',
+      highlight: 'Fast & Mobile-Ready'
     },
     {
       id: 'business',
@@ -44,19 +52,27 @@ const WebsiteServicesPage = () => {
       price: 'KSh 45,000',
       description: 'Comprehensive solution for growing businesses',
       features: [
-        '10-page responsive website',
-        'Professional custom design',
-        'Advanced SEO optimization',
-        'Lead generation forms',
-        'WhatsApp integration',
-        'Google My Business setup',
-        '6 months free hosting',
-        'Advanced analytics & tracking',
-        'Blog section setup',
-        'Payment gateway integration'
+        '100+ pages (Website, Blog, SEO landing pages)',
+        'Premium Next.js, Node.js & React stack',
+        '95+ Google PageSpeed score guaranteed',
+        'Professional custom design & branding',
+        'Complete SEO optimization package',
+        'Advanced lead generation system',
+        'WhatsApp & Live Chat integration',
+        'Google My Business setup & optimization',
+        '12 months premium hosting included',
+        'Advanced analytics & conversion tracking',
+        'Blog management system',
+        'M-Pesa & payment gateway integration',
+        'Email marketing automation setup',
+        'Content management training',
+        'Mobile app deployment ready',
+        '60-day revision guarantee',
+        'Monthly performance reports'
       ],
       popular: true,
-      delivery: '10-14 business days'
+      delivery: '10-14 business days',
+      highlight: 'Most Popular - Complete Solution'
     },
     {
       id: 'ecommerce',
@@ -64,21 +80,30 @@ const WebsiteServicesPage = () => {
       price: 'KSh 75,000',
       description: 'Complete online store for selling products',
       features: [
-        'Unlimited pages',
-        'Product catalog management',
-        'Shopping cart & checkout',
-        'Payment processing (M-Pesa, Cards)',
-        'Inventory management',
-        'Order management system',
-        'Customer accounts',
-        'Advanced SEO package',
-        '1 year free hosting',
-        'Sales analytics dashboard',
-        'Email marketing setup',
-        'Security & SSL certificate'
+        '200+ pages (Store, Products, Blog, SEO pages)',
+        'Enterprise Next.js, Node.js & React architecture',
+        '95+ Google PageSpeed score guaranteed',
+        'Professional e-commerce design',
+        'Complete product catalog management',
+        'Advanced shopping cart & checkout system',
+        'Multi-payment processing (M-Pesa, Airtel, Cards)',
+        'Real-time inventory management',
+        'Comprehensive order management system',
+        'Customer account & loyalty system',
+        'Advanced SEO & marketing package',
+        '18 months premium hosting included',
+        'Sales analytics & reporting dashboard',
+        'Email marketing & automation',
+        'Social media marketing integration',
+        'Mobile app deployment ready',
+        'Security & fraud protection',
+        'Staff training & onboarding sessions',
+        '90-day revision guarantee',
+        'Priority support & maintenance'
       ],
       popular: false,
-      delivery: '14-21 business days'
+      delivery: '14-21 business days',
+      highlight: 'Enterprise Solution'
     }
   ];
 
@@ -136,10 +161,19 @@ const WebsiteServicesPage = () => {
               <h1 className="text-5xl font-bold mb-6">
                 Let Us Build You the Perfect Business Website
               </h1>
-              <p className="text-xl text-blue-100 mb-8">
+              <p className="text-xl text-blue-100 mb-6">
                 Professional website design & SEO services to help your Kenyan business thrive online. 
                 Get more customers, increase visibility, and grow your revenue.
               </p>
+              <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 mb-8">
+                <p className="text-blue-100 text-lg font-semibold mb-2">🚀 Built with Latest Technology</p>
+                <div className="flex flex-wrap justify-center gap-4 text-sm">
+                  <span className="bg-white/20 px-3 py-1 rounded-full">Next.js 14</span>
+                  <span className="bg-white/20 px-3 py-1 rounded-full">React 18</span>
+                  <span className="bg-white/20 px-3 py-1 rounded-full">Node.js</span>
+                  <span className="bg-white/20 px-3 py-1 rounded-full">90+ PageSpeed Score</span>
+                </div>
+              </div>
               <p className="text-blue-100 mt-4">
                 📍 Nairobi, Kenya | 📧 info@newkenyan.com
               </p>
@@ -201,9 +235,9 @@ const WebsiteServicesPage = () => {
                 <div className="w-16 h-16 bg-purple-100 rounded-full flex items-center justify-center mx-auto mb-4">
                   <Zap className="h-8 w-8 text-purple-600" />
                 </div>
-                <h3 className="text-lg font-semibold mb-2">Fast Loading</h3>
+                <h3 className="text-lg font-semibold mb-2">90+ PageSpeed Score</h3>
                 <p className="text-gray-600 text-sm">
-                  Optimized for Kenya&apos;s internet speeds with fast loading times
+                  Lightning-fast sites built with Next.js, React & Node.js for superior performance
                 </p>
               </div>
 
@@ -252,7 +286,10 @@ const WebsiteServicesPage = () => {
                   <div className="text-center mb-6">
                     <h3 className="text-2xl font-bold mb-2">{plan.name}</h3>
                     <div className="text-4xl font-bold text-blue-600 mb-2">{plan.price}</div>
-                    <p className="text-gray-600 text-sm">{plan.description}</p>
+                    <p className="text-gray-600 text-sm mb-3">{plan.description}</p>
+                    <Badge variant="secondary" className="text-xs">
+                      {plan.highlight}
+                    </Badge>
                   </div>
 
                   <div className="space-y-3 mb-8">
@@ -337,7 +374,7 @@ const WebsiteServicesPage = () => {
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Button 
                   size="lg" 
-                  className="bg-white text-blue-600 hover:bg-blue-50 font-semibold"
+                  className="bg-white text-blue-600 hover:bg-blue-50 hover:text-blue-700 font-semibold"
                   onClick={() => window.open('https://wa.me/254736407642?text=Hi, I would like to discuss web services for my business.', '_blank')}
                 >
                   <MessageCircle className="mr-2 h-5 w-5" />
@@ -377,10 +414,20 @@ const WebsiteServicesPage = () => {
               </div>
 
               <div className="border border-gray-200 rounded-lg p-6">
-                <h3 className="font-semibold mb-2">Do you provide ongoing support?</h3>
+                <h3 className="font-semibold mb-2">Why are your websites so fast?</h3>
                 <p className="text-gray-600 text-sm">
-                  Yes! All our packages include ongoing support for technical issues, content updates, 
-                  and basic maintenance. We&apos;re here to help your business succeed online.
+                  We use cutting-edge technology including Next.js 14, React 18, and Node.js to build 
+                  lightning-fast websites. Our sites consistently score 90+ on Google PageSpeed Insights, 
+                  ensuring better user experience and higher search rankings.
+                </p>
+              </div>
+
+              <div className="border border-gray-200 rounded-lg p-6">
+                <h3 className="font-semibold mb-2">Do you provide training and onboarding?</h3>
+                <p className="text-gray-600 text-sm">
+                  Yes! Every package includes professional onboarding meetings where we train you on managing 
+                  your website, updating content, and following best practices. We ensure you&apos;re completely 
+                  comfortable using your new website.
                 </p>
               </div>
 
@@ -388,15 +435,24 @@ const WebsiteServicesPage = () => {
                 <h3 className="font-semibold mb-2">Can you integrate M-Pesa payments?</h3>
                 <p className="text-gray-600 text-sm">
                   Absolutely! We specialize in integrating popular Kenyan payment methods including 
-                  M-Pesa, Airtel Money, and international payment gateways.
+                  M-Pesa, Airtel Money, and international payment gateways for seamless transactions.
                 </p>
               </div>
 
               <div className="border border-gray-200 rounded-lg p-6">
-                <h3 className="font-semibold mb-2">What if I&apos;m not satisfied with the result?</h3>
+                <h3 className="font-semibold mb-2">What about revisions and guarantees?</h3>
                 <p className="text-gray-600 text-sm">
-                  We offer unlimited revisions during the development process and a 30-day money-back 
-                  guarantee if you&apos;re not completely satisfied with your website.
+                  We offer comprehensive revision guarantees: 30 days for Starter, 60 days for Business Pro, 
+                  and 90 days for E-Commerce packages. We also provide ongoing site management and support 
+                  to ensure your website continues performing at its best.
+                </p>
+              </div>
+
+              <div className="border border-gray-200 rounded-lg p-6">
+                <h3 className="font-semibold mb-2">Can my website be turned into a mobile app?</h3>
+                <p className="text-gray-600 text-sm">
+                  Yes! Our websites are built with React and Next.js, making them mobile app deployment ready. 
+                  This means you can easily expand to iOS and Android apps in the future without rebuilding.
                 </p>
               </div>
             </div>
