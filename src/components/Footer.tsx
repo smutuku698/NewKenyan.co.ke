@@ -112,9 +112,15 @@ const Footer = () => {
             </ul>
           </div>
 
-          {/* Tools Section */}
+          {/* Services Section */}
           <div>
-            <h3 className="text-lg font-semibold mb-4 text-white">Tools & Calculators</h3>
+            <h3 className="text-lg font-semibold mb-4 text-white">Our Services</h3>
+            <ul className="space-y-2">
+              <li><Link href="/website-services" className="text-gray-400 hover:text-white transition-colors flex items-center group">Website & SEO Services <ArrowRight className="h-4 w-4 ml-1 opacity-0 group-hover:opacity-100 transition-opacity" /></Link></li>
+              <li><Link href="/real-estate-services" className="text-gray-400 hover:text-white transition-colors flex items-center group">Real Estate Services <ArrowRight className="h-4 w-4 ml-1 opacity-0 group-hover:opacity-100 transition-opacity" /></Link></li>
+            </ul>
+            
+            <h4 className="text-md font-semibold mb-3 mt-6 text-white">Tools & Calculators</h4>
             <ul className="space-y-2">
               <li><Link href="/construction-cost-calculator-kenya" className="text-gray-400 hover:text-white transition-colors flex items-center group">Construction Cost Calculator <ArrowRight className="h-4 w-4 ml-1 opacity-0 group-hover:opacity-100 transition-opacity" /></Link></li>
               <li><Link href="/mortgage-calculator-kenya" className="text-gray-400 hover:text-white transition-colors flex items-center group">Mortgage Calculator Kenya <ArrowRight className="h-4 w-4 ml-1 opacity-0 group-hover:opacity-100 transition-opacity" /></Link></li>
@@ -130,7 +136,6 @@ const Footer = () => {
               <li><Link href="/contact" className="text-gray-400 hover:text-white transition-colors flex items-center group">Contact <ArrowRight className="h-4 w-4 ml-1 opacity-0 group-hover:opacity-100 transition-opacity" /></Link></li>
               <li><Link href="/privacy-policy" className="text-gray-400 hover:text-white transition-colors flex items-center group">Privacy Policy <ArrowRight className="h-4 w-4 ml-1 opacity-0 group-hover:opacity-100 transition-opacity" /></Link></li>
               <li><Link href="/terms-of-service" className="text-gray-400 hover:text-white transition-colors flex items-center group">Terms of Service <ArrowRight className="h-4 w-4 ml-1 opacity-0 group-hover:opacity-100 transition-opacity" /></Link></li>
-              <li><Link href="/website-services" className="text-gray-400 hover:text-white transition-colors flex items-center group">Website Services <ArrowRight className="h-4 w-4 ml-1 opacity-0 group-hover:opacity-100 transition-opacity" /></Link></li>
             </ul>
 
             {/* Contact Info */}

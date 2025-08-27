@@ -4,12 +4,13 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { SignInButton, SignedIn, SignedOut, UserButton } from '@clerk/nextjs';
-import { Menu, X, Search, MapPin, ChevronDown, Building, Home, Briefcase, Heart } from 'lucide-react';
+import { Menu, X, Search, MapPin, ChevronDown, Building, Home, Briefcase, Heart, Globe, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isPostDropdownOpen, setIsPostDropdownOpen] = useState(false);
+  const [isServicesDropdownOpen, setIsServicesDropdownOpen] = useState(false);
   const currentPath = usePathname();
 
   const navigation = [
@@ -17,6 +18,7 @@ const Header = () => {
     { name: 'BDirectory', path: '/business-directory' },
     { name: 'Jobs', path: '/jobs-in-kenya' },
     { name: 'Properties', path: '/properties' },
+    { name: 'Services', path: '#', hasDropdown: true },
     { name: 'Blog', path: '/blog' },
   ];
 
@@ -42,17 +44,55 @@ const Header = () => {
           {/* Desktop Navigation */}
           <nav className="hidden lg:flex items-center space-x-6 flex-1 justify-center max-w-md">
             {navigation.map((item) => (
-              <Link
-                key={item.path}
-                href={item.path}
-                className={`btn-text font-semibold transition-all duration-200 hover:scale-105 whitespace-nowrap ${
-                  currentPath === item.path
-                    ? 'text-white bg-white/20 px-3 py-2 rounded-lg backdrop-blur-sm shadow-lg'
-                    : 'text-green-50 hover:text-white hover:bg-white/10 px-3 py-2 rounded-lg'
-                }`}
-              >
-                {item.name}
-              </Link>
+              item.hasDropdown ? (
+                <div key={item.path} className="relative">
+                  <button
+                    onClick={() => setIsServicesDropdownOpen(!isServicesDropdownOpen)}
+                    className={`btn-text font-semibold transition-all duration-200 hover:scale-105 whitespace-nowrap flex items-center ${
+                      currentPath.startsWith('/website-services') || currentPath.startsWith('/real-estate-services')
+                        ? 'text-white bg-white/20 px-3 py-2 rounded-lg backdrop-blur-sm shadow-lg'
+                        : 'text-green-50 hover:text-white hover:bg-white/10 px-3 py-2 rounded-lg'
+                    }`}
+                  >
+                    {item.name}
+                    <ChevronDown className="h-3 w-3 ml-1" />
+                  </button>
+                  {isServicesDropdownOpen && (
+                    <div className="absolute top-full left-0 mt-2 w-56 bg-white border border-gray-200 rounded-xl shadow-xl z-50 backdrop-blur-lg">
+                      <div className="py-2">
+                        <Link 
+                          href="/website-services"
+                          className="flex items-center px-4 py-3 text-sm font-medium text-gray-700 hover:bg-green-50 hover:text-green-700 transition-colors duration-200"
+                          onClick={() => setIsServicesDropdownOpen(false)}
+                        >
+                          <Globe className="h-5 w-5 mr-3 text-green-600" />
+                          Website & SEO Services
+                        </Link>
+                        <Link 
+                          href="/real-estate-services"
+                          className="flex items-center px-4 py-3 text-sm font-medium text-gray-700 hover:bg-green-50 hover:text-green-700 transition-colors duration-200"
+                          onClick={() => setIsServicesDropdownOpen(false)}
+                        >
+                          <Home className="h-5 w-5 mr-3 text-green-600" />
+                          Real Estate Services
+                        </Link>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                <Link
+                  key={item.path}
+                  href={item.path}
+                  className={`btn-text font-semibold transition-all duration-200 hover:scale-105 whitespace-nowrap ${
+                    currentPath === item.path
+                      ? 'text-white bg-white/20 px-3 py-2 rounded-lg backdrop-blur-sm shadow-lg'
+                      : 'text-green-50 hover:text-white hover:bg-white/10 px-3 py-2 rounded-lg'
+                  }`}
+                >
+                  {item.name}
+                </Link>
+              )
             ))}
           </nav>
 
@@ -208,18 +248,42 @@ const Header = () => {
             <div className="mx-2 mt-4 mb-2 bg-white/95 backdrop-blur-lg border border-white/20 rounded-xl shadow-2xl overflow-hidden">
               <div className="px-4 py-4 space-y-2">
                 {navigation.map((item) => (
-                  <Link
-                    key={item.path}
-                    href={item.path}
-                    className={`block px-4 py-3 body-large font-semibold transition-all duration-200 rounded-lg ${
-                      currentPath === item.path
-                        ? 'text-white bg-gradient-to-r from-green-600 to-green-700 shadow-lg'
-                        : 'text-gray-700 hover:text-white hover:bg-gradient-to-r hover:from-green-500 hover:to-green-600 hover:shadow-md'
-                    }`}
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    {item.name}
-                  </Link>
+                  item.hasDropdown ? (
+                    <div key={item.path} className="space-y-1">
+                      <div className="px-4 py-2 text-sm font-semibold text-gray-600 bg-gray-100 rounded-lg">
+                        {item.name}
+                      </div>
+                      <Link
+                        href="/website-services"
+                        className="flex items-center px-6 py-2 text-sm font-medium text-gray-700 hover:text-white hover:bg-gradient-to-r hover:from-green-500 hover:to-green-600 hover:shadow-md rounded-lg transition-all duration-200"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                      >
+                        <Globe className="h-4 w-4 mr-3 text-green-600" />
+                        Website & SEO
+                      </Link>
+                      <Link
+                        href="/real-estate-services"
+                        className="flex items-center px-6 py-2 text-sm font-medium text-gray-700 hover:text-white hover:bg-gradient-to-r hover:from-green-500 hover:to-green-600 hover:shadow-md rounded-lg transition-all duration-200"
+                        onClick={() => setIsMobileMenuOpen(false)}
+                      >
+                        <Home className="h-4 w-4 mr-3 text-green-600" />
+                        Real Estate Sales
+                      </Link>
+                    </div>
+                  ) : (
+                    <Link
+                      key={item.path}
+                      href={item.path}
+                      className={`block px-4 py-3 body-large font-semibold transition-all duration-200 rounded-lg ${
+                        currentPath === item.path
+                          ? 'text-white bg-gradient-to-r from-green-600 to-green-700 shadow-lg'
+                          : 'text-gray-700 hover:text-white hover:bg-gradient-to-r hover:from-green-500 hover:to-green-600 hover:shadow-md'
+                      }`}
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      {item.name}
+                    </Link>
+                  )
                 ))}
               </div>
               

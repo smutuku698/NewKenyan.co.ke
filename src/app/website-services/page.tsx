@@ -140,10 +140,13 @@ const WebsiteServicesPage = () => {
                 Professional website design & SEO services to help your Kenyan business thrive online. 
                 Get more customers, increase visibility, and grow your revenue.
               </p>
+              <p className="text-blue-100 mt-4">
+                📍 Nairobi, Kenya | 📧 info@newkenyan.com
+              </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Button 
                   size="lg" 
-                  className="bg-white text-blue-600 hover:bg-blue-50"
+                  className="bg-white text-blue-600 hover:bg-blue-50 font-semibold"
                   onClick={() => document.getElementById('pricing')?.scrollIntoView({ behavior: 'smooth' })}
                 >
                   View Our Packages
@@ -152,7 +155,8 @@ const WebsiteServicesPage = () => {
                 <Button 
                   size="lg" 
                   variant="outline" 
-                  className="border-white text-white hover:bg-white hover:text-blue-600"
+                  className="border-white text-white hover:bg-white hover:text-blue-600 font-semibold"
+                  onClick={() => window.open('mailto:info@newkenyan.com?subject=Free Consultation Request&body=Hi, I would like to schedule a free consultation for web services.', '_blank')}
                 >
                   <MessageCircle className="mr-2 h-4 w-4" />
                   Get Free Consultation
@@ -268,12 +272,12 @@ const WebsiteServicesPage = () => {
                   </div>
 
                   <Button
-                    className={`w-full ${
+                    className={`w-full font-semibold ${
                       plan.popular 
                         ? 'bg-blue-600 hover:bg-blue-700 text-white' 
                         : 'bg-gray-900 hover:bg-gray-800 text-white'
                     }`}
-                    onClick={() => setSelectedPlan(plan.id)}
+                    onClick={() => window.open('mailto:hr@jobvacancy.co.ke?subject=' + encodeURIComponent('Website Service Request - ' + plan.name) + '&body=' + encodeURIComponent('Hi, I am interested in the ' + plan.name + ' package (' + plan.price + '). Please provide more details and next steps for ordering this service.'), '_blank')}
                   >
                     Get Started
                   </Button>
@@ -309,7 +313,11 @@ const WebsiteServicesPage = () => {
                     ))}
                   </div>
 
-                  <Button variant="outline" className="w-full">
+                  <Button 
+                    variant="outline" 
+                    className="w-full font-semibold"
+                    onClick={() => window.open('mailto:hr@jobvacancy.co.ke?subject=' + encodeURIComponent('SEO Service Inquiry - ' + service.name) + '&body=' + encodeURIComponent('Hi, I am interested in your ' + service.name + ' service (' + service.price + '). Please provide more details and next steps.'), '_blank')}
+                  >
                     Learn More
                   </Button>
                 </div>
@@ -329,18 +337,20 @@ const WebsiteServicesPage = () => {
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Button 
                   size="lg" 
-                  className="bg-white text-blue-600 hover:bg-blue-50"
+                  className="bg-white text-blue-600 hover:bg-blue-50 font-semibold"
+                  onClick={() => window.open('https://wa.me/254736407642?text=Hi, I would like to discuss web services for my business.', '_blank')}
                 >
                   <MessageCircle className="mr-2 h-5 w-5" />
-                  WhatsApp: +254 700 123 456
+                  WhatsApp: +254 736 407 642
                 </Button>
                 <Button 
                   size="lg" 
                   variant="outline" 
-                  className="border-white text-white hover:bg-white hover:text-blue-600"
+                  className="border-white text-white hover:bg-white hover:text-blue-600 font-semibold"
+                  onClick={() => window.open('tel:+254736407642', '_self')}
                 >
                   <Phone className="mr-2 h-5 w-5" />
-                  Call: +254 700 123 456
+                  Call: +254 736 407 642
                 </Button>
               </div>
               <p className="text-blue-200 text-sm mt-4">
