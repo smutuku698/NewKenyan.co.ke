@@ -1,23 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Calculator, Home, MapPin, Settings, FileText, AlertCircle, Info, Edit3, Lock, Plus, X, ArrowLeft, HelpCircle } from 'lucide-react';
-
-// Input sanitization utility
-const sanitizeInput = (input: string): string => {
-  return input
-    .replace(/[<>]/g, '') // Remove HTML tags
-    .replace(/javascript:/gi, '') // Remove JavaScript protocol
-    .replace(/on\w+=/gi, '') // Remove event handlers
-    .replace(/script/gi, '') // Remove script references
-    .trim();
-};
-
-const sanitizeNumber = (input: string): number => {
-  const sanitized = sanitizeInput(input);
-  const number = parseFloat(sanitized);
-  return isNaN(number) ? 0 : Math.max(0, number);
-};
+import { Calculator, Home, MapPin, Settings, FileText, AlertCircle, Info, Edit3 } from 'lucide-react';
 
 // Material price interfaces
 interface MaterialPrices {
@@ -46,15 +30,6 @@ interface LabourRates {
   plumber: { rate: number; description: string };
 }
 
-interface CustomItem {
-  id: string;
-  name: string;
-  price: number;
-  unit: string;
-  description: string;
-  quantity: number;
-}
-
 interface ConstructionEstimate {
   totalCost: number;
   costPerSqm: number;
@@ -80,7 +55,6 @@ interface ConstructionEstimate {
     timber: { quantity: number; cost: number };
     bricks: { quantity: number; cost: number };
     finishing: { quantity: number; cost: number };
-    customItems: { quantity: number; cost: number };
   };
 }
 
@@ -123,54 +97,8 @@ const defaultLabourRates: LabourRates = {
   plumber: { rate: 1800, description: 'Plumber per day' },
 };
 
-// Example custom items with descriptions
-const exampleCustomItems: Omit<CustomItem, 'id'>[] = [
-  {
-    name: 'Glass Windows',
-    price: 2500,
-    unit: 'square meter',
-    description: 'Tempered glass for windows and doors',
-    quantity: 0
-  },
-  {
-    name: 'Granite Countertops',
-    price: 8000,
-    unit: 'square meter', 
-    description: 'High-quality granite kitchen countertops',
-    quantity: 0
-  },
-  {
-    name: 'Solar Panels',
-    price: 25000,
-    unit: 'panel',
-    description: '300W solar panel with installation',
-    quantity: 0
-  },
-  {
-    name: 'Septic Tank',
-    price: 45000,
-    unit: 'unit',
-    description: 'Complete septic tank system with installation',
-    quantity: 0
-  },
-  {
-    name: 'Water Storage Tank',
-    price: 12000,
-    unit: '1000L tank',
-    description: 'Plastic water storage tank',
-    quantity: 0
-  },
-  {
-    name: 'Security System',
-    price: 35000,
-    unit: 'complete system',
-    description: 'CCTV cameras, alarm system, and monitoring',
-    quantity: 0
-  }
-];
-
 export default function ConstructionCalculator() {
-  const [activeTab, setActiveTab] = useState<'calculator' | 'breakdown' | 'customize' | 'how-to-use'>('calculator');
+  const [activeTab, setActiveTab] = useState<'calculator' | 'breakdown' | 'customize'>('calculator');
   const [showCustomPricing, setShowCustomPricing] = useState(false);
   
   // Main calculator inputs
@@ -185,20 +113,6 @@ export default function ConstructionCalculator() {
   // Customizable pricing states
   const [materialPrices, setMaterialPrices] = useState<MaterialPrices>(defaultMaterialPrices);
   const [labourRates, setLabourRates] = useState<LabourRates>(defaultLabourRates);
-  
-  // Custom items functionality
-  const [customItems, setCustomItems] = useState<CustomItem[]>([]);
-  const [showAddCustomItem, setShowAddCustomItem] = useState(false);
-  const [newCustomItem, setNewCustomItem] = useState({
-    name: '',
-    price: '',
-    unit: '',
-    description: '',
-    quantity: ''
-  });
-  
-  // Pricing lock functionality
-  const [pricesLocked, setPricesLocked] = useState(false);
   
   // Results
   const [estimate, setEstimate] = useState<ConstructionEstimate | null>(null);
@@ -281,14 +195,8 @@ export default function ConstructionCalculator() {
       const doorsCost = quantities.doors * adjustedMaterialPrices.doors.price;
       const windowsCost = quantities.windows * adjustedMaterialPrices.windows.price;
 
-      // Custom items costs
-      const customItemsCost = customItems.reduce((total, item) => {
-        const adjustedPrice = item.price * regionalMultiplier;
-        return total + (adjustedPrice * item.quantity);
-      }, 0);
-
       const totalMaterialCosts = cementCost + sandCost + ballastCost + steelCost + timberCost + 
-                               bricksCost + roofingCost + flooringCost + paintCost + doorsCost + windowsCost + customItemsCost;
+                               bricksCost + roofingCost + flooringCost + paintCost + doorsCost + windowsCost;
 
       // Labour costs (estimated at 30% of material costs + specific trades)
       const generalLabourCost = totalMaterialCosts * 0.25;
@@ -336,7 +244,6 @@ export default function ConstructionCalculator() {
         timber: { quantity: quantities.timber, cost: timberCost },
         bricks: { quantity: quantities.bricks, cost: bricksCost },
         finishing: { quantity: size, cost: flooringCost + paintCost + doorsCost + windowsCost },
-        customItems: { quantity: customItems.length, cost: customItemsCost },
       };
 
       setEstimate({
@@ -350,7 +257,7 @@ export default function ConstructionCalculator() {
         materialBreakdown,
       });
     }
-  }, [houseSize, location, buildStandard, roofingType, flooringType, contingencyPercent, materialPrices, labourRates, customItems]);
+  }, [houseSize, location, buildStandard, roofingType, flooringType, contingencyPercent, materialPrices, labourRates]);
 
   const formatCurrency = (amount: number) => {
     return new Intl.NumberFormat('en-KE', {
@@ -378,68 +285,6 @@ export default function ConstructionCalculator() {
   const resetToDefaults = () => {
     setMaterialPrices(defaultMaterialPrices);
     setLabourRates(defaultLabourRates);
-    setCustomItems([]);
-  };
-
-  // Custom items management with 6-item limit
-  const addCustomItem = () => {
-    if (customItems.length >= 6) {
-      alert('You can add a maximum of 6 custom items. Please remove an existing item to add a new one.');
-      return;
-    }
-    
-    if (newCustomItem.name && newCustomItem.price && newCustomItem.unit) {
-      const customItem: CustomItem = {
-        id: Date.now().toString(),
-        name: sanitizeInput(newCustomItem.name),
-        price: sanitizeNumber(newCustomItem.price),
-        unit: sanitizeInput(newCustomItem.unit),
-        description: sanitizeInput(newCustomItem.description),
-        quantity: Math.max(0, sanitizeNumber(newCustomItem.quantity))
-      };
-      
-      setCustomItems(prev => [...prev, customItem]);
-      setNewCustomItem({ name: '', price: '', unit: '', description: '', quantity: '' });
-      setShowAddCustomItem(false);
-    }
-  };
-
-  const removeCustomItem = (id: string) => {
-    setCustomItems(prev => prev.filter(item => item.id !== id));
-  };
-
-  const updateCustomItemQuantity = (id: string, quantity: number) => {
-    setCustomItems(prev => 
-      prev.map(item => 
-        item.id === id ? { ...item, quantity: Math.max(0, quantity) } : item
-      )
-    );
-  };
-
-  const addExampleItem = (exampleItem: Omit<CustomItem, 'id'>) => {
-    if (customItems.length >= 6) {
-      alert('You can add a maximum of 6 custom items. Please remove an existing item to add a new one.');
-      return;
-    }
-    
-    const customItem: CustomItem = {
-      ...exampleItem,
-      id: Date.now().toString(),
-      name: sanitizeInput(exampleItem.name),
-      description: sanitizeInput(exampleItem.description),
-      unit: sanitizeInput(exampleItem.unit)
-    };
-    
-    setCustomItems(prev => [...prev, customItem]);
-  };
-
-  // Lock/unlock prices functionality
-  const togglePriceLock = () => {
-    setPricesLocked(!pricesLocked);
-    if (!pricesLocked) {
-      // Switch back to calculator when locking prices
-      setActiveTab('calculator');
-    }
   };
 
   return (
@@ -479,17 +324,6 @@ export default function ConstructionCalculator() {
           <Settings className="w-4 h-4" />
           Customize Prices
         </button>
-        <button
-          onClick={() => setActiveTab('how-to-use')}
-          className={`px-6 py-3 rounded-lg font-medium transition-all duration-200 flex items-center gap-2 ${
-            activeTab === 'how-to-use'
-              ? 'bg-orange-100 text-orange-700 shadow-sm'
-              : 'text-gray-600 hover:text-orange-600'
-          }`}
-        >
-          <HelpCircle className="w-4 h-4" />
-          How to Use
-        </button>
       </div>
 
       {/* Calculator Tab */}
@@ -501,31 +335,6 @@ export default function ConstructionCalculator() {
               <Home className="w-6 h-6 text-orange-600" />
               Project Details
             </h3>
-
-            {/* Custom Pricing Notification */}
-            <div className="mb-6 bg-blue-50 border border-blue-200 rounded-lg p-4">
-              <div className="flex items-start gap-3">
-                <Info className="w-5 h-5 text-blue-600 mt-0.5 flex-shrink-0" />
-                <div className="flex-1">
-                  <h4 className="font-semibold text-blue-800 mb-1">💡 Customize Your Prices</h4>
-                  <p className="text-sm text-blue-700 mb-2">
-                    Want to use your own material prices or add custom items like glass, granite, or solar panels? 
-                  </p>
-                  <button
-                    onClick={() => setActiveTab('customize')}
-                    className="text-blue-600 hover:text-blue-700 font-semibold text-sm underline"
-                  >
-                    Set your own prices and add custom items →
-                  </button>
-                  {pricesLocked && (
-                    <div className="mt-2 flex items-center gap-2">
-                      <Lock className="w-4 h-4 text-green-600" />
-                      <span className="text-xs text-green-700 font-medium">Custom prices locked and active</span>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
 
             <div className="space-y-6">
               {/* House Size */}
@@ -820,7 +629,7 @@ export default function ConstructionCalculator() {
                     {formatCurrency(estimate.materialBreakdown.bricks.cost)}
                   </span>
                 </div>
-                <div className="flex justify-between items-center py-2 border-b border-gray-100">
+                <div className="flex justify-between items-center py-2">
                   <div>
                     <span className="text-gray-900 block">Finishing Materials</span>
                     <span className="text-xs text-gray-500">Paint, doors, windows, tiles</span>
@@ -829,19 +638,6 @@ export default function ConstructionCalculator() {
                     {formatCurrency(estimate.materialBreakdown.finishing.cost)}
                   </span>
                 </div>
-                {estimate.materialBreakdown.customItems.cost > 0 && (
-                  <div className="flex justify-between items-center py-2">
-                    <div>
-                      <span className="text-gray-900 block">Custom Items</span>
-                      <span className="text-xs text-gray-500">
-                        {customItems.filter(item => item.quantity > 0).map(item => item.name).join(', ')}
-                      </span>
-                    </div>
-                    <span className="font-semibold text-gray-900">
-                      {formatCurrency(estimate.materialBreakdown.customItems.cost)}
-                    </span>
-                  </div>
-                )}
               </div>
             </div>
           </div>
@@ -871,313 +667,17 @@ export default function ConstructionCalculator() {
             <h3 className="text-2xl font-semibold text-gray-900">
               Customize Material & Labour Prices
             </h3>
-            <div className="flex items-center gap-3">
-              <button
-                onClick={resetToDefaults}
-                className="px-4 py-2 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
-              >
-                Reset to Defaults
-              </button>
-              <button
-                onClick={togglePriceLock}
-                className={`px-4 py-2 text-sm rounded-lg font-medium transition-all flex items-center gap-2 ${
-                  pricesLocked
-                    ? 'bg-green-100 text-green-700 hover:bg-green-200'
-                    : 'bg-orange-100 text-orange-700 hover:bg-orange-200'
-                }`}
-              >
-                {pricesLocked ? (
-                  <>
-                    <ArrowLeft className="w-4 h-4" />
-                    Return to Calculator
-                  </>
-                ) : (
-                  <>
-                    <Lock className="w-4 h-4" />
-                    Lock Prices & Return
-                  </>
-                )}
-              </button>
-            </div>
+            <button
+              onClick={resetToDefaults}
+              className="px-4 py-2 text-sm bg-gray-100 text-gray-700 rounded-lg hover:bg-gray-200 transition-colors"
+            >
+              Reset to Defaults
+            </button>
           </div>
 
-          {pricesLocked && (
-            <div className="mb-6 bg-green-50 border border-green-200 rounded-lg p-4">
-              <div className="flex items-center gap-2">
-                <Lock className="w-5 h-5 text-green-600" />
-                <span className="font-semibold text-green-800">Prices Locked</span>
-              </div>
-              <p className="text-sm text-green-700 mt-1">
-                Your custom prices are now active and will be used in all calculations. Click "Return to Calculator" above to see the updated costs.
-              </p>
-            </div>
-          )}
-
-          {/* Quick How-to-Use Guide */}
-          <div className="mb-8 bg-gray-50 border border-gray-200 rounded-lg p-6">
-            <div className="flex items-start gap-3">
-              <HelpCircle className="w-5 h-5 text-gray-600 mt-0.5 flex-shrink-0" />
-              <div className="flex-1">
-                <h4 className="font-semibold text-gray-900 mb-3">📝 Quick Guide: How to Customize</h4>
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div>
-                    <h5 className="font-medium text-gray-800 mb-2">💰 Adjust Material & Labour Prices:</h5>
-                    <ul className="text-sm text-gray-700 space-y-1">
-                      <li>• Change any price to match your local supplier quotes</li>
-                      <li>• <strong>Set price to 0 (zero) to exclude materials</strong> you don't need</li>
-                      <li>• Example: Set paint = 0 if doing DIY painting</li>
-                      <li>• Higher quality materials typically cost 20-50% more</li>
-                    </ul>
-                  </div>
-                  <div>
-                    <h5 className="font-medium text-gray-800 mb-2">🏗️ Add Custom Items (Max 6):</h5>
-                    <ul className="text-sm text-gray-700 space-y-1">
-                      <li>• Use quick-add buttons for common items</li>
-                      <li>• Add your own custom items: specialized materials, services, etc.</li>
-                      <li>• Maximum of 6 custom items to keep calculations manageable</li>
-                      <li>• Set quantities to get accurate total costs</li>
-                      <li>• Remove items you don't need with the X button</li>
-                    </ul>
-                  </div>
-                </div>
-                <div className="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                  <p className="text-sm text-blue-800">
-                    <strong>💡 Pro Tip:</strong> After customizing, click "Lock Prices & Return" to apply your changes and see the updated cost calculation. 
-                    Your settings will remain active until you reset or change them.
-                  </p>
-                </div>
-                <div className="mt-3 text-center">
-                  <button
-                    onClick={() => setActiveTab('how-to-use')}
-                    className="text-blue-600 hover:text-blue-700 font-medium text-sm underline"
-                  >
-                    Need detailed instructions? → View Complete How-to-Use Guide
-                  </button>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          <div className="space-y-8">
-            {/* Custom Items Section */}
+          <div className="grid md:grid-cols-2 gap-8">
+            {/* Material Prices */}
             <div>
-              <div className="flex justify-between items-start mb-4">
-                <div>
-                  <h4 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-                    <Plus className="w-5 h-5" />
-                    Custom Items & Add-ons
-                  </h4>
-                  <p className="text-sm text-gray-600 mt-1">
-                    Add any specialized items not included in standard materials ({customItems.length}/6 items used)
-                  </p>
-                </div>
-                <div className="flex flex-col items-end gap-2">
-                  <button
-                    onClick={() => setShowAddCustomItem(true)}
-                    disabled={customItems.length >= 6}
-                    className={`px-4 py-2 text-sm rounded-lg font-medium transition-all flex items-center gap-2 ${
-                      customItems.length >= 6
-                        ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
-                        : 'bg-green-100 text-green-700 hover:bg-green-200'
-                    }`}
-                  >
-                    <Plus className="w-4 h-4" />
-                    Add Your Own Item
-                  </button>
-                  {customItems.length >= 6 && (
-                    <p className="text-xs text-red-600 text-right">
-                      Maximum 6 items reached
-                    </p>
-                  )}
-                  {customItems.length < 6 && (
-                    <p className="text-xs text-green-600 text-right">
-                      {6 - customItems.length} more items available
-                    </p>
-                  )}
-                </div>
-              </div>
-
-              {/* Example Items */}
-              <div className="mb-4 bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <div className="flex justify-between items-center mb-3">
-                  <h5 className="font-semibold text-blue-800">💡 Quick Add: Common Items</h5>
-                  {customItems.length >= 6 && (
-                    <span className="text-xs text-red-600 font-medium">
-                      Remove an item to add more
-                    </span>
-                  )}
-                </div>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-2">
-                  {exampleCustomItems.map((item, index) => (
-                    <button
-                      key={index}
-                      onClick={() => addExampleItem(item)}
-                      disabled={customItems.length >= 6}
-                      className={`text-left p-2 text-xs border rounded-lg transition-colors ${
-                        customItems.length >= 6
-                          ? 'bg-gray-100 border-gray-200 text-gray-400 cursor-not-allowed'
-                          : 'bg-white border-blue-200 hover:bg-blue-50'
-                      }`}
-                    >
-                      <span className={`font-medium ${customItems.length >= 6 ? 'text-gray-400' : 'text-blue-800'}`}>
-                        {item.name}
-                      </span>
-                      <br />
-                      <span className={customItems.length >= 6 ? 'text-gray-400' : 'text-blue-600'}>
-                        KES {item.price.toLocaleString()} per {item.unit}
-                      </span>
-                    </button>
-                  ))}
-                </div>
-                <p className="text-xs text-blue-700 mt-2">
-                  Click any item above to quickly add it, or use "Add Your Own Item" for custom materials
-                </p>
-              </div>
-
-              {/* Add Custom Item Form */}
-              {showAddCustomItem && (
-                <div className="border border-green-300 rounded-lg p-6 mb-4 bg-green-50">
-                  <div className="flex justify-between items-center mb-4">
-                    <div>
-                      <h5 className="font-semibold text-green-800">✨ Add Your Custom Item</h5>
-                      <p className="text-sm text-green-700 mt-1">
-                        Add any specialized material or service not covered above (Item {customItems.length + 1} of 6)
-                      </p>
-                    </div>
-                    <button
-                      onClick={() => setShowAddCustomItem(false)}
-                      className="text-green-400 hover:text-green-600"
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
-                  </div>
-                  
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Item Name *
-                      </label>
-                      <input
-                        type="text"
-                        value={newCustomItem.name}
-                        onChange={(e) => setNewCustomItem(prev => ({...prev, name: sanitizeInput(e.target.value)}))}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-sm"
-                        placeholder="e.g., Italian Marble, CCTV Camera, Swimming Pool Tiles"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Price (KES) *
-                      </label>
-                      <input
-                        type="number"
-                        value={newCustomItem.price}
-                        onChange={(e) => setNewCustomItem(prev => ({...prev, price: e.target.value}))}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-sm"
-                        placeholder="e.g., 15000, 2500, 45000"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Unit *
-                      </label>
-                      <input
-                        type="text"
-                        value={newCustomItem.unit}
-                        onChange={(e) => setNewCustomItem(prev => ({...prev, unit: sanitizeInput(e.target.value)}))}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-sm"
-                        placeholder="e.g., square meter, piece, liter, bag, roll"
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Quantity
-                      </label>
-                      <input
-                        type="number"
-                        value={newCustomItem.quantity}
-                        onChange={(e) => setNewCustomItem(prev => ({...prev, quantity: e.target.value}))}
-                        className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-sm"
-                        placeholder="0"
-                      />
-                    </div>
-                  </div>
-                  <div className="mt-4">
-                    <label className="block text-sm font-medium text-gray-700 mb-1">
-                      Description (Optional)
-                    </label>
-                    <input
-                      type="text"
-                      value={newCustomItem.description}
-                      onChange={(e) => setNewCustomItem(prev => ({...prev, description: sanitizeInput(e.target.value)}))}
-                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-sm"
-                      placeholder="e.g., High-quality imported material, Professional installation included"
-                    />
-                  </div>
-                  <div className="mt-4 flex justify-end gap-3">
-                    <button
-                      onClick={() => setShowAddCustomItem(false)}
-                      className="px-4 py-2 text-sm text-gray-600 hover:text-gray-800"
-                    >
-                      Cancel
-                    </button>
-                    <button
-                      onClick={addCustomItem}
-                      className="px-4 py-2 text-sm bg-orange-600 text-white rounded-lg hover:bg-orange-700"
-                    >
-                      Add Item
-                    </button>
-                  </div>
-                </div>
-              )}
-
-              {/* Current Custom Items */}
-              {customItems.length > 0 && (
-                <div className="space-y-3">
-                  <h5 className="font-semibold text-gray-900">Your Custom Items</h5>
-                  {customItems.map((item) => (
-                    <div key={item.id} className="border border-gray-200 rounded-lg p-4 bg-gray-50">
-                      <div className="flex justify-between items-start mb-2">
-                        <div>
-                          <h6 className="font-medium text-gray-900">{item.name}</h6>
-                          <p className="text-xs text-gray-600">{item.description}</p>
-                          <p className="text-sm text-gray-700 mt-1">
-                            KES {item.price.toLocaleString()} per {item.unit}
-                          </p>
-                        </div>
-                        <button
-                          onClick={() => removeCustomItem(item.id)}
-                          className="text-red-400 hover:text-red-600"
-                        >
-                          <X className="w-4 h-4" />
-                        </button>
-                      </div>
-                      <div className="flex items-center gap-3">
-                        <label className="text-sm text-gray-600">Quantity:</label>
-                        <input
-                          type="number"
-                          value={item.quantity}
-                          onChange={(e) => updateCustomItemQuantity(item.id, sanitizeNumber(e.target.value))}
-                          className="w-20 px-2 py-1 border border-gray-300 rounded text-sm"
-                          min="0"
-                        />
-                        <span className="text-sm text-gray-600">{item.unit}(s)</span>
-                        {item.quantity > 0 && (
-                          <span className="text-sm font-medium text-green-700 ml-auto">
-                            = {formatCurrency(item.price * item.quantity)}
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* Material Prices Section */}
-            <div className="grid md:grid-cols-2 gap-8">
-              {/* Material Prices */}
-              <div>
               <h4 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
                 <Edit3 className="w-5 h-5" />
                 Material Prices
@@ -1194,7 +694,7 @@ export default function ConstructionCalculator() {
                       <input
                         type="number"
                         value={details.price}
-                        onChange={(e) => updateMaterialPrice(material as keyof MaterialPrices, sanitizeNumber(e.target.value))}
+                        onChange={(e) => updateMaterialPrice(material as keyof MaterialPrices, parseFloat(e.target.value) || 0)}
                         className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-sm"
                       />
                       <span className="text-sm text-gray-600">per {details.unit}</span>
@@ -1222,7 +722,7 @@ export default function ConstructionCalculator() {
                       <input
                         type="number"
                         value={details.rate}
-                        onChange={(e) => updateLabourRate(role as keyof LabourRates, sanitizeNumber(e.target.value))}
+                        onChange={(e) => updateLabourRate(role as keyof LabourRates, parseFloat(e.target.value) || 0)}
                         className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-orange-500 text-sm"
                       />
                       <span className="text-sm text-gray-600">per day</span>
@@ -1247,251 +747,6 @@ export default function ConstructionCalculator() {
                 </ul>
               </div>
             </div>
-          </div>
-        </div>
-      )}
-
-      {/* How to Use Tab */}
-      {activeTab === 'how-to-use' && (
-        <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8">
-          <div className="text-center mb-8">
-            <div className="w-16 h-16 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <HelpCircle className="w-8 h-8 text-blue-600" />
-            </div>
-            <h3 className="text-2xl font-semibold text-gray-900 mb-2">
-              Complete Guide: How to Use the Construction Calculator
-            </h3>
-            <p className="text-gray-600 max-w-2xl mx-auto">
-              Master our construction cost calculator with this comprehensive step-by-step guide
-            </p>
-          </div>
-
-          <div className="space-y-8">
-            {/* Getting Started */}
-            <div className="bg-green-50 border border-green-200 rounded-lg p-6">
-              <h4 className="text-xl font-semibold text-green-800 mb-4 flex items-center gap-2">
-                <Calculator className="w-5 h-5" />
-                1. Getting Started - Calculator Tab
-              </h4>
-              <div className="grid md:grid-cols-2 gap-6 text-sm">
-                <div>
-                  <h5 className="font-medium text-green-700 mb-2">Basic Project Setup:</h5>
-                  <ul className="text-green-600 space-y-1">
-                    <li>• Choose number of bedrooms or set custom size</li>
-                    <li>• Select your location for regional pricing</li>
-                    <li>• Pick build quality (Budget/Standard/Luxury)</li>
-                    <li>• Choose roofing material (Iron sheets, clay, concrete)</li>
-                    <li>• Select floor finish type</li>
-                    <li>• Set contingency buffer (8-20%)</li>
-                  </ul>
-                </div>
-                <div>
-                  <h5 className="font-medium text-green-700 mb-2">Instant Results:</h5>
-                  <ul className="text-green-600 space-y-1">
-                    <li>• Total cost calculated in real-time</li>
-                    <li>• Cost per square meter displayed</li>
-                    <li>• Breakdown by materials, labor, permits</li>
-                    <li>• Quick size comparisons (2BR, 3BR, 4BR)</li>
-                    <li>• All prices in Kenyan Shillings (KES)</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-
-            {/* Detailed Breakdown */}
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-6">
-              <h4 className="text-xl font-semibold text-blue-800 mb-4 flex items-center gap-2">
-                <FileText className="w-5 h-5" />
-                2. Understanding Costs - Breakdown Tab
-              </h4>
-              <div className="grid md:grid-cols-2 gap-6 text-sm">
-                <div>
-                  <h5 className="font-medium text-blue-700 mb-2">Construction Phases:</h5>
-                  <ul className="text-blue-600 space-y-1">
-                    <li>• <strong>Foundation:</strong> 15% of total cost</li>
-                    <li>• <strong>Walling:</strong> 25% of total cost</li>
-                    <li>• <strong>Roofing:</strong> 20% of total cost</li>
-                    <li>• <strong>Finishing:</strong> 25% of total cost</li>
-                    <li>• <strong>Electrical:</strong> 8% of total cost</li>
-                    <li>• <strong>Plumbing:</strong> 7% of total cost</li>
-                  </ul>
-                </div>
-                <div>
-                  <h5 className="font-medium text-blue-700 mb-2">Material Quantities:</h5>
-                  <ul className="text-blue-600 space-y-1">
-                    <li>• Exact bags of cement needed</li>
-                    <li>• Cubic meters of sand and ballast</li>
-                    <li>• Kilograms of steel reinforcement</li>
-                    <li>• Square meters of roofing coverage</li>
-                    <li>• Feet of timber required</li>
-                    <li>• Number of blocks/bricks needed</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-
-            {/* Customization Guide */}
-            <div className="bg-orange-50 border border-orange-200 rounded-lg p-6">
-              <h4 className="text-xl font-semibold text-orange-800 mb-4 flex items-center gap-2">
-                <Settings className="w-5 h-5" />
-                3. Customization - Customize Prices Tab
-              </h4>
-              
-              <div className="space-y-6 text-sm">
-                <div>
-                  <h5 className="font-medium text-orange-700 mb-3">🎯 Adjusting Material & Labour Prices:</h5>
-                  <div className="grid md:grid-cols-2 gap-6">
-                    <div className="bg-white rounded-lg p-4 border border-orange-200">
-                      <h6 className="font-medium text-gray-800 mb-2">Price Adjustments:</h6>
-                      <ul className="text-gray-700 space-y-1">
-                        <li>• Enter your actual supplier quotes</li>
-                        <li>• Account for transport costs</li>
-                        <li>• Adjust for quality differences</li>
-                        <li>• Update regional labor rates</li>
-                      </ul>
-                    </div>
-                    <div className="bg-white rounded-lg p-4 border border-orange-200">
-                      <h6 className="font-medium text-gray-800 mb-2">Excluding Materials:</h6>
-                      <ul className="text-gray-700 space-y-1">
-                        <li>• <strong>Set price to 0 to exclude completely</strong></li>
-                        <li>• Paint = 0 if doing DIY painting</li>
-                        <li>• Windows = 0 if using existing</li>
-                        <li>• Any material you're not using</li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-
-                <div>
-                  <h5 className="font-medium text-orange-700 mb-3">➕ Adding Custom Items:</h5>
-                  <div className="grid md:grid-cols-3 gap-4">
-                    <div className="bg-white rounded-lg p-4 border border-orange-200">
-                      <h6 className="font-medium text-gray-800 mb-2">Quick Add Examples:</h6>
-                      <ul className="text-gray-700 space-y-1 text-xs">
-                        <li>• Glass Windows (KES 2,500/m²)</li>
-                        <li>• Granite Countertops (KES 8,000/m²)</li>
-                        <li>• Solar Panels (KES 25,000/panel)</li>
-                        <li>• Security System (KES 35,000)</li>
-                      </ul>
-                    </div>
-                    <div className="bg-white rounded-lg p-4 border border-orange-200">
-                      <h6 className="font-medium text-gray-800 mb-2">Custom Items (Max 6):</h6>
-                      <ul className="text-gray-700 space-y-1 text-xs">
-                        <li>• Add any specialized item you need</li>
-                        <li>• Set custom name, price, and unit</li>
-                        <li>• Add description for reference</li>
-                        <li>• Maximum of 6 custom items allowed</li>
-                        <li>• Adjust quantities as needed</li>
-                      </ul>
-                    </div>
-                    <div className="bg-white rounded-lg p-4 border border-orange-200">
-                      <h6 className="font-medium text-gray-800 mb-2">Management:</h6>
-                      <ul className="text-gray-700 space-y-1 text-xs">
-                        <li>• Remove items with X button</li>
-                        <li>• Update quantities anytime</li>
-                        <li>• See real-time cost calculations</li>
-                        <li>• Reset all to defaults</li>
-                      </ul>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                  <h6 className="font-medium text-yellow-800 mb-2">🔒 Locking Your Prices:</h6>
-                  <ol className="text-yellow-700 space-y-1">
-                    <li>1. Adjust all prices and add custom items</li>
-                    <li>2. Click "Lock Prices & Return" button</li>
-                    <li>3. Automatically returns to Calculator tab</li>
-                    <li>4. See updated costs with your custom pricing</li>
-                    <li>5. Lock indicator shows your prices are active</li>
-                  </ol>
-                </div>
-              </div>
-            </div>
-
-            {/* Best Practices */}
-            <div className="bg-purple-50 border border-purple-200 rounded-lg p-6">
-              <h4 className="text-xl font-semibold text-purple-800 mb-4 flex items-center gap-2">
-                <Info className="w-5 h-5" />
-                4. Best Practices & Tips
-              </h4>
-              
-              <div className="grid md:grid-cols-2 gap-6 text-sm">
-                <div>
-                  <h5 className="font-medium text-purple-700 mb-3">📊 Getting Accurate Estimates:</h5>
-                  <ul className="text-purple-600 space-y-2">
-                    <li>• <strong>Get multiple supplier quotes</strong> for current prices</li>
-                    <li>• Consider transport costs for remote locations</li>
-                    <li>• Add 15-20% contingency for rural areas</li>
-                    <li>• Factor in seasonal price variations</li>
-                    <li>• Account for quality differences in materials</li>
-                    <li>• Include waste factor (typically 5-10%)</li>
-                  </ul>
-                </div>
-                <div>
-                  <h5 className="font-medium text-purple-700 mb-3">💡 Pro Tips:</h5>
-                  <ul className="text-purple-600 space-y-2">
-                    <li>• Start with standard quality, then customize</li>
-                    <li>• Compare costs across different regions</li>
-                    <li>• Use custom items for specialized needs</li>
-                    <li>• Set excluded materials to zero price</li>
-                    <li>• Save screenshots of your calculations</li>
-                    <li>• Review breakdown tab for detailed costs</li>
-                  </ul>
-                </div>
-              </div>
-            </div>
-
-            {/* Troubleshooting */}
-            <div className="bg-red-50 border border-red-200 rounded-lg p-6">
-              <h4 className="text-xl font-semibold text-red-800 mb-4">🔧 Common Questions & Troubleshooting</h4>
-              
-              <div className="space-y-4 text-sm">
-                <div className="grid md:grid-cols-2 gap-6">
-                  <div>
-                    <h5 className="font-medium text-red-700 mb-2">❓ Frequently Asked:</h5>
-                    <div className="space-y-3">
-                      <div>
-                        <p className="font-medium text-gray-800">Q: How do I exclude materials I don't need?</p>
-                        <p className="text-red-600">A: Set the material price to 0 (zero) in Customize Prices tab.</p>
-                      </div>
-                      <div>
-                        <p className="font-medium text-gray-800">Q: Can I add items not listed?</p>
-                        <p className="text-red-600">A: Yes! Use the "Add Custom Item" feature for any specialized materials.</p>
-                      </div>
-                      <div>
-                        <p className="font-medium text-gray-800">Q: Why are my costs different from quotes?</p>
-                        <p className="text-red-600">A: Update prices with your actual supplier quotes for accuracy.</p>
-                      </div>
-                    </div>
-                  </div>
-                  <div>
-                    <h5 className="font-medium text-red-700 mb-2">⚠️ Important Notes:</h5>
-                    <ul className="text-red-600 space-y-1">
-                      <li>• Estimates are based on 2025 Kenya market rates</li>
-                      <li>• Prices vary by location and supplier</li>
-                      <li>• Always add contingency for unexpected costs</li>
-                      <li>• Get professional quotes for final decisions</li>
-                      <li>• Consider permit and approval costs</li>
-                      <li>• Factor in site access and conditions</li>
-                    </ul>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Back to Calculator CTA */}
-          <div className="mt-8 text-center bg-gradient-to-r from-orange-100 to-yellow-100 rounded-lg p-6">
-            <h4 className="text-lg font-semibold text-gray-900 mb-2">Ready to Calculate Your Construction Costs?</h4>
-            <p className="text-gray-600 mb-4">Use this guide to get the most accurate estimate for your project</p>
-            <button
-              onClick={() => setActiveTab('calculator')}
-              className="px-6 py-3 bg-orange-600 text-white font-semibold rounded-lg hover:bg-orange-700 transition-colors flex items-center gap-2 mx-auto"
-            >
-              <Calculator className="w-4 h-4" />
-              Start Calculating Now
-            </button>
           </div>
         </div>
       )}

@@ -18,7 +18,8 @@
       "WebSearch",
       "Bash(git pull:*)",
       "Bash(git log:*)",
-      "Bash(git log:*)"
+      "Bash(git log:*)",
+      "Bash(npx tsc:*)"
     ],
     "deny": [],
     "ask": []

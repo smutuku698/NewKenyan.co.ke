@@ -13,7 +13,8 @@ import {
   ArrowRight,
   MessageCircle,
   Phone,
-  MapPin
+  MapPin,
+  Mail
 } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -141,8 +142,16 @@ const RealEstateServicesPage = () => {
                   className="border-white text-white hover:bg-white hover:text-green-600 font-semibold"
                   onClick={() => window.open('mailto:info@newkenyan.com?subject=Real Estate Service Consultation&body=Hi, I would like to discuss real estate services for my property.', '_blank')}
                 >
-                  <MessageCircle className="mr-2 h-4 w-4" />
+                  <Mail className="mr-2 h-4 w-4" />
                   Get Free Consultation
+                </Button>
+                <Button 
+                  size="lg" 
+                  className="bg-green-700 text-white hover:bg-green-800 font-semibold"
+                  onClick={() => window.open('https://wa.me/254736407642?text=' + encodeURIComponent('Hi, I would like to discuss real estate services for my property.'), '_blank')}
+                >
+                  <MessageCircle className="mr-2 h-4 w-4" />
+                  WhatsApp Consultation
                 </Button>
               </div>
             </div>
@@ -254,16 +263,27 @@ const RealEstateServicesPage = () => {
                     </p>
                   </div>
 
-                  <Button
-                    className={`w-full font-semibold ${
-                      service.popular 
-                        ? 'bg-green-600 hover:bg-green-700 text-white' 
-                        : 'bg-gray-900 hover:bg-gray-800 text-white'
-                    }`}
-                    onClick={() => window.open('mailto:hr@jobvacancy.co.ke?subject=' + encodeURIComponent('Real Estate Service Request - ' + service.name) + '&body=' + encodeURIComponent('Hi, I am interested in the ' + service.name + ' package (' + service.price + ') for my property. Please provide more details and next steps.'), '_blank')}
-                  >
-                    Get Started
-                  </Button>
+                  <div className="space-y-3">
+                    <Button
+                      className={`w-full font-semibold ${
+                        service.popular 
+                          ? 'bg-green-600 hover:bg-green-700 text-white' 
+                          : 'bg-gray-900 hover:bg-gray-800 text-white'
+                      }`}
+                      onClick={() => window.open('mailto:hr@jobvacancy.co.ke?subject=' + encodeURIComponent('Real Estate Service Request - ' + service.name) + '&body=' + encodeURIComponent('Hi, I am interested in the ' + service.name + ' package (' + service.price + ') for my property. Please provide more details and next steps.'), '_blank')}
+                    >
+                      <Mail className="w-4 h-4 mr-2" />
+                      Get Started via Email
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="w-full font-semibold border-green-500 text-green-600 hover:bg-green-50"
+                      onClick={() => window.open('https://wa.me/254736407642?text=' + encodeURIComponent('Hi, I am interested in the ' + service.name + ' package (' + service.price + ') for my property. Please provide more details and next steps.'), '_blank')}
+                    >
+                      <MessageCircle className="w-4 h-4 mr-2" />
+                      WhatsApp Us
+                    </Button>
+                  </div>
                 </div>
               ))}
             </div>
@@ -296,13 +316,24 @@ const RealEstateServicesPage = () => {
                     ))}
                   </div>
 
-                  <Button 
-                    variant="outline" 
-                    className="w-full font-semibold"
-                    onClick={() => window.open('mailto:hr@jobvacancy.co.ke?subject=' + encodeURIComponent('Real Estate Service Inquiry - ' + service.name) + '&body=' + encodeURIComponent('Hi, I am interested in your ' + service.name + ' service (' + service.price + '). Please provide more details.'), '_blank')}
-                  >
-                    Learn More
-                  </Button>
+                  <div className="space-y-3">
+                    <Button 
+                      variant="outline" 
+                      className="w-full font-semibold"
+                      onClick={() => window.open('mailto:hr@jobvacancy.co.ke?subject=' + encodeURIComponent('Real Estate Service Inquiry - ' + service.name) + '&body=' + encodeURIComponent('Hi, I am interested in your ' + service.name + ' service (' + service.price + '). Please provide more details.'), '_blank')}
+                    >
+                      <Mail className="w-4 h-4 mr-2" />
+                      Learn More via Email
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="w-full font-semibold border-green-500 text-green-600 hover:bg-green-50"
+                      onClick={() => window.open('https://wa.me/254736407642?text=' + encodeURIComponent('Hi, I am interested in your ' + service.name + ' service (' + service.price + '). Please provide more details.'), '_blank')}
+                    >
+                      <MessageCircle className="w-4 h-4 mr-2" />
+                      WhatsApp Us
+                    </Button>
+                  </div>
                 </div>
               ))}
             </div>

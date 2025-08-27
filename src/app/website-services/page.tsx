@@ -12,7 +12,8 @@ import {
   Shield, 
   ArrowRight,
   MessageCircle,
-  Phone
+  Phone,
+  Mail
 } from 'lucide-react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -308,16 +309,27 @@ const WebsiteServicesPage = () => {
                     </p>
                   </div>
 
-                  <Button
-                    className={`w-full font-semibold ${
-                      plan.popular 
-                        ? 'bg-blue-600 hover:bg-blue-700 text-white' 
-                        : 'bg-gray-900 hover:bg-gray-800 text-white'
-                    }`}
-                    onClick={() => window.open('mailto:hr@jobvacancy.co.ke?subject=' + encodeURIComponent('Website Service Request - ' + plan.name) + '&body=' + encodeURIComponent('Hi, I am interested in the ' + plan.name + ' package (' + plan.price + '). Please provide more details and next steps for ordering this service.'), '_blank')}
-                  >
-                    Get Started
-                  </Button>
+                  <div className="space-y-3">
+                    <Button
+                      className={`w-full font-semibold ${
+                        plan.popular 
+                          ? 'bg-blue-600 hover:bg-blue-700 text-white' 
+                          : 'bg-gray-900 hover:bg-gray-800 text-white'
+                      }`}
+                      onClick={() => window.open('mailto:hr@jobvacancy.co.ke?subject=' + encodeURIComponent('Website Service Request - ' + plan.name) + '&body=' + encodeURIComponent('Hi, I am interested in the ' + plan.name + ' package (' + plan.price + '). Please provide more details and next steps for ordering this service.'), '_blank')}
+                    >
+                      <Mail className="w-4 h-4 mr-2" />
+                      Get Started via Email
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="w-full font-semibold border-green-500 text-green-600 hover:bg-green-50"
+                      onClick={() => window.open('https://wa.me/254736407642?text=' + encodeURIComponent('Hi, I am interested in the ' + plan.name + ' package (' + plan.price + '). Please provide more details and next steps for ordering this service.'), '_blank')}
+                    >
+                      <MessageCircle className="w-4 h-4 mr-2" />
+                      WhatsApp Us
+                    </Button>
+                  </div>
                 </div>
               ))}
             </div>
@@ -350,13 +362,24 @@ const WebsiteServicesPage = () => {
                     ))}
                   </div>
 
-                  <Button 
-                    variant="outline" 
-                    className="w-full font-semibold"
-                    onClick={() => window.open('mailto:hr@jobvacancy.co.ke?subject=' + encodeURIComponent('SEO Service Inquiry - ' + service.name) + '&body=' + encodeURIComponent('Hi, I am interested in your ' + service.name + ' service (' + service.price + '). Please provide more details and next steps.'), '_blank')}
-                  >
-                    Learn More
-                  </Button>
+                  <div className="space-y-3">
+                    <Button 
+                      variant="outline" 
+                      className="w-full font-semibold"
+                      onClick={() => window.open('mailto:hr@jobvacancy.co.ke?subject=' + encodeURIComponent('SEO Service Inquiry - ' + service.name) + '&body=' + encodeURIComponent('Hi, I am interested in your ' + service.name + ' service (' + service.price + '). Please provide more details and next steps.'), '_blank')}
+                    >
+                      <Mail className="w-4 h-4 mr-2" />
+                      Learn More via Email
+                    </Button>
+                    <Button
+                      variant="outline"
+                      className="w-full font-semibold border-green-500 text-green-600 hover:bg-green-50"
+                      onClick={() => window.open('https://wa.me/254736407642?text=' + encodeURIComponent('Hi, I am interested in your ' + service.name + ' service (' + service.price + '). Please provide more details and next steps.'), '_blank')}
+                    >
+                      <MessageCircle className="w-4 h-4 mr-2" />
+                      WhatsApp Us
+                    </Button>
+                  </div>
                 </div>
               ))}
             </div>
