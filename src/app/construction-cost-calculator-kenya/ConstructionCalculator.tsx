@@ -1257,75 +1257,196 @@ export default function ConstructionCalculator() {
             </div>
           </div>
 
-          {/* What's Included */}
+          {/* Complete Cost Breakdown */}
           <div className="bg-gray-50 rounded-xl p-6">
-            <h4 className="text-xl font-bold text-gray-900 mb-4">What's Included in This Estimate</h4>
-            <div className="grid md:grid-cols-2 gap-6">
-              <div>
-                <h5 className="font-semibold text-gray-800 mb-3">Selected Materials ({selectedMaterials.size})</h5>
-                <div className="space-y-2">
-                  {Array.from(selectedMaterials).slice(0, 6).map((key) => {
-                    const material = materialPrices[key as keyof MaterialPrices];
+            <h4 className="text-xl font-bold text-gray-900 mb-6">Complete Cost Breakdown - Every Item Accounted For</h4>
+            
+            <div className="grid lg:grid-cols-3 gap-6">
+              {/* Construction Materials */}
+              <div className="bg-white rounded-lg p-4 border border-gray-200">
+                <h5 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                  <span className="w-3 h-3 bg-blue-500 rounded-full"></span>
+                  Core Materials ({selectedMaterials.size} selected)
+                </h5>
+                <div className="space-y-2 text-sm">
+                  {Array.from(selectedMaterials).map((key) => {
                     const cost = estimate.materialBreakdown[key as keyof typeof estimate.materialBreakdown]?.cost || 0;
+                    const quantity = estimate.materialBreakdown[key as keyof typeof estimate.materialBreakdown]?.quantity || 0;
+                    const material = materialPrices[key as keyof MaterialPrices];
+                    if (cost === 0) return null;
+                    
                     return (
-                      <div key={key} className="flex justify-between items-center py-1 border-b border-gray-200 last:border-0">
-                        <span className="text-gray-700 capitalize text-sm">
-                          {key.replace(/([A-Z])/g, ' $1').trim()}
-                        </span>
-                        <span className="font-medium text-sm">{formatCurrency(cost)}</span>
+                      <div key={key} className="border-b border-gray-100 pb-2 last:border-0">
+                        <div className="flex justify-between items-start">
+                          <div className="flex-1">
+                            <div className="font-medium text-gray-800 capitalize">
+                              {key.replace(/([A-Z])/g, ' $1').trim()}
+                            </div>
+                            <div className="text-xs text-gray-500">
+                              {quantity.toFixed(['cement', 'steel', 'timber', 'bricks'].includes(key) ? 0 : 1)} {material?.unit || 'units'}
+                            </div>
+                          </div>
+                          <div className="font-semibold text-gray-900">{formatCurrency(cost)}</div>
+                        </div>
                       </div>
                     );
                   })}
-                  {selectedMaterials.size > 6 && (
-                    <div className="text-gray-500 text-sm mt-2">...and {selectedMaterials.size - 6} more materials</div>
-                  )}
                 </div>
               </div>
-              
-              <div>
-                {customItems.length > 0 && (
-                  <div className="mb-6">
-                    <h5 className="font-semibold text-gray-800 mb-3">Custom Items ({customItems.length})</h5>
-                    <div className="space-y-2">
-                      {customItems.slice(0, 4).map((item) => {
-                        const totalCost = item.price * item.quantity * (regionalMultipliers[location as keyof typeof regionalMultipliers] || 1.0);
-                        return (
-                          <div key={item.id} className="flex justify-between items-center py-1 border-b border-gray-200 last:border-0">
-                            <div className="text-gray-700 text-sm">
-                              <div>{item.name}</div>
-                              <div className="text-xs text-gray-500">{item.quantity} {item.unit}</div>
-                            </div>
-                            <span className="font-medium text-sm">{formatCurrency(totalCost)}</span>
+
+              {/* Finishing Components */}
+              <div className="bg-white rounded-lg p-4 border border-gray-200">
+                <h5 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                  <span className="w-3 h-3 bg-green-500 rounded-full"></span>
+                  Finishing & Components
+                </h5>
+                <div className="space-y-2 text-sm">
+                  {/* Calculate individual finishing costs */}
+                  {(() => {
+                    const size = parseFloat(houseSize) || 0;
+                    const regionalMultiplier = regionalMultipliers[location as keyof typeof regionalMultipliers] || 1.0;
+                    const quantities = {
+                      paintArea: size * 4,
+                      doors: Math.ceil(size / 30),
+                      windows: Math.ceil(size / 20),
+                    };
+                    
+                    const paintCost = (quantities.paintArea / 12) * materialPrices.paint.price * regionalMultiplier;
+                    const doorsCost = quantities.doors * materialPrices.doors.price * regionalMultiplier;
+                    const windowsCost = quantities.windows * materialPrices.windows.price * regionalMultiplier;
+                    const flooringCost = size * (flooringType === 'tiles' ? materialPrices.tiles.price * regionalMultiplier : 500);
+                    const roofingCost = estimate.materialBreakdown.roofing?.cost || 0;
+                    
+                    const finishingItems = [
+                      { name: 'Roofing System', cost: roofingCost, detail: `${(size * 1.3).toFixed(1)} m² coverage` },
+                      { name: 'Floor Finishing', cost: flooringCost, detail: `${size} m² ${flooringType}` },
+                      { name: 'Paint & Coating', cost: paintCost, detail: `${(quantities.paintArea / 12).toFixed(1)} liters needed` },
+                      { name: 'Doors', cost: doorsCost, detail: `${quantities.doors} doors` },
+                      { name: 'Windows', cost: windowsCost, detail: `${quantities.windows} windows` },
+                    ];
+                    
+                    return finishingItems.map((item, idx) => (
+                      <div key={idx} className="border-b border-gray-100 pb-2 last:border-0">
+                        <div className="flex justify-between items-start">
+                          <div className="flex-1">
+                            <div className="font-medium text-gray-800">{item.name}</div>
+                            <div className="text-xs text-gray-500">{item.detail}</div>
                           </div>
-                        );
-                      })}
-                      {customItems.length > 4 && (
-                        <div className="text-gray-500 text-sm mt-2">...and {customItems.length - 4} more custom items</div>
-                      )}
+                          <div className="font-semibold text-gray-900">{formatCurrency(item.cost)}</div>
+                        </div>
+                      </div>
+                    ));
+                  })()}
+                </div>
+              </div>
+
+              {/* Construction Phases & Services */}
+              <div className="bg-white rounded-lg p-4 border border-gray-200">
+                <h5 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                  <span className="w-3 h-3 bg-purple-500 rounded-full"></span>
+                  Construction Phases
+                </h5>
+                <div className="space-y-2 text-sm">
+                  {Object.entries(estimate.breakdown).map(([phase, cost]) => (
+                    <div key={phase} className="border-b border-gray-100 pb-2 last:border-0">
+                      <div className="flex justify-between items-start">
+                        <div className="flex-1">
+                          <div className="font-medium text-gray-800 capitalize">
+                            {phase.replace(/([A-Z])/g, ' $1').trim()}
+                          </div>
+                          <div className="text-xs text-gray-500">
+                            {((cost / estimate.totalCost) * 100).toFixed(1)}% of project
+                          </div>
+                        </div>
+                        <div className="font-semibold text-gray-900">{formatCurrency(cost)}</div>
+                      </div>
                     </div>
-                  </div>
-                )}
-                
+                  ))}
+                </div>
+              </div>
+            </div>
+            
+            {/* Custom Items Section */}
+            {customItems.length > 0 && (
+              <div className="mt-6 bg-white rounded-lg p-4 border border-gray-200">
+                <h5 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                  <span className="w-3 h-3 bg-orange-500 rounded-full"></span>
+                  Your Custom Items ({customItems.length} items)
+                </h5>
+                <div className="grid md:grid-cols-2 gap-4">
+                  {customItems.map((item) => {
+                    const regionalPrice = item.price * (regionalMultipliers[location as keyof typeof regionalMultipliers] || 1.0);
+                    const totalCost = regionalPrice * item.quantity;
+                    return (
+                      <div key={item.id} className="border-b border-gray-100 pb-2 last:border-0">
+                        <div className="flex justify-between items-start">
+                          <div className="flex-1">
+                            <div className="font-medium text-gray-800">{item.name}</div>
+                            <div className="text-xs text-gray-500">
+                              {item.quantity} {item.unit} @ KES {regionalPrice.toLocaleString()} each
+                            </div>
+                          </div>
+                          <div className="font-semibold text-gray-900">{formatCurrency(totalCost)}</div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+            
+            {/* Labour Breakdown */}
+            <div className="mt-6 bg-white rounded-lg p-4 border border-gray-200">
+              <h5 className="font-semibold text-gray-800 mb-3 flex items-center gap-2">
+                <span className="w-3 h-3 bg-teal-500 rounded-full"></span>
+                Labour & Services Breakdown
+              </h5>
+              <div className="grid md:grid-cols-2 gap-4 text-sm">
                 <div>
-                  <h5 className="font-semibold text-gray-800 mb-3">Project Details</h5>
-                  <div className="space-y-1 text-sm text-gray-600">
-                    <div>• {buildStandard.charAt(0).toUpperCase() + buildStandard.slice(1)} quality construction</div>
-                    <div>• {roofingType === 'ironSheets' ? 'Iron sheets' : roofingType === 'clayTiles' ? 'Clay tiles' : 'Concrete tiles'} roofing</div>
-                    <div>• {flooringType === 'tiles' ? 'Ceramic tiles' : 'Polished concrete'} flooring</div>
-                    <div>• Permits and approvals included</div>
-                    <div>• {contingencyPercent}% contingency buffer for unexpected costs</div>
+                  <div className="flex justify-between items-center py-1">
+                    <span className="text-gray-700">General Construction Labour</span>
+                    <span className="font-semibold">{formatCurrency(estimate.labourCosts * 0.75)}</span>
                   </div>
+                  <div className="text-xs text-gray-500 mb-2">Masons, general workers, supervision</div>
+                </div>
+                <div>
+                  <div className="flex justify-between items-center py-1">
+                    <span className="text-gray-700">Specialist Trades</span>
+                    <span className="font-semibold">{formatCurrency(estimate.labourCosts * 0.25)}</span>
+                  </div>
+                  <div className="text-xs text-gray-500 mb-2">Electrician, plumber, carpenter</div>
+                </div>
+              </div>
+            </div>
+            
+            {/* Final Costs */}
+            <div className="mt-6 bg-gradient-to-r from-gray-100 to-gray-200 rounded-lg p-4">
+              <h5 className="font-semibold text-gray-800 mb-3">Additional Costs & Buffer</h5>
+              <div className="grid md:grid-cols-2 gap-4 text-sm">
+                <div className="flex justify-between items-center py-1">
+                  <span className="text-gray-700">Building Permits & Approvals</span>
+                  <span className="font-semibold">{formatCurrency(estimate.permitCosts)}</span>
+                </div>
+                <div className="flex justify-between items-center py-1">
+                  <span className="text-gray-700">Contingency Buffer ({contingencyPercent}%)</span>
+                  <span className="font-semibold">{formatCurrency(estimate.contingency)}</span>
+                </div>
+              </div>
+              <div className="mt-3 pt-3 border-t border-gray-300">
+                <div className="flex justify-between items-center font-bold text-lg">
+                  <span>TOTAL PROJECT COST</span>
+                  <span className="text-orange-700">{formatCurrency(estimate.totalCost)}</span>
                 </div>
               </div>
             </div>
             
             <div className="mt-6 pt-6 border-t border-gray-300 text-center">
-              <p className="text-gray-600 mb-4">Need more detailed breakdown with quantities and phases?</p>
+              <p className="text-gray-600 mb-4">Every single cost component is accounted for above. For material quantities and construction phases analysis:</p>
               <button 
                 onClick={() => setActiveTab('breakdown')}
                 className="px-6 py-3 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors font-medium"
               >
-                View Detailed Cost Breakdown →
+                View Technical Breakdown Tab →
               </button>
             </div>
           </div>
