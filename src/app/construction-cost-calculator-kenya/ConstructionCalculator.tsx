@@ -1219,6 +1219,119 @@ export default function ConstructionCalculator() {
         </div>
       )}
 
+      {/* Comprehensive Cost Summary - Always Visible */}
+      {estimate && (
+        <div className="mt-12 bg-white rounded-xl shadow-lg border border-gray-200 p-8">
+          <div className="text-center mb-8">
+            <h3 className="text-3xl font-bold text-gray-900 mb-4">
+              Your Construction Cost Summary
+            </h3>
+            <div className="bg-gradient-to-r from-orange-50 to-orange-100 rounded-lg p-6">
+              <div className="text-5xl font-bold text-orange-700 mb-2">{formatCurrency(estimate.totalCost)}</div>
+              <div className="text-orange-600 font-medium text-lg">Total Project Cost</div>
+              <div className="text-orange-600 mt-2">
+                {formatCurrency(estimate.costPerSqm)} per m² • {houseSize} m² house • {location.replace('-', ' ')} pricing
+              </div>
+            </div>
+          </div>
+
+          {/* Quick Stats */}
+          <div className="grid md:grid-cols-4 gap-4 mb-8">
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 text-center">
+              <div className="text-2xl font-bold text-blue-800">{formatCurrency(estimate.materialCosts)}</div>
+              <div className="text-blue-600 text-sm font-medium">Materials ({selectedMaterials.size} items)</div>
+            </div>
+            <div className="bg-green-50 border border-green-200 rounded-lg p-4 text-center">
+              <div className="text-2xl font-bold text-green-800">{formatCurrency(estimate.labourCosts)}</div>
+              <div className="text-green-600 text-sm font-medium">Labor & Services</div>
+            </div>
+            {estimate.customItemsCost > 0 && (
+              <div className="bg-purple-50 border border-purple-200 rounded-lg p-4 text-center">
+                <div className="text-2xl font-bold text-purple-800">{formatCurrency(estimate.customItemsCost)}</div>
+                <div className="text-purple-600 text-sm font-medium">Custom Items ({customItems.length})</div>
+              </div>
+            )}
+            <div className="bg-orange-50 border border-orange-200 rounded-lg p-4 text-center">
+              <div className="text-2xl font-bold text-orange-800">{formatCurrency(estimate.contingency)}</div>
+              <div className="text-orange-600 text-sm font-medium">{contingencyPercent}% Contingency</div>
+            </div>
+          </div>
+
+          {/* What's Included */}
+          <div className="bg-gray-50 rounded-xl p-6">
+            <h4 className="text-xl font-bold text-gray-900 mb-4">What's Included in This Estimate</h4>
+            <div className="grid md:grid-cols-2 gap-6">
+              <div>
+                <h5 className="font-semibold text-gray-800 mb-3">Selected Materials ({selectedMaterials.size})</h5>
+                <div className="space-y-2">
+                  {Array.from(selectedMaterials).slice(0, 6).map((key) => {
+                    const material = materialPrices[key as keyof MaterialPrices];
+                    const cost = estimate.materialBreakdown[key as keyof typeof estimate.materialBreakdown]?.cost || 0;
+                    return (
+                      <div key={key} className="flex justify-between items-center py-1 border-b border-gray-200 last:border-0">
+                        <span className="text-gray-700 capitalize text-sm">
+                          {key.replace(/([A-Z])/g, ' $1').trim()}
+                        </span>
+                        <span className="font-medium text-sm">{formatCurrency(cost)}</span>
+                      </div>
+                    );
+                  })}
+                  {selectedMaterials.size > 6 && (
+                    <div className="text-gray-500 text-sm mt-2">...and {selectedMaterials.size - 6} more materials</div>
+                  )}
+                </div>
+              </div>
+              
+              <div>
+                {customItems.length > 0 && (
+                  <div className="mb-6">
+                    <h5 className="font-semibold text-gray-800 mb-3">Custom Items ({customItems.length})</h5>
+                    <div className="space-y-2">
+                      {customItems.slice(0, 4).map((item) => {
+                        const totalCost = item.price * item.quantity * (regionalMultipliers[location as keyof typeof regionalMultipliers] || 1.0);
+                        return (
+                          <div key={item.id} className="flex justify-between items-center py-1 border-b border-gray-200 last:border-0">
+                            <div className="text-gray-700 text-sm">
+                              <div>{item.name}</div>
+                              <div className="text-xs text-gray-500">{item.quantity} {item.unit}</div>
+                            </div>
+                            <span className="font-medium text-sm">{formatCurrency(totalCost)}</span>
+                          </div>
+                        );
+                      })}
+                      {customItems.length > 4 && (
+                        <div className="text-gray-500 text-sm mt-2">...and {customItems.length - 4} more custom items</div>
+                      )}
+                    </div>
+                  </div>
+                )}
+                
+                <div>
+                  <h5 className="font-semibold text-gray-800 mb-3">Project Details</h5>
+                  <div className="space-y-1 text-sm text-gray-600">
+                    <div>• {buildStandard.charAt(0).toUpperCase() + buildStandard.slice(1)} quality construction</div>
+                    <div>• {roofingType === 'ironSheets' ? 'Iron sheets' : roofingType === 'clayTiles' ? 'Clay tiles' : 'Concrete tiles'} roofing</div>
+                    <div>• {flooringType === 'tiles' ? 'Ceramic tiles' : 'Polished concrete'} flooring</div>
+                    <div>• Permits and approvals included</div>
+                    <div>• {contingencyPercent}% contingency buffer for unexpected costs</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <div className="mt-6 pt-6 border-t border-gray-300 text-center">
+              <p className="text-gray-600 mb-4">Need more detailed breakdown with quantities and phases?</p>
+              <button 
+                onClick={() => setActiveTab('breakdown')}
+                className="px-6 py-3 bg-orange-600 text-white rounded-lg hover:bg-orange-700 transition-colors font-medium"
+              >
+                View Detailed Cost Breakdown →
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Additional Information Section */}
       <div className="mt-12 bg-gray-50 rounded-xl p-8">
         <h3 className="text-2xl font-semibold text-gray-900 text-center mb-8">
