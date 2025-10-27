@@ -164,7 +164,19 @@ export const propertyListingSchema = z.object({
     .int('Square feet must be a whole number')
     .min(100, 'Square feet must be at least 100')
     .optional(),
-  
+
+  garage: z.number()
+    .int('Garage spaces must be a whole number')
+    .min(0, 'Garage spaces cannot be negative')
+    .max(10, 'Garage spaces cannot exceed 10')
+    .optional(),
+
+  yearBuilt: z.number()
+    .int('Year built must be a whole number')
+    .min(1900, 'Year built must be after 1900')
+    .max(new Date().getFullYear(), `Year built cannot be after ${new Date().getFullYear()}`)
+    .optional(),
+
   address: z.string()
     .min(5, 'Address must be at least 5 characters')
     .max(200, 'Address must be less than 200 characters')
@@ -181,7 +193,13 @@ export const propertyListingSchema = z.object({
     .refine(val => !val || val.length >= 2, 'County must be at least 2 characters')
     .refine(val => !val || val.length <= 50, 'County must be less than 50 characters')
     .transform(val => val ? sanitizeInput(val) : null),
-  
+
+  googleMapsLink: z.string()
+    .url('Please enter a valid Google Maps URL')
+    .optional()
+    .or(z.literal(''))
+    .transform(val => val || null),
+
   pinLocationUrl: z.string()
     .url('Please enter a valid URL')
     .optional()

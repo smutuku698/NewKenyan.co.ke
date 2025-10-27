@@ -4,6 +4,8 @@ import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import PropertyCard from '@/components/PropertyCard';
+import PropertyDetailsCard from '@/components/PropertyDetailsCard';
+import PropertyMap from '@/components/PropertyMap';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { 
@@ -57,6 +59,9 @@ interface PropertyListing {
   is_featured: boolean;
   views_count: number;
   user_id: string;
+  year_built: number | null;
+  garage: number | null;
+  google_maps_link: string | null;
 }
 
 interface PropertyDetailClientProps {
@@ -415,6 +420,17 @@ export default function PropertyDetailClient({ property, similarProperties }: Pr
               </div>
             </div>
 
+            {/* Enhanced Property Details Card */}
+            <PropertyDetailsCard
+              propertyType={property.property_type}
+              bedrooms={property.bedrooms}
+              bathrooms={property.bathrooms}
+              garage={property.garage}
+              squareFeet={property.square_feet}
+              yearBuilt={property.year_built}
+              rating={property.rating}
+            />
+
             {/* Property Details */}
             <div className="bg-white rounded-lg shadow-sm border p-3 sm:p-6 mb-6">
               <h2 className="text-xl font-semibold mb-4">Property Description</h2>
@@ -548,6 +564,15 @@ export default function PropertyDetailClient({ property, similarProperties }: Pr
             </div>
           </div>
         </div>
+
+        {/* Google Maps Section */}
+        <PropertyMap
+          googleMapsLink={property.google_maps_link}
+          address={property.address}
+          city={property.city}
+          county={property.county}
+          propertyTitle={property.property_title}
+        />
 
         {/* More Properties Section */}
         {similarProperties.length > 0 && (

@@ -9,7 +9,7 @@ import { propertyListingSchema, type PropertyListingInput } from '@/lib/validati
 import { supabase } from '@/lib/supabase';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Upload, MapPin, Phone, Mail, MessageCircle, Bed, Bath, Square, Calendar, CheckCircle, ArrowRight, Shield, UserPlus, Home, Users, CreditCard } from 'lucide-react';
+import { Upload, MapPin, Phone, Mail, MessageCircle, Bed, Bath, Square, Calendar, CheckCircle, ArrowRight, Shield, UserPlus, Home, Users, CreditCard, Car, Building } from 'lucide-react';
 import PaymentModal from '@/components/PaymentModal';
 
 const PROPERTY_TYPES = [
@@ -521,7 +521,7 @@ export default function AddPropertyForm() {
         </div>
 
         {/* Property Details */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
           <div>
             <label htmlFor="bedrooms" className="block text-sm font-medium text-gray-700 mb-2">
               <Bed className="inline h-4 w-4 mr-1" />
@@ -561,6 +561,25 @@ export default function AddPropertyForm() {
           </div>
 
           <div>
+            <label htmlFor="garage" className="block text-sm font-medium text-gray-700 mb-2">
+              <Car className="inline h-4 w-4 mr-1" />
+              Garage Spaces
+            </label>
+            <Input
+              id="garage"
+              name="garage"
+              type="number"
+              min="0"
+              max="10"
+              value={formData.garage || ''}
+              onChange={handleInputChange}
+              placeholder="Number of garage spaces"
+              className={errors.garage ? 'border-red-300' : ''}
+            />
+            {errors.garage && <p className="text-red-600 text-sm mt-1">{errors.garage}</p>}
+          </div>
+
+          <div>
             <label htmlFor="squareFeet" className="block text-sm font-medium text-gray-700 mb-2">
               <Square className="inline h-4 w-4 mr-1" />
               Size (sq ft)
@@ -576,6 +595,25 @@ export default function AddPropertyForm() {
               className={errors.squareFeet ? 'border-red-300' : ''}
             />
             {errors.squareFeet && <p className="text-red-600 text-sm mt-1">{errors.squareFeet}</p>}
+          </div>
+
+          <div>
+            <label htmlFor="yearBuilt" className="block text-sm font-medium text-gray-700 mb-2">
+              <Building className="inline h-4 w-4 mr-1" />
+              Year Built
+            </label>
+            <Input
+              id="yearBuilt"
+              name="yearBuilt"
+              type="number"
+              min="1900"
+              max={new Date().getFullYear()}
+              value={formData.yearBuilt || ''}
+              onChange={handleInputChange}
+              placeholder="Year property was built"
+              className={errors.yearBuilt ? 'border-red-300' : ''}
+            />
+            {errors.yearBuilt && <p className="text-red-600 text-sm mt-1">{errors.yearBuilt}</p>}
           </div>
         </div>
 
@@ -635,6 +673,28 @@ export default function AddPropertyForm() {
             {errors.county && <p className="text-red-600 text-sm mt-1">{errors.county}</p>}
           </div>
 
+          <div>
+            <label htmlFor="googleMapsLink" className="block text-sm font-medium text-gray-700 mb-2">
+              <MapPin className="inline h-4 w-4 mr-1" />
+              Google Maps Link
+            </label>
+            <Input
+              id="googleMapsLink"
+              name="googleMapsLink"
+              type="url"
+              value={formData.googleMapsLink || ''}
+              onChange={handleInputChange}
+              placeholder="https://maps.google.com/..."
+              className={errors.googleMapsLink ? 'border-red-300' : ''}
+            />
+            <p className="text-sm text-gray-500 mt-1">
+              Optional: Add a Google Maps link to show exact property location
+            </p>
+            {errors.googleMapsLink && <p className="text-red-600 text-sm mt-1">{errors.googleMapsLink}</p>}
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label htmlFor="availableFrom" className="block text-sm font-medium text-gray-700 mb-2">
               <Calendar className="inline h-4 w-4 mr-1" />
