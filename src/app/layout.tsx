@@ -5,6 +5,7 @@ import GoogleAnalytics from '@/components/GoogleAnalytics';
 import CookieConsent from '@/components/CookieConsent';
 import GoogleTagManager, { GoogleTagManagerNoScript } from '@/components/GoogleTagManager';
 import SEOOptimizations from '@/components/SEOOptimizations';
+import SiteProtection from '@/components/SiteProtection';
 import "./globals.css";
 
 // Primary font for headings - Modern and professional
@@ -359,6 +360,7 @@ export default function RootLayout({
           <GoogleTagManagerNoScript />
           <GoogleAnalytics />
           <SEOOptimizations />
+          <SiteProtection />
           {children}
           <CookieConsent />
         </body>

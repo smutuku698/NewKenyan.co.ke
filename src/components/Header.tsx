@@ -28,8 +28,13 @@ const Header = () => {
         <div className="flex min-h-20 py-3 items-center justify-between gap-4">
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-3 group">
-            <div className="h-12 w-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform duration-200">
-              <MapPin className="h-7 w-7 text-white drop-shadow-md" />
+            <div className="h-12 w-12 bg-white rounded-xl flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform duration-200 relative">
+              {/* Red Map Pin matching favicon */}
+              <svg className="h-8 w-8" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" fill="#ef4444" stroke="#dc2626" strokeWidth="1"/>
+                <circle cx="12" cy="9" r="2.5" fill="white"/>
+                <ellipse cx="12" cy="21" rx="3" ry="1" fill="#22c55e" opacity="0.8"/>
+              </svg>
             </div>
             <div className="flex flex-col">
               <span className="text-xl lg:text-2xl font-heading font-bold text-white drop-shadow-md">
