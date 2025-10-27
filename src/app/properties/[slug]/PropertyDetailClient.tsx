@@ -638,65 +638,33 @@ export default function PropertyDetailClient({ property, similarProperties }: Pr
         </section>
       </main>
 
-      {/* Image Gallery Modal */}
+      {/* Vertical Scrolling Image Gallery Modal */}
       {isGalleryOpen && property.images && property.images.length > 0 && (
-        <div 
-          className="fixed inset-0 z-50 bg-black bg-opacity-90 flex items-center justify-center"
+        <div
+          className="fixed inset-0 z-50 bg-black"
           onClick={closeGallery}
         >
           {/* Close Button */}
           <button
             onClick={closeGallery}
-            className="absolute top-4 right-4 z-10 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-70 transition-colors"
+            className="fixed top-4 right-4 z-20 bg-black bg-opacity-50 text-white p-3 rounded-full hover:bg-opacity-70 transition-colors backdrop-blur-sm"
           >
             <X className="h-6 w-6" />
           </button>
 
-          {/* Image Navigation */}
-          {property.images.length > 1 && (
-            <>
-              <button
-                onClick={prevImage}
-                className="absolute left-4 z-10 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-70 transition-colors"
-              >
-                <ChevronLeft className="h-6 w-6" />
-              </button>
-              <button
-                onClick={nextImage}
-                className="absolute right-4 z-10 bg-black bg-opacity-50 text-white p-2 rounded-full hover:bg-opacity-70 transition-colors"
-              >
-                <ChevronRight className="h-6 w-6" />
-              </button>
-            </>
-          )}
-
-          {/* Main Image Container */}
-          <div 
-            className="relative w-full h-full max-w-4xl max-h-[80vh] mx-4"
-            onClick={(e) => e.stopPropagation()}
-          >
-            <Image
-              src={property.images[currentImageIndex]}
-              alt={`${property.property_title} - Image ${currentImageIndex + 1}`}
-              fill
-              className="object-contain"
-              sizes="(max-width: 768px) 100vw, 80vw"
-            />
-          </div>
-
           {/* Image Counter */}
-          <div className="absolute top-4 left-1/2 transform -translate-x-1/2 bg-black bg-opacity-50 text-white px-4 py-2 rounded-full text-sm">
+          <div className="fixed top-4 left-4 z-20 bg-black bg-opacity-50 text-white px-4 py-2 rounded-full text-sm backdrop-blur-sm">
             {currentImageIndex + 1} / {property.images.length}
           </div>
 
-          {/* Contact Buttons */}
-          <div 
-            className="absolute bottom-4 left-1/2 transform -translate-x-1/2 flex space-x-4"
+          {/* Contact Buttons Fixed at Bottom */}
+          <div
+            className="fixed bottom-6 left-1/2 transform -translate-x-1/2 z-20 flex space-x-3"
             onClick={(e) => e.stopPropagation()}
           >
             <Button
               onClick={() => handleContactClick('phone')}
-              className="bg-green-600 hover:bg-green-700 text-white px-6 py-2"
+              className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 shadow-lg rounded-full"
             >
               <Phone className="h-4 w-4 mr-2" />
               Call
@@ -704,7 +672,7 @@ export default function PropertyDetailClient({ property, similarProperties }: Pr
             {property.whatsapp_number && (
               <Button
                 onClick={() => handleContactClick('whatsapp')}
-                className="bg-green-600 hover:bg-green-700 text-white px-6 py-2"
+                className="bg-green-600 hover:bg-green-700 text-white px-6 py-3 shadow-lg rounded-full"
               >
                 <MessageCircle className="h-4 w-4 mr-2" />
                 WhatsApp
@@ -712,28 +680,81 @@ export default function PropertyDetailClient({ property, similarProperties }: Pr
             )}
           </div>
 
-          {/* Thumbnail Strip */}
-          {property.images.length > 1 && (
-            <div 
-              className="absolute bottom-20 left-1/2 transform -translate-x-1/2 flex space-x-2 bg-black bg-opacity-50 p-2 rounded-lg max-w-xs overflow-x-auto"
-              onClick={(e) => e.stopPropagation()}
-            >
-              {property.images.map((image, index) => (
-                <div
-                  key={index}
-                  className={`relative w-12 h-12 rounded cursor-pointer overflow-hidden border-2 transition-colors flex-shrink-0 ${
-                    index === currentImageIndex ? 'border-green-500' : 'border-gray-400 hover:border-gray-300'
-                  }`}
-                  onClick={() => setCurrentImageIndex(index)}
-                >
+          {/* Vertical Scrolling Container */}
+          <div
+            className="h-full w-full overflow-y-scroll snap-y snap-mandatory scrollbar-hide"
+            onClick={(e) => e.stopPropagation()}
+            onScroll={(e) => {
+              // Update current image index based on scroll position
+              const scrollTop = e.currentTarget.scrollTop;
+              const windowHeight = window.innerHeight;
+              const newIndex = Math.round(scrollTop / windowHeight);
+              if (newIndex !== currentImageIndex && newIndex >= 0 && newIndex < property.images.length) {
+                setCurrentImageIndex(newIndex);
+              }
+            }}
+          >
+            {/* Each image takes full viewport height */}
+            {property.images.map((image, index) => (
+              <div
+                key={index}
+                className="w-full h-screen flex items-center justify-center snap-start snap-always relative"
+              >
+                <div className="relative w-full h-full">
                   <Image
                     src={image}
-                    alt={`Thumbnail ${index + 1}`}
+                    alt={`${property.property_title} - Image ${index + 1}`}
                     fill
-                    className="object-cover"
-                    sizes="48px"
+                    className="object-contain"
+                    sizes="100vw"
+                    priority={index === 0}
+                    loading={index === 0 ? 'eager' : 'lazy'}
                   />
                 </div>
+
+                {/* Image Number Indicator (bottom right of each image) */}
+                <div className="absolute bottom-24 right-4 bg-black bg-opacity-50 text-white px-3 py-1 rounded-full text-xs backdrop-blur-sm">
+                  {index + 1}
+                </div>
+
+                {/* Scroll Hint - only show on first image */}
+                {index === 0 && property.images.length > 1 && (
+                  <div className="absolute bottom-32 left-1/2 transform -translate-x-1/2 animate-bounce">
+                    <div className="bg-black bg-opacity-50 text-white px-4 py-2 rounded-full text-sm flex items-center backdrop-blur-sm">
+                      <ChevronDown className="h-4 w-4 mr-1" />
+                      Scroll for more
+                    </div>
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+
+          {/* Scroll Progress Indicator - Right Side */}
+          {property.images.length > 1 && (
+            <div className="fixed right-6 top-1/2 transform -translate-y-1/2 z-20 flex flex-col space-y-2">
+              {property.images.map((_, index) => (
+                <div
+                  key={index}
+                  className={`w-2 h-2 rounded-full transition-all duration-300 ${
+                    index === currentImageIndex
+                      ? 'bg-green-500 h-8'
+                      : 'bg-white bg-opacity-50 hover:bg-opacity-75'
+                  }`}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setCurrentImageIndex(index);
+                    // Smooth scroll to the selected image
+                    const container = document.querySelector('.overflow-y-scroll');
+                    if (container) {
+                      container.scrollTo({
+                        top: index * window.innerHeight,
+                        behavior: 'smooth'
+                      });
+                    }
+                  }}
+                  style={{ cursor: 'pointer' }}
+                />
               ))}
             </div>
           )}
