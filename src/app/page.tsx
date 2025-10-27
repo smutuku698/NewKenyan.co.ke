@@ -105,7 +105,7 @@ export default function HomePage() {
             .eq('is_approved', true)
             .order('is_featured', { ascending: false })
             .order('created_at', { ascending: false })
-            .limit(3),
+            .limit(6),
 
           fetch('/api/jobs?limit=3&status=approved')
             .then(res => res.json())
@@ -171,10 +171,30 @@ export default function HomePage() {
     }
   ];
 
+  // FAQ Schema for SEO
+  const faqSchema = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "mainEntity": faqData.map(faq => ({
+      "@type": "Question",
+      "name": faq.question,
+      "acceptedAnswer": {
+        "@type": "Answer",
+        "text": faq.answer.replace(/<[^>]*>/g, '').replace(/&[^;]+;/g, ' ')
+      }
+    }))
+  };
+
   return (
     <div className="min-h-screen bg-white">
+      {/* FAQ Schema Markup */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema) }}
+      />
+
       <Header />
-      
+
       {/* 8 Years Anniversary Banner */}
       <div className="bg-gradient-to-r from-purple-600 to-blue-600 text-white py-3 px-4">
         <div className="container mx-auto px-3 text-center">
@@ -209,45 +229,45 @@ export default function HomePage() {
               Find Jobs, Businesses & Properties in Kenya
             </h1>
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center mb-12 px-4">
-              <Button className="bg-green-600 hover:bg-green-700 text-white px-4 sm:px-8 py-3 text-base sm:text-lg w-full sm:w-auto" asChild>
-                <Link href="/properties">Find Houses for Rent</Link>
+              <Button className="bg-green-600 hover:bg-green-700 text-white px-4 sm:px-8 py-3 text-base sm:text-lg w-full sm:w-auto font-semibold" asChild>
+                <Link href="/properties/rent">Find Houses for Rent</Link>
               </Button>
-              <Button variant="outline" className="border-2 border-white text-white hover:bg-white hover:text-gray-900 px-4 sm:px-8 py-3 text-base sm:text-lg bg-transparent w-full sm:w-auto" asChild>
+              <Button variant="outline" className="border-2 border-white text-white hover:bg-white hover:text-gray-900 px-4 sm:px-8 py-3 text-base sm:text-lg bg-transparent w-full sm:w-auto font-semibold transition-all duration-200" asChild>
                 <Link href="/jobs-in-kenya">Browse Jobs in Kenya</Link>
               </Button>
             </div>
 
             {/* Stats */}
             <div className="grid grid-cols-3 gap-8 max-w-2xl mx-auto">
-              <div className="text-center">
-                <div className="flex items-center justify-center w-12 h-12 bg-green-600 rounded-full mx-auto mb-2">
+              <Link href="/business-directory" className="text-center group cursor-pointer transition-transform hover:scale-105">
+                <div className="flex items-center justify-center w-12 h-12 bg-green-600 rounded-full mx-auto mb-2 group-hover:bg-green-700 transition-colors">
                   <Users className="h-6 w-6 text-white" />
                 </div>
                 <div className="text-xl sm:text-2xl font-bold text-white mb-1">
                   {heroStats.businesses.toLocaleString()}+
                 </div>
-                <div className="text-white text-sm">Businesses</div>
-              </div>
+                <div className="text-white text-sm group-hover:underline">Businesses</div>
+              </Link>
 
-              <div className="text-center">
-                <div className="flex items-center justify-center w-12 h-12 bg-blue-600 rounded-full mx-auto mb-2">
+              <Link href="/jobs-in-kenya" className="text-center group cursor-pointer transition-transform hover:scale-105">
+                <div className="flex items-center justify-center w-12 h-12 bg-blue-600 rounded-full mx-auto mb-2 group-hover:bg-blue-700 transition-colors">
                   <Briefcase className="h-6 w-6 text-white" />
                 </div>
                 <div className="text-xl sm:text-2xl font-bold text-white mb-1">
                   {heroStats.jobs.toLocaleString()}+
                 </div>
-                <div className="text-white text-sm">Jobs</div>
-              </div>
+                <div className="text-white text-sm group-hover:underline">Jobs</div>
+              </Link>
 
-              <div className="text-center">
-                <div className="flex items-center justify-center w-12 h-12 bg-orange-600 rounded-full mx-auto mb-2">
+              <Link href="/properties" className="text-center group cursor-pointer transition-transform hover:scale-105">
+                <div className="flex items-center justify-center w-12 h-12 bg-orange-600 rounded-full mx-auto mb-2 group-hover:bg-orange-700 transition-colors">
                   <Home className="h-6 w-6 text-white" />
                 </div>
                 <div className="text-xl sm:text-2xl font-bold text-white mb-1">
                   {heroStats.properties.toLocaleString()}+
                 </div>
-                <div className="text-white text-sm">Properties</div>
-              </div>
+                <div className="text-white text-sm group-hover:underline">Properties</div>
+              </Link>
             </div>
           </div>
         </section>
@@ -263,7 +283,7 @@ export default function HomePage() {
                   <div className="flex items-center justify-center w-10 h-10 bg-orange-100 rounded-lg">
                     <Home className="h-5 w-5 text-orange-600" />
                   </div>
-                  <h3 className="section-title">Featured Properties for Sale & Rent in Nairobi</h3>
+                  <h2 className="section-title">Featured Properties for Sale & Rent in Nairobi</h2>
                 </div>
                 <Button variant="outline" className="border-2 border-gray-300 hover:bg-gray-100" asChild>
                   <Link href="/properties" className="flex items-center">
@@ -275,7 +295,7 @@ export default function HomePage() {
               
               <div className="grid gap-4 sm:gap-6 md:grid-cols-2 lg:grid-cols-3">
                 {loading ? (
-                  <GridLoadingSkeleton type="property" count={3} />
+                  <GridLoadingSkeleton type="property" count={6} />
                 ) : featuredProperties.length > 0 ? (
                   featuredProperties.map((property) => (
                     <PropertyCard 
@@ -309,7 +329,7 @@ export default function HomePage() {
                   <div className="flex items-center justify-center w-10 h-10 bg-green-100 rounded-lg">
                     <Building2 className="h-5 w-5 text-green-600" />
                   </div>
-                  <h3 className="section-title">Top Companies in Kenya Business Directory</h3>
+                  <h2 className="section-title">Top Companies in Kenya Business Directory</h2>
                 </div>
                 <Button variant="outline" className="border-2 border-gray-300 hover:bg-gray-100" asChild>
                   <Link href="/business-directory" className="flex items-center">
@@ -370,7 +390,7 @@ export default function HomePage() {
                   <div className="flex items-center justify-center w-10 h-10 bg-blue-100 rounded-lg">
                     <Briefcase className="h-5 w-5 text-blue-600" />
                   </div>
-                  <h3 className="section-title">Latest Job Opportunities in Kenya</h3>
+                  <h2 className="section-title">Latest Job Opportunities in Kenya</h2>
                 </div>
                 <Button variant="outline" className="border-2 border-gray-300 hover:bg-gray-100" asChild>
                   <Link href="/jobs-in-kenya" className="flex items-center">
@@ -414,7 +434,7 @@ export default function HomePage() {
                   <div className="flex items-center justify-center w-10 h-10 bg-purple-100 rounded-lg">
                     <BookOpen className="h-5 w-5 text-purple-600" />
                   </div>
-                  <h3 className="section-title">Latest Business News & Updates from Kenya</h3>
+                  <h2 className="section-title">Latest Business News & Updates from Kenya</h2>
                 </div>
                 <Button variant="outline" className="border-2 border-gray-300 hover:bg-gray-100" asChild>
                   <Link href="/blog" className="flex items-center">

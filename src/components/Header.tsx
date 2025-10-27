@@ -14,18 +14,18 @@ const Header = () => {
   const currentPath = usePathname();
 
   const navigation = [
-    { name: 'Home', path: '/' },
-    { name: 'BDirectory', path: '/business-directory' },
-    { name: 'Jobs', path: '/jobs-in-kenya' },
-    { name: 'Properties', path: '/properties' },
-    { name: 'Services', path: '#', hasDropdown: true },
-    { name: 'Blog', path: '/blog' },
+    { name: 'Home', displayName: 'Home', path: '/' },
+    { name: 'Business\nDirectory', displayName: 'Business Directory', path: '/business-directory' },
+    { name: 'Jobs in\nKenya', displayName: 'Jobs in Kenya', path: '/jobs-in-kenya' },
+    { name: 'Properties\nFor Sale/Rent', displayName: 'Properties For Sale/Rent', path: '/properties' },
+    { name: 'Services', displayName: 'Services', path: '#', hasDropdown: true },
+    { name: 'Blog', displayName: 'Blog', path: '/blog' },
   ];
 
   return (
     <header className="sticky top-0 z-50 w-full bg-gradient-to-r from-green-600 via-green-700 to-emerald-800 shadow-lg">
       <div className="container mx-auto px-3 sm:px-6 lg:px-8 max-w-7xl">
-        <div className="flex h-20 items-center justify-between gap-4">
+        <div className="flex min-h-20 py-3 items-center justify-between gap-4">
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-3 group">
             <div className="h-12 w-12 bg-white/20 backdrop-blur-sm rounded-xl flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform duration-200">
@@ -42,20 +42,20 @@ const Header = () => {
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center space-x-6 flex-1 justify-center max-w-md">
+          <nav className="hidden lg:flex items-center space-x-4 flex-1 justify-center max-w-2xl">
             {navigation.map((item) => (
               item.hasDropdown ? (
                 <div key={item.path} className="relative">
                   <button
                     onClick={() => setIsServicesDropdownOpen(!isServicesDropdownOpen)}
-                    className={`btn-text font-semibold transition-all duration-200 hover:scale-105 whitespace-nowrap flex items-center ${
+                    className={`btn-text font-semibold transition-all duration-200 hover:scale-105 text-center flex flex-col items-center leading-tight ${
                       currentPath.startsWith('/website-services') || currentPath.startsWith('/real-estate-services')
                         ? 'text-white bg-white/20 px-3 py-2 rounded-lg backdrop-blur-sm shadow-lg'
                         : 'text-green-50 hover:text-white hover:bg-white/10 px-3 py-2 rounded-lg'
                     }`}
                   >
-                    {item.name}
-                    <ChevronDown className="h-3 w-3 ml-1" />
+                    <span className="whitespace-pre-line text-xs leading-tight">{item.name}</span>
+                    <ChevronDown className="h-3 w-3 mt-0.5" />
                   </button>
                   {isServicesDropdownOpen && (
                     <div className="absolute top-full left-0 mt-2 w-56 bg-white border border-gray-200 rounded-xl shadow-xl z-50 backdrop-blur-lg">
@@ -84,13 +84,13 @@ const Header = () => {
                 <Link
                   key={item.path}
                   href={item.path}
-                  className={`btn-text font-semibold transition-all duration-200 hover:scale-105 whitespace-nowrap ${
+                  className={`btn-text font-semibold transition-all duration-200 hover:scale-105 text-center px-3 py-2 rounded-lg ${
                     currentPath === item.path
-                      ? 'text-white bg-white/20 px-3 py-2 rounded-lg backdrop-blur-sm shadow-lg'
-                      : 'text-green-50 hover:text-white hover:bg-white/10 px-3 py-2 rounded-lg'
+                      ? 'text-white bg-white/20 backdrop-blur-sm shadow-lg'
+                      : 'text-green-50 hover:text-white hover:bg-white/10'
                   }`}
                 >
-                  {item.name}
+                  <span className="whitespace-pre-line text-xs leading-tight block">{item.name}</span>
                 </Link>
               )
             ))}
@@ -251,7 +251,7 @@ const Header = () => {
                   item.hasDropdown ? (
                     <div key={item.path} className="space-y-1">
                       <div className="px-4 py-2 text-sm font-semibold text-gray-600 bg-gray-100 rounded-lg">
-                        {item.name}
+                        {item.displayName}
                       </div>
                       <Link
                         href="/website-services"
@@ -281,7 +281,7 @@ const Header = () => {
                       }`}
                       onClick={() => setIsMobileMenuOpen(false)}
                     >
-                      {item.name}
+                      {item.displayName}
                     </Link>
                   )
                 ))}

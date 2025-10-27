@@ -1,15 +1,18 @@
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
-import { 
-  generatePropertySlug, 
-  generatePropertyMetaTags, 
-  generatePropertyHeadings 
+import {
+  generatePropertySlug,
+  generatePropertyMetaTags,
+  generatePropertyHeadings
 } from '@/lib/utils';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import Breadcrumb from '@/components/Breadcrumb';
 import PropertyDetailClient from './PropertyDetailClient';
+
+// Revalidate pages every 24 hours (86400 seconds) for ISR
+export const revalidate = 86400;
 
 interface PropertyListing {
   id: string;
@@ -93,7 +96,7 @@ export async function generateStaticParams() {
       .from('property_listings')
       .select('id, property_title, property_type, city, bedrooms')
       .eq('is_approved', true)
-      .limit(100); // Limit for build performance, adjust as needed
+      .limit(1000); // Generate pages for up to 1000 properties
 
     if (!properties) return [];
 
@@ -362,6 +365,43 @@ export default async function PropertyPage({ params }: PageProps) {
           }}
         />
 
+        {/* BreadcrumbList Schema */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "BreadcrumbList",
+              "itemListElement": [
+                {
+                  "@type": "ListItem",
+                  "position": 1,
+                  "name": "Home",
+                  "item": "https://newkenyan.com"
+                },
+                {
+                  "@type": "ListItem",
+                  "position": 2,
+                  "name": "Properties",
+                  "item": "https://newkenyan.com/properties"
+                },
+                {
+                  "@type": "ListItem",
+                  "position": 3,
+                  "name": property.city,
+                  "item": `https://newkenyan.com/properties/city/${property.city.toLowerCase()}`
+                },
+                {
+                  "@type": "ListItem",
+                  "position": 4,
+                  "name": property.property_title,
+                  "item": `https://newkenyan.com/properties/${generatePropertySlug(property.property_title, property.property_type, property.city, property.bedrooms)}`
+                }
+              ]
+            })
+          }}
+        />
+
         {/* FAQ Schema */}
         <script
           type="application/ld+json"
@@ -379,7 +419,7 @@ export default async function PropertyPage({ params }: PageProps) {
                   }
                 },
                 {
-                  "@type": "Question", 
+                  "@type": "Question",
                   "name": `Are there other ${property.bedrooms}-bedroom properties available in ${property.city}?`,
                   "acceptedAnswer": {
                     "@type": "Answer",
