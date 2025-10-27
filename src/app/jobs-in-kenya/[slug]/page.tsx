@@ -442,6 +442,43 @@ export default async function JobDetailsPage({ params }: JobDetailsPageProps) {
           }}
         />
 
+        {/* BreadcrumbList Schema */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "BreadcrumbList",
+              "itemListElement": [
+                {
+                  "@type": "ListItem",
+                  "position": 1,
+                  "name": "Home",
+                  "item": "https://newkenyan.com"
+                },
+                {
+                  "@type": "ListItem",
+                  "position": 2,
+                  "name": "Jobs in Kenya",
+                  "item": "https://newkenyan.com/jobs-in-kenya"
+                },
+                {
+                  "@type": "ListItem",
+                  "position": 3,
+                  "name": job.job_location,
+                  "item": `https://newkenyan.com/jobs-in-kenya?location=${job.job_location}`
+                },
+                {
+                  "@type": "ListItem",
+                  "position": 4,
+                  "name": job.job_title,
+                  "item": `https://newkenyan.com/jobs-in-kenya/${slug}`
+                }
+              ]
+            })
+          }}
+        />
+
         {/* FAQ Schema */}
         <script
           type="application/ld+json"

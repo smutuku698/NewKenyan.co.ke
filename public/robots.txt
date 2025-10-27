@@ -1,0 +1,27 @@
+# NewKenyan.com Robots.txt
+# https://newkenyan.com/robots.txt
+
+User-agent: *
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+Disallow: /dashboard/
+Disallow: /_next/
+Disallow: /static/
+
+# Special rules for Googlebot
+User-agent: Googlebot
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+Disallow: /dashboard/
+
+# Special rules for Bingbot
+User-agent: Bingbot
+Allow: /
+Disallow: /admin/
+Disallow: /api/
+Disallow: /dashboard/
+
+# Sitemap location
+Sitemap: https://newkenyan.com/sitemap.xml

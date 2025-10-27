@@ -290,6 +290,49 @@ export default async function BusinessPage({ params }: PageProps) {
           }}
         />
 
+        {/* BreadcrumbList Schema */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "BreadcrumbList",
+              "itemListElement": [
+                {
+                  "@type": "ListItem",
+                  "position": 1,
+                  "name": "Home",
+                  "item": "https://newkenyan.com"
+                },
+                {
+                  "@type": "ListItem",
+                  "position": 2,
+                  "name": "Business Directory",
+                  "item": "https://newkenyan.com/business-directory"
+                },
+                {
+                  "@type": "ListItem",
+                  "position": 3,
+                  "name": business.city,
+                  "item": `https://newkenyan.com/business-directory/city/${business.city.toLowerCase()}`
+                },
+                {
+                  "@type": "ListItem",
+                  "position": 4,
+                  "name": business.category,
+                  "item": `https://newkenyan.com/business-directory?category=${business.category}`
+                },
+                {
+                  "@type": "ListItem",
+                  "position": 5,
+                  "name": business.business_name,
+                  "item": `https://newkenyan.com/business/${generateBusinessSlug(business.business_name, business.city, business.category)}`
+                }
+              ]
+            })
+          }}
+        />
+
         {/* FAQ Schema */}
         <script
           type="application/ld+json"
@@ -307,7 +350,7 @@ export default async function BusinessPage({ params }: PageProps) {
                   }
                 },
                 {
-                  "@type": "Question", 
+                  "@type": "Question",
                   "name": `How can I contact ${business.business_name}?`,
                   "acceptedAnswer": {
                     "@type": "Answer",
