@@ -2,6 +2,8 @@
 import { MetadataRoute } from 'next'
 import { createClient } from '@supabase/supabase-js'
 import { generatePropertySlug, generateBusinessSlug } from '@/utils/seo'
+import jobsData from '@/data/jobs.json'
+import { generateJobSlug } from '@/lib/utils'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = 'https://newkenyan.com'
@@ -132,12 +134,24 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       priority: 0.7,
     }))
 
+    // Job pages from JSON data
+    const jobPages = jobsData.jobs.map((job) => {
+      const slug = generateJobSlug(job.job_title, 'NewKenyan', job.job_location)
+      return {
+        url: `${baseUrl}/jobs-in-kenya/${slug}`,
+        lastModified: new Date(job.date),
+        changeFrequency: 'weekly' as const,
+        priority: 0.7,
+      }
+    })
+
     return [
       ...staticPages,
       ...propertyPages,
       ...businessPages,
       ...propertyCityPages,
       ...businessCityPages,
+      ...jobPages,
     ]
 
   } catch (error) {
