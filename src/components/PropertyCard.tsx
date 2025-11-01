@@ -109,14 +109,19 @@ const PropertyCard = ({
             <p className="text-2xl font-bold text-gray-900">{formatPrice(price)}</p>
           </div>
 
+          {/* Property Title */}
+          <h3 className="text-base font-semibold text-gray-900 mb-2 line-clamp-2 leading-tight">
+            {title}
+          </h3>
+
           {/* Bedroom, Bathroom, Sq Ft - Inline with custom icons */}
-          <div className="flex items-center gap-3 mb-3 text-gray-700">
+          <div className="flex items-center gap-3 mb-2 text-gray-700">
             {bedrooms !== undefined && bedrooms !== null && (
               <div className="flex items-center gap-1">
                 <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M20 9V6c0-1.1-.9-2-2-2H6c-1.1 0-2 .9-2 2v3c-1.1 0-2 .9-2 2v5h1.33L4 19h1l.67-3h12.67l.66 3h1l.67-3H22v-5c0-1.1-.9-2-2-2zm-4-3h2v3h-2V6zm-4 0h2v3h-2V6zM8 6h2v3H8V6zM6 6h2v3H6V6z"/>
                 </svg>
-                <span className="text-base font-medium">{bedrooms} Bd</span>
+                <span className="text-sm font-medium">{bedrooms} Bd</span>
               </div>
             )}
             {bathrooms !== undefined && bathrooms !== null && (
@@ -124,16 +129,21 @@ const PropertyCard = ({
                 <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
                   <path d="M7 7h10v2H7zm0 6h10v-2H7zm12-8c-.55 0-1 .45-1 1 0 .28-.22.5-.5.5s-.5-.22-.5-.5c0-1.1.9-2 2-2s2 .9 2 2v10c0 1.1-.9 2-2 2H5c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2s2 .9 2 2c0 .28-.22.5-.5.5S6 6.28 6 6c0-.55-.45-1-1-1s-1 .45-1 1v10c0 .55.45 1 1 1h14c.55 0 1-.45 1-1V6c0-.55-.45-1-1-1z"/>
                 </svg>
-                <span className="text-base font-medium">{bathrooms} Ba</span>
+                <span className="text-sm font-medium">{bathrooms} Ba</span>
               </div>
             )}
             {squareFeet && (
               <div className="flex items-center gap-1">
-                <span className="text-base font-medium">{squareFeet.toLocaleString()}</span>
-                <span className="text-sm text-gray-600">Sq Ft</span>
+                <span className="text-sm font-medium">{squareFeet.toLocaleString()}</span>
+                <span className="text-xs text-gray-600">Sq Ft</span>
               </div>
             )}
           </div>
+
+          {/* Property Type */}
+          <p className="text-sm text-gray-600 mb-2">
+            {type}
+          </p>
 
           {/* Address */}
           <p className="text-sm text-gray-600 line-clamp-1">
