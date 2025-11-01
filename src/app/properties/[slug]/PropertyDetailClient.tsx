@@ -109,46 +109,59 @@ export default function PropertyDetailClient({ property, similarProperties }: Pr
     }
   };
 
-  // Generate property-specific FAQ
+  // Generate property-specific FAQ with unique content based on actual property details
   const generatePropertyFAQ = (property: PropertyListing) => {
+    const listingType = property.price_type === 'rent' ? 'Rent' : 'Sale';
+    const priceString = `KSh ${property.price.toLocaleString()}${property.price_type === 'rent' ? '/month' : ''}`;
+
     const baseQuestions = [
       {
-        question: `What is included in the rent for this ${property.property_type.toLowerCase()} in ${property.city}?`,
-        answer: `This ${property.property_type.toLowerCase()} includes the main living space with ${property.bedrooms || 'multiple'} bedroom(s) and ${property.bathrooms || 'bathroom(s)'}. ${property.is_furnished ? 'The property comes fully furnished.' : 'This is an unfurnished property.'} Additional amenities include: ${property.amenities?.join(', ') || 'standard amenities'}. Contact the property owner for detailed information about utilities and services included.`
+        question: `What makes this ${property.bedrooms}-bedroom ${property.property_type.toLowerCase()} in ${property.city} unique?`,
+        answer: `${property.property_title} stands out with its ${property.is_furnished ? 'fully furnished interiors' : 'spacious layout'}${property.square_feet ? ` spanning ${property.square_feet.toLocaleString()} sq ft` : ''}, featuring ${property.bedrooms} bedroom${property.bedrooms > 1 ? 's' : ''} and ${property.bathrooms} bathroom${property.bathrooms > 1 ? 's' : ''}. Located in ${property.address}, ${property.city}, this property offers ${property.amenities && property.amenities.length > 0 ? property.amenities.slice(0, 3).join(', ') + (property.amenities.length > 3 ? ', and more' : '') : 'quality amenities'}. ${property.nearby_features && property.nearby_features.length > 0 ? `The neighborhood features convenient access to ${property.nearby_features.slice(0, 3).join(', ')}.` : ''}`
       },
       {
-        question: `How do I schedule a viewing for this property in ${property.city}?`,
-        answer: `To schedule a viewing for this ${property.property_type.toLowerCase()}, contact the property owner directly using the contact information provided. You can call ${property.contact_phone}${property.whatsapp_number ? ` or WhatsApp ${property.whatsapp_number}` : ''}. We recommend viewing the property in person before making any commitments.`
+        question: `How much is the ${property.price_type === 'rent' ? 'monthly rent' : 'sale price'} for ${property.property_title}?`,
+        answer: `The ${property.price_type === 'rent' ? 'monthly rent' : 'asking price'} for this ${property.bedrooms}-bedroom ${property.property_type.toLowerCase()} in ${property.city} is ${priceString}. ${property.payment_plan ? `Payment options include: ${property.payment_plan}. ` : ''}${property.price_type === 'rent' ? 'Additional costs may include security deposit and service charges.' : 'This price is competitive for the area considering the property features and location.'} Contact ${property.contact_phone} for more details.`
       },
       {
-        question: `Are pets allowed in this ${property.property_type.toLowerCase()}?`,
-        answer: `${property.pets_allowed ? 'Yes, pets are allowed in this property.' : 'Pets are not permitted in this property.'} Please confirm the pet policy directly with the property owner as terms and conditions may apply.`
+        question: `What amenities are included in this ${property.property_type.toLowerCase()} in ${property.city}?`,
+        answer: `${property.property_title} comes with ${property.is_furnished ? 'full furnishing and ' : ''}excellent amenities including ${property.amenities && property.amenities.length > 0 ? property.amenities.join(', ') : 'standard modern features'}. ${property.external_features && property.external_features.length > 0 ? `External features include ${property.external_features.join(', ')}. ` : ''}${property.internal_features && property.internal_features.length > 0 ? `Inside, you'll find ${property.internal_features.join(', ')}.` : ''}`
       },
       {
-        question: `What are the nearby amenities around this property in ${property.city}?`,
-        answer: `This property is located in ${property.address}, ${property.city}. The area typically offers good access to shopping centers, schools, hospitals, and public transportation. For specific information about nearby amenities, check our <a href='/properties' class='text-green-600 hover:underline'>properties section</a> or contact the property owner.`
+        question: `How can I schedule a viewing for this property in ${property.city}?`,
+        answer: `To view ${property.property_title} in person, contact the property owner directly at ${property.contact_phone}${property.whatsapp_number ? ` or via WhatsApp at ${property.whatsapp_number}` : ''}. ${property.contact_email ? `You can also email ${property.contact_email}. ` : ''}${property.available_from ? `The property is available from ${new Date(property.available_from).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}.` : 'Schedule your viewing today!'} We always recommend viewing the property in person before making any commitments.`
       },
       {
-        question: `What documents do I need to rent this ${property.property_type.toLowerCase()}?`,
-        answer: `Typically, you'll need a valid ID, proof of income, references, and a security deposit. For this specific property, contact the owner at ${property.contact_phone} for exact requirements. Always ensure you get a written rental agreement. Check our <a href='/blog' class='text-green-600 hover:underline'>blog</a> for rental tips and advice.`
+        question: `Are pets allowed at ${property.property_title} in ${property.city}?`,
+        answer: `${property.pets_allowed ? `Yes! This ${property.property_type.toLowerCase()} in ${property.city} is pet-friendly, making it perfect for you and your furry companions.` : `Unfortunately, pets are not permitted at ${property.property_title}.`} Please confirm the specific pet policy${property.pets_allowed ? ' and any related terms (such as pet deposits or size restrictions)' : ''} directly with the property owner at ${property.contact_phone}.`
       },
       {
-        question: `Is this property listing verified and legitimate?`,
-        answer: `All properties on NewKenyan.com go through our verification process. However, we always recommend viewing the property in person, verifying the owner's identity, and getting all agreements in writing. Never send money without seeing the property first. Visit our <a href='/business-directory' class='text-green-600 hover:underline'>business directory</a> for verified property agents.`
+        question: `What is the neighborhood like around ${property.property_title}?`,
+        answer: `${property.property_title} is located in ${property.address}, ${property.city}${property.county ? `, ${property.county}` : ''}. ${property.nearby_features && property.nearby_features.length > 0 ? `The area offers convenient access to ${property.nearby_features.join(', ')}. ` : 'The neighborhood provides good access to shopping centers, schools, hospitals, and public transportation. '}${property.city === 'Nairobi' ? 'The location offers excellent connectivity to major business districts and entertainment hubs.' : `${property.city} is known for its peaceful environment and growing infrastructure.`} Contact the property owner for more details about the local community.`
       }
     ];
 
-    if (property.property_type.toLowerCase().includes('house')) {
+    // Add construction/payment-specific FAQ if applicable
+    if (property.construction_progress || property.completion_date) {
       baseQuestions.push({
-        question: `What is the construction quality of this house in ${property.city}?`,
-        answer: `This house in ${property.city} has been listed with detailed specifications. For information about construction materials, building quality, and recent renovations, contact the property owner directly. We recommend a professional inspection before finalizing any rental or purchase agreement.`
+        question: `What is the construction status of ${property.property_title}?`,
+        answer: `${property.construction_progress ? `The construction status is: ${property.construction_progress}. ` : ''}${property.completion_date ? `The expected completion date is ${new Date(property.completion_date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}. ` : ''}${property.payment_plan ? `Flexible payment plans are available: ${property.payment_plan}.` : ''} For the latest updates on construction progress and handover schedules, please contact ${property.contact_phone}.`
       });
     }
 
+    // Add sale-specific FAQ
     if (property.price_type === 'sale') {
       baseQuestions.push({
-        question: `What are the property transfer and legal costs for buying this ${property.property_type.toLowerCase()}?`,
-        answer: `Property transfer costs in Kenya typically include stamp duty, legal fees, and registration costs. For this property priced at KSh ${property.price.toLocaleString()}, consult with a qualified lawyer for exact costs. Find legal professionals in our <a href='/business-directory' class='text-green-600 hover:underline'>business directory</a>.`
+        question: `What are the costs involved in buying ${property.property_title} in ${property.city}?`,
+        answer: `The purchase price for this property is ${priceString}. Additional costs in Kenya typically include stamp duty (4% for properties over KSh 5 million, 2% below), legal fees (approximately 1-2% of purchase price), valuation fees, and registration costs. ${property.payment_plan ? `The seller offers: ${property.payment_plan}. ` : ''}For a detailed breakdown specific to this property, contact ${property.contact_phone} or consult with a qualified property lawyer. Visit our <a href='/business-directory' class='text-green-600 hover:underline'>business directory</a> for trusted legal professionals.`
+      });
+    }
+
+    // Add rental-specific FAQ
+    if (property.price_type === 'rent') {
+      baseQuestions.push({
+        question: `What documents do I need to rent ${property.property_title}?`,
+        answer: `To rent this ${property.bedrooms}-bedroom ${property.property_type.toLowerCase()} in ${property.city}, you'll typically need: a valid national ID or passport, proof of income (pay slips or bank statements), personal references, and a security deposit (usually 1-2 months' rent). For this specific property at ${priceString}, contact the owner at ${property.contact_phone} for exact requirements. Always ensure you receive a written tenancy agreement. Check our <a href='/blog' class='text-green-600 hover:underline'>blog</a> for more rental tips and tenant rights information.`
       });
     }
 
@@ -748,7 +761,7 @@ export default function PropertyDetailClient({ property, similarProperties }: Pr
             <div className="text-center mb-12">
               <h2 className="text-2xl font-bold mb-4">Frequently Asked Questions</h2>
               <p className="text-gray-600">
-                Common questions about this {property.property_type.toLowerCase()} in {property.city}
+                Common questions about {property.property_title} - {property.bedrooms}-bedroom {property.property_type.toLowerCase()} in {property.city}
               </p>
             </div>
 
