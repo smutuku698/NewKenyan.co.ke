@@ -47,6 +47,7 @@ interface PropertyListing {
   price_type: string;
   bedrooms: number | null;
   bathrooms: number | null;
+  square_feet: number | null;
   address: string;
   city: string;
   county: string | null;
@@ -57,6 +58,7 @@ interface PropertyListing {
   images: string[];
   is_approved: boolean;
   is_featured: boolean;
+  created_at: string;
 }
 
 interface JobListing {
@@ -108,7 +110,7 @@ export default function HomePage() {
 
       const { data, error, count } = await supabase
         .from('property_listings')
-        .select('id, property_title, property_type, description, price, price_type, bedrooms, bathrooms, address, city, county, contact_phone, contact_email, whatsapp_number, amenities, images, is_approved, is_featured', { count: 'exact' })
+        .select('id, property_title, property_type, description, price, price_type, bedrooms, bathrooms, square_feet, address, city, county, contact_phone, contact_email, whatsapp_number, amenities, images, is_approved, is_featured, created_at', { count: 'exact' })
         .eq('is_approved', true)
         .order('is_featured', { ascending: false })
         .order('created_at', { ascending: false })
@@ -392,12 +394,15 @@ export default function HomePage() {
                       price={property.price}
                       bedrooms={property.bedrooms || undefined}
                       bathrooms={property.bathrooms || undefined}
+                      squareFeet={property.square_feet || undefined}
                       location={`${property.city}${property.county ? `, ${property.county}` : ''}`}
                       city={property.city}
                       images={property.images}
                       amenities={property.amenities}
                       contactPhone={property.contact_phone}
                       whatsappNumber={property.whatsapp_number || undefined}
+                      createdAt={property.created_at}
+                      isFeatured={property.is_featured}
                     />
                   ))
                 ) : (

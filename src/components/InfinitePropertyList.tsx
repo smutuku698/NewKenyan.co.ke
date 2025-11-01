@@ -14,6 +14,7 @@ interface Property {
   price_type: string;
   bedrooms: number | null;
   bathrooms: number | null;
+  square_feet: number | null;
   city: string;
   county: string | null;
   images: string[];
@@ -22,6 +23,7 @@ interface Property {
   whatsapp_number: string | null;
   address: string;
   is_featured: boolean;
+  created_at: string;
 }
 
 interface InfinitePropertyListProps {
@@ -134,12 +136,15 @@ export default function InfinitePropertyList({
                 price={property.price}
                 bedrooms={property.bedrooms || undefined}
                 bathrooms={property.bathrooms || undefined}
+                squareFeet={property.square_feet || undefined}
                 location={`${property.city}${property.county ? `, ${property.county}` : ''}`}
                 city={property.city}
                 images={property.images}
                 amenities={property.amenities}
                 contactPhone={property.contact_phone}
                 whatsappNumber={property.whatsapp_number || undefined}
+                createdAt={property.created_at}
+                isFeatured={property.is_featured}
               />
             ))}
           </div>

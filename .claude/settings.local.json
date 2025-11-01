@@ -24,7 +24,8 @@
       "Bash(curl:*)",
       "Bash(echo:*)",
       "Bash(.env.local)",
-      "Bash(taskkill:*)"
+      "Bash(taskkill:*)",
+      "Bash(git config:*)"
     ],
     "deny": [],
     "ask": []
