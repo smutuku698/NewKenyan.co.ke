@@ -2,7 +2,6 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -12,7 +11,7 @@ import PropertyCard from '@/components/PropertyCard';
 import BlogCard from '@/components/BlogCard';
 import { GridLoadingSkeleton } from '@/components/LoadingSkeleton';
 import { LazySection } from '@/components/LazySection';
-import ScrollToTop from '@/components/ScrollToTop';
+import WhatsAppButton from '@/components/WhatsAppButton';
 import { 
   sampleBusinesses, 
   sampleBlogPosts, 
@@ -259,64 +258,101 @@ export default function HomePage() {
       </div>
       
       <main>
-        {/* Hero Section */}
-        <section className="relative bg-gray-900 text-white py-20">
-          <div className="absolute inset-0">
-            <Image
-              src="/images/hero-kenya.webp"
-              alt="Beautiful Kenya landscape showing houses for rent and sale in Nairobi"
-              fill
-              className="object-cover opacity-60"
-              priority
-              sizes="100vw"
-              quality={75}
-            />
-            <div className="absolute inset-0 bg-gray-900/40" />
-          </div>
-          
-          <div className="relative container mx-auto px-4 text-center">
-            <h1 className="display-title mb-6 text-white">
-              Find Jobs, Businesses & Properties in Kenya
-            </h1>
-            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center mb-12 px-4">
-              <Button className="bg-green-600 hover:bg-green-700 text-white px-4 sm:px-8 py-3 text-base sm:text-lg w-full sm:w-auto font-semibold" asChild>
-                <Link href="/properties/rent">Find Houses for Rent</Link>
-              </Button>
-              <Button variant="outline" className="border-2 border-white text-white hover:bg-white hover:text-gray-900 px-4 sm:px-8 py-3 text-base sm:text-lg bg-transparent w-full sm:w-auto font-semibold transition-all duration-200" asChild>
-                <Link href="/jobs-in-kenya">Browse Jobs in Kenya</Link>
-              </Button>
+        {/* Hero Section - Professional Redesign */}
+        <section className="relative bg-gradient-to-br from-green-700 via-green-600 to-green-500 text-white py-12">
+          <div className="container mx-auto px-4">
+            {/* Title */}
+            <div className="text-center mb-8">
+              <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-3 text-white">
+                Find Jobs, Businesses & Properties in Kenya
+              </h1>
+              <p className="text-green-50 text-base md:text-lg max-w-2xl mx-auto">
+                Your trusted marketplace for real estate, job opportunities, and business listings across Kenya
+              </p>
             </div>
 
-            {/* Stats */}
-            <div className="grid grid-cols-3 gap-8 max-w-2xl mx-auto">
-              <Link href="/business-directory" className="text-center group cursor-pointer transition-transform hover:scale-105">
-                <div className="flex items-center justify-center w-12 h-12 bg-green-600 rounded-full mx-auto mb-2 group-hover:bg-green-700 transition-colors">
-                  <Users className="h-6 w-6 text-white" />
+            {/* Professional Search Bar */}
+            <div className="max-w-4xl mx-auto mb-8">
+              <div className="bg-white rounded-2xl shadow-2xl p-6">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+                  {/* Search Input */}
+                  <div className="md:col-span-2">
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Search Properties, Jobs, or Businesses
+                    </label>
+                    <input
+                      type="text"
+                      placeholder="e.g., 3 bedroom house, marketing job..."
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-gray-900 placeholder-gray-400"
+                    />
+                  </div>
+
+                  {/* Location */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Location
+                    </label>
+                    <select className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-gray-900">
+                      <option value="">All Locations</option>
+                      <option value="nairobi">Nairobi</option>
+                      <option value="mombasa">Mombasa</option>
+                      <option value="kisumu">Kisumu</option>
+                      <option value="nakuru">Nakuru</option>
+                      <option value="eldoret">Eldoret</option>
+                    </select>
+                  </div>
+
+                  {/* Category */}
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                      Category
+                    </label>
+                    <select className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-gray-900">
+                      <option value="">All Categories</option>
+                      <option value="properties">Properties</option>
+                      <option value="jobs">Jobs</option>
+                      <option value="businesses">Businesses</option>
+                    </select>
+                  </div>
                 </div>
-                <div className="text-xl sm:text-2xl font-bold text-white mb-1">
+
+                {/* Search Button */}
+                <Button className="w-full mt-4 bg-green-600 hover:bg-green-700 text-white py-3 text-lg font-semibold rounded-lg shadow-lg">
+                  Search Now
+                </Button>
+              </div>
+            </div>
+
+            {/* Quick Access Icons - Clickable Stats */}
+            <div className="grid grid-cols-3 gap-4 md:gap-8 max-w-2xl mx-auto">
+              <Link href="/business-directory" className="text-center group cursor-pointer transition-transform hover:scale-105">
+                <div className="flex items-center justify-center w-14 h-14 md:w-16 md:h-16 bg-white/20 backdrop-blur-sm rounded-2xl mx-auto mb-2 group-hover:bg-white/30 transition-all shadow-lg">
+                  <Users className="h-7 w-7 md:h-8 md:w-8 text-white" />
+                </div>
+                <div className="text-xl md:text-2xl font-bold text-white mb-1">
                   {heroStats.businesses.toLocaleString()}+
                 </div>
-                <div className="text-white text-sm group-hover:underline">Businesses</div>
+                <div className="text-green-50 text-xs md:text-sm group-hover:underline">Businesses</div>
               </Link>
 
               <Link href="/jobs-in-kenya" className="text-center group cursor-pointer transition-transform hover:scale-105">
-                <div className="flex items-center justify-center w-12 h-12 bg-blue-600 rounded-full mx-auto mb-2 group-hover:bg-blue-700 transition-colors">
-                  <Briefcase className="h-6 w-6 text-white" />
+                <div className="flex items-center justify-center w-14 h-14 md:w-16 md:h-16 bg-white/20 backdrop-blur-sm rounded-2xl mx-auto mb-2 group-hover:bg-white/30 transition-all shadow-lg">
+                  <Briefcase className="h-7 w-7 md:h-8 md:w-8 text-white" />
                 </div>
-                <div className="text-xl sm:text-2xl font-bold text-white mb-1">
+                <div className="text-xl md:text-2xl font-bold text-white mb-1">
                   {heroStats.jobs.toLocaleString()}+
                 </div>
-                <div className="text-white text-sm group-hover:underline">Jobs</div>
+                <div className="text-green-50 text-xs md:text-sm group-hover:underline">Jobs</div>
               </Link>
 
               <Link href="/properties" className="text-center group cursor-pointer transition-transform hover:scale-105">
-                <div className="flex items-center justify-center w-12 h-12 bg-orange-600 rounded-full mx-auto mb-2 group-hover:bg-orange-700 transition-colors">
-                  <Home className="h-6 w-6 text-white" />
+                <div className="flex items-center justify-center w-14 h-14 md:w-16 md:h-16 bg-white/20 backdrop-blur-sm rounded-2xl mx-auto mb-2 group-hover:bg-white/30 transition-all shadow-lg">
+                  <Home className="h-7 w-7 md:h-8 md:w-8 text-white" />
                 </div>
-                <div className="text-xl sm:text-2xl font-bold text-white mb-1">
+                <div className="text-xl md:text-2xl font-bold text-white mb-1">
                   {heroStats.properties.toLocaleString()}+
                 </div>
-                <div className="text-white text-sm group-hover:underline">Properties</div>
+                <div className="text-green-50 text-xs md:text-sm group-hover:underline">Properties</div>
               </Link>
             </div>
           </div>
@@ -667,7 +703,7 @@ export default function HomePage() {
         </LazySection>
       </main>
 
-      <ScrollToTop />
+      <WhatsAppButton />
       <Footer />
     </div>
   );

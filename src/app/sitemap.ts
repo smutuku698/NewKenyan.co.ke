@@ -87,6 +87,13 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       .eq('is_approved', true)
       .order('updated_at', { ascending: false })
 
+    // Get all active locations
+    const { data: locations } = await supabase
+      .from('locations')
+      .select('slug, type, updated_at')
+      .eq('is_active', true)
+      .order('type', { ascending: true })
+
     // Property pages
     const propertyPages = properties?.map((property) => {
       const slug = generatePropertySlug(
@@ -95,7 +102,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
         property.city,
         property.bedrooms
       )
-      
+
       return {
         url: `${baseUrl}/properties/${property.id}`,
         lastModified: new Date(property.updated_at),
@@ -114,17 +121,44 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       }
     }) || []
 
-    // Major Kenyan cities - static pages
+    // Location-based property pages - Dynamic routes
+    const locationPropertyPages: MetadataRoute.Sitemap = []
+
+    if (locations && locations.length > 0) {
+      // Property type combinations
+      const propertyRoutes = [
+        { path: 'houses-for-sale', priority: 0.85 },
+        { path: 'houses-for-rent', priority: 0.85 },
+        { path: 'apartments-for-sale', priority: 0.85 },
+        { path: 'apartments-for-rent', priority: 0.85 }
+      ]
+
+      locations.forEach((location) => {
+        propertyRoutes.forEach((route) => {
+          // Higher priority for counties and major neighborhoods
+          const priority = location.type === 'county' ? route.priority : route.priority - 0.05
+
+          locationPropertyPages.push({
+            url: `${baseUrl}/${route.path}/${location.slug}`,
+            lastModified: new Date(location.updated_at || new Date()),
+            changeFrequency: 'daily' as const,
+            priority: priority,
+          })
+        })
+      })
+    }
+
+    // Legacy property city pages (keep for backwards compatibility)
     const majorCities = [
-      'nairobi', 'mombasa', 'kisumu', 'nakuru', 'eldoret', 'thika', 'malindi', 
+      'nairobi', 'mombasa', 'kisumu', 'nakuru', 'eldoret', 'thika', 'malindi',
       'kitale', 'garissa', 'kakamega', 'machakos', 'meru', 'nyeri', 'kericho'
     ];
-    
+
     const propertyCityPages = majorCities.map((city) => ({
       url: `${baseUrl}/properties/city/${city}`,
       lastModified: new Date(),
       changeFrequency: 'daily' as const,
-      priority: 0.8,
+      priority: 0.75,
     }))
 
     const businessCityPages = majorCities.map((city) => ({
@@ -147,6 +181,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
     return [
       ...staticPages,
+      ...locationPropertyPages,
       ...propertyPages,
       ...businessPages,
       ...propertyCityPages,

@@ -86,12 +86,8 @@ export default function RootLayout({
 }>) {
   const publishableKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
 
-  if (!publishableKey) {
-    throw new Error('Missing Publishable Key')
-  }
-
-  return (
-    <ClerkProvider publishableKey={publishableKey}>
+  // Make Clerk optional - if no key provided, run without authentication
+  const content = (
       <html lang="en">
         <head>
           <meta name="google-site-verification" content="RV-BVBthjlDouZHZJbNOL0ts9uKXyoCQ2AF6Dyed4-0" />
@@ -365,6 +361,11 @@ export default function RootLayout({
           <CookieConsent />
         </body>
       </html>
-    </ClerkProvider>
   );
+
+  return publishableKey ? (
+    <ClerkProvider publishableKey={publishableKey}>
+      {content}
+    </ClerkProvider>
+  ) : content;
 }
