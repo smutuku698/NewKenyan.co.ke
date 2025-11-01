@@ -61,8 +61,8 @@ const PropertyCard = ({
   return (
     <Link href={`/properties/${slug}`} className="block group">
       <div className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 border border-gray-100">
-        {/* Image Container */}
-        <div className="relative h-64 bg-gray-200">
+        {/* Image Container - Landscape aspect ratio like Movoto */}
+        <div className="relative w-full aspect-[16/10] bg-gray-200">
           {images[0] ? (
             <Image
               src={images[0]}
