@@ -8,14 +8,14 @@ import PropertyDetailsCard from '@/components/PropertyDetailsCard';
 import PropertyMap from '@/components/PropertyMap';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { 
-  MapPin, 
-  Phone, 
-  Mail, 
-  MessageCircle, 
-  Bed, 
-  Bath, 
-  Square, 
+import {
+  MapPin,
+  Phone,
+  Mail,
+  MessageCircle,
+  Bed,
+  Bath,
+  Square,
   Calendar,
   ArrowLeft,
   Heart,
@@ -28,7 +28,8 @@ import {
   Star,
   Shield,
   CheckCircle,
-  X
+  X,
+  Building2
 } from 'lucide-react';
 
 interface PropertyListing {
@@ -62,6 +63,12 @@ interface PropertyListing {
   year_built: number | null;
   garage: number | null;
   google_maps_link: string | null;
+  construction_progress?: string | null;
+  completion_date?: string | null;
+  payment_plan?: string | null;
+  nearby_features?: string[];
+  external_features?: string[];
+  internal_features?: string[];
 }
 
 interface PropertyDetailClientProps {
@@ -478,7 +485,100 @@ export default function PropertyDetailClient({ property, similarProperties }: Pr
                   {property.amenities.map((amenity, index) => (
                     <div key={index} className="flex items-center">
                       <CheckCircle className="h-4 w-4 mr-2 text-green-600" />
-                      <span className="text-sm capitalize">{amenity}</span>
+                      <span className="text-sm">{amenity}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Construction & Payment Details */}
+            {(property.construction_progress || property.completion_date || property.payment_plan) && (
+              <div className="bg-white rounded-lg shadow-sm border p-3 sm:p-6 mb-6">
+                <h2 className="text-xl font-semibold mb-4 flex items-center">
+                  <Building2 className="h-5 w-5 mr-2 text-green-600" />
+                  Construction & Payment Information
+                </h2>
+                <div className="space-y-4">
+                  {property.construction_progress && (
+                    <div>
+                      <h3 className="text-sm font-semibold text-gray-700 mb-2">Construction Status</h3>
+                      <Badge variant="outline" className="text-sm">
+                        {property.construction_progress}
+                      </Badge>
+                    </div>
+                  )}
+                  {property.completion_date && (
+                    <div>
+                      <h3 className="text-sm font-semibold text-gray-700 mb-2">Expected Completion Date</h3>
+                      <p className="text-gray-600 flex items-center">
+                        <Calendar className="h-4 w-4 mr-2 text-blue-600" />
+                        {new Date(property.completion_date).toLocaleDateString('en-US', {
+                          year: 'numeric',
+                          month: 'long',
+                          day: 'numeric'
+                        })}
+                      </p>
+                    </div>
+                  )}
+                  {property.payment_plan && (
+                    <div>
+                      <h3 className="text-sm font-semibold text-gray-700 mb-2">Payment Plan</h3>
+                      <p className="text-gray-600 leading-relaxed whitespace-pre-line">{property.payment_plan}</p>
+                    </div>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Nearby Features */}
+            {property.nearby_features && property.nearby_features.length > 0 && (
+              <div className="bg-white rounded-lg shadow-sm border p-3 sm:p-6 mb-6">
+                <h2 className="text-xl font-semibold mb-4 flex items-center">
+                  <MapPin className="h-5 w-5 mr-2 text-green-600" />
+                  Nearby Amenities
+                </h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3">
+                  {property.nearby_features.map((feature, index) => (
+                    <div key={index} className="flex items-center">
+                      <CheckCircle className="h-4 w-4 mr-2 text-blue-600" />
+                      <span className="text-sm">{feature}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* External Features */}
+            {property.external_features && property.external_features.length > 0 && (
+              <div className="bg-white rounded-lg shadow-sm border p-3 sm:p-6 mb-6">
+                <h2 className="text-xl font-semibold mb-4 flex items-center">
+                  <Home className="h-5 w-5 mr-2 text-green-600" />
+                  External Features
+                </h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3">
+                  {property.external_features.map((feature, index) => (
+                    <div key={index} className="flex items-center">
+                      <CheckCircle className="h-4 w-4 mr-2 text-green-600" />
+                      <span className="text-sm">{feature}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Internal Features */}
+            {property.internal_features && property.internal_features.length > 0 && (
+              <div className="bg-white rounded-lg shadow-sm border p-3 sm:p-6 mb-6">
+                <h2 className="text-xl font-semibold mb-4 flex items-center">
+                  <Square className="h-5 w-5 mr-2 text-green-600" />
+                  Internal Features
+                </h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3">
+                  {property.internal_features.map((feature, index) => (
+                    <div key={index} className="flex items-center">
+                      <CheckCircle className="h-4 w-4 mr-2 text-green-600" />
+                      <span className="text-sm">{feature}</span>
                     </div>
                   ))}
                 </div>
@@ -613,6 +713,34 @@ export default function PropertyDetailClient({ property, similarProperties }: Pr
             </div>
           </section>
         )}
+
+        {/* Disclaimer Section */}
+        <section className="mt-16">
+          <div className="max-w-4xl mx-auto">
+            <div className="bg-yellow-50 border-l-4 border-yellow-400 p-6 rounded-lg shadow-sm">
+              <div className="flex items-start">
+                <Shield className="h-6 w-6 text-yellow-600 mt-1 mr-3 flex-shrink-0" />
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900 mb-3">Important Disclaimer</h3>
+                  <div className="text-gray-700 text-sm leading-relaxed space-y-2">
+                    <p>
+                      The information displayed about this property comprises a property advertisement. <strong>NewKenyan.co.ke</strong> makes no warranty as to the accuracy or completeness of the advertisement or any linked or associated information, and NewKenyan.co.ke has no control over the content.
+                    </p>
+                    <p>
+                      This property listing does not constitute property particulars. The information is provided and maintained by the property owner/agent listed above.
+                    </p>
+                    <p className="font-medium text-gray-900">
+                      <strong>NewKenyan.co.ke shall not in any way be held liable for the actions of any agent and/or property owner/landlord on or off this website.</strong>
+                    </p>
+                    <p className="text-xs text-gray-600 mt-4 pt-4 border-t border-yellow-200">
+                      We strongly recommend that you verify all property details, visit the property in person, and conduct proper due diligence before making any commitments or payments. Never send money without seeing the property and verifying ownership documentation.
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
 
         {/* FAQ Section */}
         <section className="mt-16">

@@ -1,10 +1,11 @@
 'use client';
 
 import { useState } from 'react';
-import { MapPin, Home, DollarSign, Bed, Bath, Square, Filter, X, ChevronDown, ChevronUp } from 'lucide-react';
+import { MapPin, Home, DollarSign, Bed, Bath, Square, Filter, X, ChevronDown, ChevronUp, Building2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 export interface FilterState {
+  county?: string;
   city?: string;
   propertyType?: string;
   priceMin?: number;
@@ -14,12 +15,21 @@ export interface FilterState {
   squareFeetMin?: number;
   squareFeetMax?: number;
   amenities?: string[];
+  nearbyFeatures?: string[];
+  externalFeatures?: string[];
+  internalFeatures?: string[];
+  constructionStatus?: string;
 }
 
 interface PropertyFilterSidebarProps {
   onFilterChange: (filters: FilterState) => void;
+  availableCounties?: string[];
   availableCities?: string[];
   availableAmenities?: string[];
+  availableConstructionStatus?: string[];
+  availableNearbyFeatures?: string[];
+  availableExternalFeatures?: string[];
+  availableInternalFeatures?: string[];
   className?: string;
 }
 
@@ -29,8 +39,13 @@ const BATHROOM_OPTIONS = [1, 2, 3, 4, 5];
 
 export default function PropertyFilterSidebar({
   onFilterChange,
+  availableCounties = [],
   availableCities = [],
   availableAmenities = [],
+  availableConstructionStatus = [],
+  availableNearbyFeatures = [],
+  availableExternalFeatures = [],
+  availableInternalFeatures = [],
   className = ''
 }: PropertyFilterSidebarProps) {
   const [filters, setFilters] = useState<FilterState>({});
@@ -40,7 +55,11 @@ export default function PropertyFilterSidebar({
     price: true,
     bedsBaths: true,
     size: false,
-    amenities: false
+    amenities: false,
+    construction: false,
+    nearbyFeatures: false,
+    externalFeatures: false,
+    internalFeatures: false
   });
 
   const toggleSection = (section: keyof typeof expandedSections) => {
@@ -65,6 +84,14 @@ export default function PropertyFilterSidebar({
       ? currentAmenities.filter(a => a !== amenity)
       : [...currentAmenities, amenity];
     updateFilter('amenities', newAmenities.length > 0 ? newAmenities : undefined);
+  };
+
+  const toggleFeature = (feature: string, type: 'nearbyFeatures' | 'externalFeatures' | 'internalFeatures') => {
+    const currentFeatures = filters[type] || [];
+    const newFeatures = currentFeatures.includes(feature)
+      ? currentFeatures.filter(f => f !== feature)
+      : [...currentFeatures, feature];
+    updateFilter(type, newFeatures.length > 0 ? newFeatures : undefined);
   };
 
   const clearAllFilters = () => {
@@ -120,19 +147,46 @@ export default function PropertyFilterSidebar({
             {expandedSections.location ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
           </button>
 
-          {expandedSections.location && availableCities.length > 0 && (
-            <select
-              value={filters.city || ''}
-              onChange={(e) => updateFilter('city', e.target.value || undefined)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm"
-            >
-              <option value="">All Cities</option>
-              {availableCities.map((city) => (
-                <option key={city} value={city}>
-                  {city}
-                </option>
-              ))}
-            </select>
+          {expandedSections.location && (
+            <div className="space-y-3">
+              {/* County Filter */}
+              {availableCounties.length > 0 && (
+                <div>
+                  <label className="text-xs text-gray-600 mb-1 block">County</label>
+                  <select
+                    value={filters.county || ''}
+                    onChange={(e) => updateFilter('county', e.target.value || undefined)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm"
+                  >
+                    <option value="">All Counties</option>
+                    {availableCounties.map((county) => (
+                      <option key={county} value={county}>
+                        {county}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+
+              {/* City Filter */}
+              {availableCities.length > 0 && (
+                <div>
+                  <label className="text-xs text-gray-600 mb-1 block">City / Area</label>
+                  <select
+                    value={filters.city || ''}
+                    onChange={(e) => updateFilter('city', e.target.value || undefined)}
+                    className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm"
+                  >
+                    <option value="">All Cities</option>
+                    {availableCities.map((city) => (
+                      <option key={city} value={city}>
+                        {city}
+                      </option>
+                    ))}
+                  </select>
+                </div>
+              )}
+            </div>
           )}
         </div>
 
@@ -309,7 +363,7 @@ export default function PropertyFilterSidebar({
 
         {/* Amenities Filter */}
         {availableAmenities.length > 0 && (
-          <div className="pb-4">
+          <div className="pb-4 border-b">
             <button
               onClick={() => toggleSection('amenities')}
               className="w-full flex items-center justify-between mb-3"
@@ -335,6 +389,133 @@ export default function PropertyFilterSidebar({
                       className="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500"
                     />
                     <span className="text-sm text-gray-700">{amenity}</span>
+                  </label>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Construction Status Filter */}
+        {availableConstructionStatus.length > 0 && (
+          <div className="pb-4 border-b">
+            <button
+              onClick={() => toggleSection('construction')}
+              className="w-full flex items-center justify-between mb-3"
+            >
+              <div className="flex items-center gap-2">
+                <Building2 className="h-4 w-4 text-green-600" />
+                <span className="font-semibold text-gray-900">Construction Status</span>
+              </div>
+              {expandedSections.construction ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+            </button>
+
+            {expandedSections.construction && (
+              <select
+                value={filters.constructionStatus || ''}
+                onChange={(e) => updateFilter('constructionStatus', e.target.value || undefined)}
+                className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm"
+              >
+                <option value="">All Status</option>
+                {availableConstructionStatus.map((status) => (
+                  <option key={status} value={status}>
+                    {status}
+                  </option>
+                ))}
+              </select>
+            )}
+          </div>
+        )}
+
+        {/* Nearby Features Filter */}
+        {availableNearbyFeatures.length > 0 && (
+          <div className="pb-4 border-b">
+            <button
+              onClick={() => toggleSection('nearbyFeatures')}
+              className="w-full flex items-center justify-between mb-3"
+            >
+              <div className="flex items-center gap-2">
+                <MapPin className="h-4 w-4 text-green-600" />
+                <span className="font-semibold text-gray-900">Nearby</span>
+              </div>
+              {expandedSections.nearbyFeatures ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+            </button>
+
+            {expandedSections.nearbyFeatures && (
+              <div className="space-y-2 max-h-48 overflow-y-auto">
+                {availableNearbyFeatures.slice(0, 10).map((feature) => (
+                  <label key={feature} className="flex items-center gap-2 cursor-pointer hover:bg-gray-50 p-2 rounded">
+                    <input
+                      type="checkbox"
+                      checked={filters.nearbyFeatures?.includes(feature) || false}
+                      onChange={() => toggleFeature(feature, 'nearbyFeatures')}
+                      className="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500"
+                    />
+                    <span className="text-sm text-gray-700">{feature}</span>
+                  </label>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* External Features Filter */}
+        {availableExternalFeatures.length > 0 && (
+          <div className="pb-4 border-b">
+            <button
+              onClick={() => toggleSection('externalFeatures')}
+              className="w-full flex items-center justify-between mb-3"
+            >
+              <div className="flex items-center gap-2">
+                <Home className="h-4 w-4 text-green-600" />
+                <span className="font-semibold text-gray-900">External</span>
+              </div>
+              {expandedSections.externalFeatures ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+            </button>
+
+            {expandedSections.externalFeatures && (
+              <div className="space-y-2 max-h-48 overflow-y-auto">
+                {availableExternalFeatures.slice(0, 10).map((feature) => (
+                  <label key={feature} className="flex items-center gap-2 cursor-pointer hover:bg-gray-50 p-2 rounded">
+                    <input
+                      type="checkbox"
+                      checked={filters.externalFeatures?.includes(feature) || false}
+                      onChange={() => toggleFeature(feature, 'externalFeatures')}
+                      className="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500"
+                    />
+                    <span className="text-sm text-gray-700">{feature}</span>
+                  </label>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Internal Features Filter */}
+        {availableInternalFeatures.length > 0 && (
+          <div className="pb-4">
+            <button
+              onClick={() => toggleSection('internalFeatures')}
+              className="w-full flex items-center justify-between mb-3"
+            >
+              <div className="flex items-center gap-2">
+                <Square className="h-4 w-4 text-green-600" />
+                <span className="font-semibold text-gray-900">Internal</span>
+              </div>
+              {expandedSections.internalFeatures ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+            </button>
+
+            {expandedSections.internalFeatures && (
+              <div className="space-y-2 max-h-48 overflow-y-auto">
+                {availableInternalFeatures.slice(0, 10).map((feature) => (
+                  <label key={feature} className="flex items-center gap-2 cursor-pointer hover:bg-gray-50 p-2 rounded">
+                    <input
+                      type="checkbox"
+                      checked={filters.internalFeatures?.includes(feature) || false}
+                      onChange={() => toggleFeature(feature, 'internalFeatures')}
+                      className="w-4 h-4 text-green-600 border-gray-300 rounded focus:ring-green-500"
+                    />
+                    <span className="text-sm text-gray-700">{feature}</span>
                   </label>
                 ))}
               </div>

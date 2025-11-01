@@ -60,6 +60,12 @@ interface PropertyListing {
   is_approved: boolean;
   is_featured: boolean;
   created_at: string;
+  construction_progress?: string | null;
+  completion_date?: string | null;
+  payment_plan?: string | null;
+  nearby_features?: string[];
+  external_features?: string[];
+  internal_features?: string[];
 }
 
 interface JobListing {
@@ -137,7 +143,7 @@ export default function HomePage() {
 
       const { data, error, count } = await supabase
         .from('property_listings')
-        .select('id, property_title, property_type, description, price, price_type, bedrooms, bathrooms, square_feet, address, city, county, contact_phone, contact_email, whatsapp_number, amenities, images, is_approved, is_featured, created_at', { count: 'exact' })
+        .select('id, property_title, property_type, description, price, price_type, bedrooms, bathrooms, square_feet, address, city, county, contact_phone, contact_email, whatsapp_number, amenities, images, is_approved, is_featured, created_at, construction_progress, completion_date, payment_plan, nearby_features, external_features, internal_features', { count: 'exact' })
         .eq('is_approved', true)
         .order('is_featured', { ascending: false })
         .order('created_at', { ascending: false })
@@ -175,6 +181,9 @@ export default function HomePage() {
   // Apply filters to properties
   const applyFilters = (props: PropertyListing[], filterState: FilterState): PropertyListing[] => {
     return props.filter(property => {
+      // County filter
+      if (filterState.county && property.county !== filterState.county) return false;
+
       // City filter
       if (filterState.city && property.city !== filterState.city) return false;
 
@@ -195,12 +204,39 @@ export default function HomePage() {
       if (filterState.squareFeetMin && (property.square_feet || 0) < filterState.squareFeetMin) return false;
       if (filterState.squareFeetMax && (property.square_feet || 0) > filterState.squareFeetMax) return false;
 
+      // Construction status filter
+      if (filterState.constructionStatus && property.construction_progress !== filterState.constructionStatus) return false;
+
       // Amenities filter
       if (filterState.amenities && filterState.amenities.length > 0) {
         const hasAllAmenities = filterState.amenities.every(amenity =>
-          property.amenities.some(propAmenity => propAmenity.toLowerCase().includes(amenity.toLowerCase()))
+          (property.amenities || []).some(propAmenity => propAmenity.toLowerCase().includes(amenity.toLowerCase()))
         );
         if (!hasAllAmenities) return false;
+      }
+
+      // Nearby features filter
+      if (filterState.nearbyFeatures && filterState.nearbyFeatures.length > 0) {
+        const hasAllFeatures = filterState.nearbyFeatures.every(feature =>
+          (property.nearby_features || []).some(propFeature => propFeature.toLowerCase().includes(feature.toLowerCase()))
+        );
+        if (!hasAllFeatures) return false;
+      }
+
+      // External features filter
+      if (filterState.externalFeatures && filterState.externalFeatures.length > 0) {
+        const hasAllFeatures = filterState.externalFeatures.every(feature =>
+          (property.external_features || []).some(propFeature => propFeature.toLowerCase().includes(feature.toLowerCase()))
+        );
+        if (!hasAllFeatures) return false;
+      }
+
+      // Internal features filter
+      if (filterState.internalFeatures && filterState.internalFeatures.length > 0) {
+        const hasAllFeatures = filterState.internalFeatures.every(feature =>
+          (property.internal_features || []).some(propFeature => propFeature.toLowerCase().includes(feature.toLowerCase()))
+        );
+        if (!hasAllFeatures) return false;
       }
 
       return true;
@@ -334,7 +370,7 @@ export default function HomePage() {
       
       <main>
         {/* Hero Section - Professional Redesign */}
-        <section className="relative bg-gradient-to-br from-green-700 via-green-600 to-green-500 text-white py-12">
+        <section className="relative text-white py-12" style={{ backgroundColor: '#076146' }}>
           <div className="container mx-auto px-4">
             {/* Title */}
             <div className="text-center mb-8">
@@ -454,10 +490,26 @@ export default function HomePage() {
                 </Button>
               </div>
 
-              {/* Two-column layout: Properties + Filter Sidebar */}
+              {/* Two-column layout: Filter Sidebar + Properties */}
               <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-                {/* Properties Grid - 3 columns on desktop */}
-                <div className="lg:col-span-3">
+                {/* Filter Sidebar - Sticky on desktop - NOW ON LEFT */}
+                <div className="lg:col-span-1 lg:order-2">
+                  <div className="sticky top-4">
+                    <PropertyFilterSidebar
+                      onFilterChange={handleFilterChange}
+                      availableCounties={Array.from(new Set(allProperties.map(p => p.county).filter(Boolean) as string[])).sort()}
+                      availableCities={availableLocations.length > 0 ? availableLocations : Array.from(new Set(allProperties.map(p => p.city))).sort()}
+                      availableAmenities={Array.from(new Set(allProperties.flatMap(p => p.amenities || []))).sort()}
+                      availableConstructionStatus={Array.from(new Set(allProperties.map(p => p.construction_progress).filter(Boolean) as string[])).sort()}
+                      availableNearbyFeatures={Array.from(new Set(allProperties.flatMap(p => p.nearby_features || []))).sort()}
+                      availableExternalFeatures={Array.from(new Set(allProperties.flatMap(p => p.external_features || []))).sort()}
+                      availableInternalFeatures={Array.from(new Set(allProperties.flatMap(p => p.internal_features || []))).sort()}
+                    />
+                  </div>
+                </div>
+
+                {/* Properties Grid - 3 columns on desktop - NOW ON RIGHT */}
+                <div className="lg:col-span-3 lg:order-1">
                   <div className="grid gap-4 sm:gap-6 md:grid-cols-2 lg:grid-cols-3">
                 {loading && properties.length === 0 ? (
                   <GridLoadingSkeleton type="property" count={12} />
@@ -482,11 +534,53 @@ export default function HomePage() {
                       isFeatured={property.is_featured}
                     />
                   ))
+                ) : Object.keys(filters).length > 0 && allProperties.length > 0 ? (
+                  <>
+                    {/* No results message */}
+                    <div className="col-span-full text-center py-8">
+                      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6 mb-8">
+                        <p className="text-gray-700 text-lg font-medium mb-2">
+                          No properties match your filters
+                        </p>
+                        <p className="text-gray-600 text-sm">
+                          Try adjusting your search criteria or browse our suggested properties below
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Show alternative/suggested properties */}
+                    <div className="col-span-full">
+                      <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                        <Home className="h-5 w-5 mr-2 text-green-600" />
+                        Suggested Properties You May Like
+                      </h3>
+                      <div className="grid gap-4 sm:gap-6 md:grid-cols-2 lg:grid-cols-3">
+                        {allProperties.slice(0, 6).map((property) => (
+                          <PropertyCard
+                            key={property.id}
+                            id={property.id}
+                            title={property.property_title}
+                            type={property.property_type}
+                            price={property.price}
+                            bedrooms={property.bedrooms || undefined}
+                            bathrooms={property.bathrooms || undefined}
+                            squareFeet={property.square_feet || undefined}
+                            location={`${property.city}${property.county ? `, ${property.county}` : ''}`}
+                            city={property.city}
+                            images={property.images}
+                            amenities={property.amenities}
+                            contactPhone={property.contact_phone}
+                            whatsappNumber={property.whatsapp_number || undefined}
+                            createdAt={property.created_at}
+                            isFeatured={property.is_featured}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  </>
                 ) : (
                   <div className="col-span-full text-center py-8 text-gray-500">
-                    {Object.keys(filters).length > 0
-                      ? 'No properties match your filters. Try adjusting your search criteria.'
-                      : 'No properties available at the moment. Check back soon!'}
+                    No properties available at the moment. Check back soon!
                   </div>
                 )}
                   </div>
@@ -506,17 +600,6 @@ export default function HomePage() {
                       </p>
                     </div>
                   )}
-                </div>
-
-                {/* Filter Sidebar - Sticky on desktop */}
-                <div className="lg:col-span-1">
-                  <div className="sticky top-4">
-                    <PropertyFilterSidebar
-                      onFilterChange={handleFilterChange}
-                      availableCities={availableLocations.length > 0 ? availableLocations : Array.from(new Set(allProperties.map(p => p.city))).sort()}
-                      availableAmenities={Array.from(new Set(allProperties.flatMap(p => p.amenities))).sort()}
-                    />
-                  </div>
                 </div>
               </div>
             </div>

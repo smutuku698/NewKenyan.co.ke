@@ -43,6 +43,12 @@ interface PropertyListing {
   is_featured: boolean;
   views_count: number;
   user_id: string;
+  construction_progress?: string | null;
+  completion_date?: string | null;
+  payment_plan?: string | null;
+  nearby_features?: string[];
+  external_features?: string[];
+  internal_features?: string[];
 }
 
 async function getPropertyBySlug(slug: string): Promise<PropertyListing | null> {
