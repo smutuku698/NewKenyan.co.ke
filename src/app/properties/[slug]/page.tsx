@@ -9,6 +9,7 @@ import {
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import Breadcrumb from '@/components/Breadcrumb';
+import NeighborhoodLinks from '@/components/NeighborhoodLinks';
 import PropertyDetailClient from './PropertyDetailClient';
 
 // Revalidate pages every 24 hours (86400 seconds) for ISR
@@ -310,6 +311,16 @@ export default async function PropertyPage({ params }: PageProps) {
             ))}
           </div>
         </div>
+
+        {/* Neighborhood Links - Internal Linking */}
+        {property.county && (
+          <NeighborhoodLinks
+            county={property.county}
+            currentCity={property.city}
+            propertyType={property.property_type.toLowerCase().includes('apartment') ? 'apartment' : 'house'}
+            className="mt-12"
+          />
+        )}
 
         {/* Schema Markup */}
         <script

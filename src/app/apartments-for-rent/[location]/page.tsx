@@ -5,6 +5,7 @@ import Footer from '@/components/Footer';
 import Breadcrumb from '@/components/Breadcrumb';
 import InfinitePropertyList from '@/components/InfinitePropertyList';
 import InternalLinks from '@/components/InternalLinks';
+import LocationDirectory from '@/components/LocationDirectory';
 import { supabase } from '@/lib/supabase';
 import {
   Location,
@@ -166,6 +167,20 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   return generateLocationMetadata(location, 'apartments', 'rent', stats);
 }
 
+async function getAllLocations() {
+  const { data, error } = await supabase
+    .from('locations')
+    .select('name, slug, type, county, city')
+    .eq('is_active', true)
+    .order('name');
+
+  if (error || !data) {
+    return [];
+  }
+
+  return data;
+}
+
 export default async function ApartmentsForRentPage({ params }: PageProps) {
   const location = await getLocation(params.location);
 
@@ -175,6 +190,7 @@ export default async function ApartmentsForRentPage({ params }: PageProps) {
 
   const properties = await getApartmentsForRent(location);
   const stats = calculateStats(properties);
+  const allLocations = await getAllLocations();
 
   const h1VariationIndex = parseInt(location.id.slice(0, 8), 16) % 4;
   const h1 = generateH1(location, 'apartments', 'rent', h1VariationIndex);
@@ -324,15 +340,24 @@ export default async function ApartmentsForRentPage({ params }: PageProps) {
           }}
         />
 
-        {/* Internal Links & Silo Structure */}
-        <InternalLinks
-          currentPage={{
-            type: 'location',
-            city: location.city || location.name,
-            county: location.county
-          }}
+        {/* Location Directory - Massive Internal Linking */}
+        <LocationDirectory
+          locations={allLocations}
+          currentLocationSlug={location.slug}
+          propertyType="apartments"
+          transactionType="rent"
+          className="mt-12"
         />
       </main>
+
+      {/* Internal Links & Silo Structure */}
+      <InternalLinks
+        currentPage={{
+          type: 'location',
+          city: location.city || location.name,
+          county: location.county
+        }}
+      />
 
       <Footer />
     </div>

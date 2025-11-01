@@ -9,6 +9,7 @@ import JobCard from '@/components/JobCard';
 import BusinessCard from '@/components/BusinessCard';
 import PropertyCard from '@/components/PropertyCard';
 import BlogCard from '@/components/BlogCard';
+import PropertyFilterSidebar, { FilterState } from '@/components/PropertyFilterSidebar';
 import { GridLoadingSkeleton } from '@/components/LoadingSkeleton';
 import { LazySection } from '@/components/LazySection';
 import WhatsAppButton from '@/components/WhatsAppButton';
@@ -80,15 +81,41 @@ export default function HomePage() {
   const [openFAQ, setOpenFAQ] = useState<number | null>(null);
   const [featuredBusinesses, setFeaturedBusinesses] = useState<BusinessListing[]>([]);
   const [properties, setProperties] = useState<PropertyListing[]>([]);
+  const [allProperties, setAllProperties] = useState<PropertyListing[]>([]);
   const [featuredJobs, setFeaturedJobs] = useState<JobListing[]>([]);
+  const [availableLocations, setAvailableLocations] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [hasMoreProperties, setHasMoreProperties] = useState(true);
   const [page, setPage] = useState(0);
+  const [filters, setFilters] = useState<FilterState>({});
   const PROPERTIES_PER_PAGE = 12;
 
   const toggleFAQ = (index: number) => {
     setOpenFAQ(openFAQ === index ? null : index);
+  };
+
+  // Fetch locations on mount
+  useEffect(() => {
+    fetchLocations();
+  }, []);
+
+  // Fetch available locations from locations table
+  const fetchLocations = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('locations')
+        .select('name, type')
+        .eq('is_active', true)
+        .order('name');
+
+      if (!error && data) {
+        const locationNames = data.map(l => l.name);
+        setAvailableLocations(locationNames);
+      }
+    } catch (error) {
+      console.error('Error fetching locations:', error);
+    }
   };
 
   // Fetch initial properties
@@ -118,10 +145,15 @@ export default function HomePage() {
 
       if (error) throw error;
 
+      const fetchedProperties = data || [];
+
       if (pageNum === 0) {
-        setProperties(data || []);
+        setAllProperties(fetchedProperties);
+        setProperties(applyFilters(fetchedProperties, filters));
       } else {
-        setProperties(prev => [...prev, ...(data || [])]);
+        const newAllProperties = [...allProperties, ...fetchedProperties];
+        setAllProperties(newAllProperties);
+        setProperties(applyFilters(newAllProperties, filters));
       }
 
       // Check if there are more properties to load
@@ -138,6 +170,47 @@ export default function HomePage() {
       setLoading(false);
       setLoadingMore(false);
     }
+  };
+
+  // Apply filters to properties
+  const applyFilters = (props: PropertyListing[], filterState: FilterState): PropertyListing[] => {
+    return props.filter(property => {
+      // City filter
+      if (filterState.city && property.city !== filterState.city) return false;
+
+      // Property type filter
+      if (filterState.propertyType && property.property_type !== filterState.propertyType) return false;
+
+      // Price filters
+      if (filterState.priceMin && property.price < filterState.priceMin) return false;
+      if (filterState.priceMax && property.price > filterState.priceMax) return false;
+
+      // Bedroom filter
+      if (filterState.bedrooms !== undefined && (property.bedrooms || 0) < filterState.bedrooms) return false;
+
+      // Bathroom filter
+      if (filterState.bathrooms !== undefined && (property.bathrooms || 0) < filterState.bathrooms) return false;
+
+      // Square feet filters
+      if (filterState.squareFeetMin && (property.square_feet || 0) < filterState.squareFeetMin) return false;
+      if (filterState.squareFeetMax && (property.square_feet || 0) > filterState.squareFeetMax) return false;
+
+      // Amenities filter
+      if (filterState.amenities && filterState.amenities.length > 0) {
+        const hasAllAmenities = filterState.amenities.every(amenity =>
+          property.amenities.some(propAmenity => propAmenity.toLowerCase().includes(amenity.toLowerCase()))
+        );
+        if (!hasAllAmenities) return false;
+      }
+
+      return true;
+    });
+  };
+
+  // Handle filter changes
+  const handleFilterChange = (newFilters: FilterState) => {
+    setFilters(newFilters);
+    setProperties(applyFilters(allProperties, newFilters));
   };
 
   // Fetch businesses and jobs (shown after all properties)
@@ -381,7 +454,11 @@ export default function HomePage() {
                 </Button>
               </div>
 
-              <div className="grid gap-4 sm:gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+              {/* Two-column layout: Properties + Filter Sidebar */}
+              <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
+                {/* Properties Grid - 3 columns on desktop */}
+                <div className="lg:col-span-3">
+                  <div className="grid gap-4 sm:gap-6 md:grid-cols-2 lg:grid-cols-3">
                 {loading && properties.length === 0 ? (
                   <GridLoadingSkeleton type="property" count={12} />
                 ) : properties.length > 0 ? (
@@ -407,26 +484,41 @@ export default function HomePage() {
                   ))
                 ) : (
                   <div className="col-span-full text-center py-8 text-gray-500">
-                    No properties available at the moment. Check back soon!
+                    {Object.keys(filters).length > 0
+                      ? 'No properties match your filters. Try adjusting your search criteria.'
+                      : 'No properties available at the moment. Check back soon!'}
                   </div>
                 )}
+                  </div>
+
+                  {/* Loading More Indicator */}
+                  {loadingMore && (
+                    <div className="mt-8">
+                      <GridLoadingSkeleton type="property" count={4} />
+                    </div>
+                  )}
+
+                  {/* End of Properties Message */}
+                  {!hasMoreProperties && properties.length > 0 && (
+                    <div className="text-center mt-12 py-6 border-t border-gray-200">
+                      <p className="text-gray-600 font-medium">
+                        You've reached the end of properties. Browse businesses and jobs below!
+                      </p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Filter Sidebar - Sticky on desktop */}
+                <div className="lg:col-span-1">
+                  <div className="sticky top-4">
+                    <PropertyFilterSidebar
+                      onFilterChange={handleFilterChange}
+                      availableCities={availableLocations.length > 0 ? availableLocations : Array.from(new Set(allProperties.map(p => p.city))).sort()}
+                      availableAmenities={Array.from(new Set(allProperties.flatMap(p => p.amenities))).sort()}
+                    />
+                  </div>
+                </div>
               </div>
-
-              {/* Loading More Indicator */}
-              {loadingMore && (
-                <div className="mt-8">
-                  <GridLoadingSkeleton type="property" count={4} />
-                </div>
-              )}
-
-              {/* End of Properties Message */}
-              {!hasMoreProperties && properties.length > 0 && (
-                <div className="text-center mt-12 py-6 border-t border-gray-200">
-                  <p className="text-gray-600 font-medium">
-                    You've reached the end of properties. Browse businesses and jobs below!
-                  </p>
-                </div>
-              )}
             </div>
 
             {/* Top Businesses - Only show when all properties are loaded */}

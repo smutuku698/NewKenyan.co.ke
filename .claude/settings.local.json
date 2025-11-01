@@ -25,7 +25,14 @@
       "Bash(echo:*)",
       "Bash(.env.local)",
       "Bash(taskkill:*)",
-      "Bash(git config:*)"
+      "Bash(git config:*)",
+      "Bash(npx ts-node:*)",
+      "Bash(npx tsx:*)",
+      "Bash(psql $NEXT_PUBLIC_SUPABASE_URL -c \"SELECT id, property_title, images FROM property_listings WHERE property_title ILIKE ''%luxury modern apartment in nyali mombasa%'' LIMIT 5;\")",
+      "Bash(for dir in houses-for-rent apartments-for-sale apartments-for-rent)",
+      "Bash(do cp src/app/houses-for-sale/[location]/page.tsx src/app/$dir/[location]/page.tsx.backup)",
+      "Bash(done)",
+      "Bash(cat:*)"
     ],
     "deny": [],
     "ask": []
