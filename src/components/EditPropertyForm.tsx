@@ -734,7 +734,7 @@ export default function EditPropertyForm({ property }: EditPropertyFormProps) {
           <Button
             type="submit"
             disabled={isSubmitting}
-            className="flex-1 bg-green-600 hover:bg-green-700 text-white"
+            className="flex-1 bg-green-700 hover:bg-green-800 text-white"
           >
             {isSubmitting ? 'Updating...' : 'Update Property Listing'}
           </Button>

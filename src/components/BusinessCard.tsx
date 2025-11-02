@@ -123,8 +123,8 @@ const BusinessCard = ({
             <span className="truncate">Call</span>
           </Button>
           {whatsappNumber && (
-            <Button 
-              className="bg-green-600 hover:bg-green-700 text-white flex-1 min-w-0" 
+            <Button
+              className="bg-green-700 hover:bg-green-800 text-white flex-1 min-w-0"
               size="sm"
               onClick={() => window.open(`https://wa.me/${whatsappNumber.replace('+', '')}`, '_blank')}
             >

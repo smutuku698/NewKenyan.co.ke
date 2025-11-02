@@ -90,6 +90,12 @@ export default function RootLayout({
   const content = (
       <html lang="en">
         <head>
+          {/* Resource hints for critical origins */}
+          <link rel="preconnect" href="https://gsdctfcfkrtuxnwapjcj.supabase.co" crossOrigin="anonymous" />
+          <link rel="preconnect" href="https://cheerful-llama-11.clerk.accounts.dev" />
+          <link rel="dns-prefetch" href="https://static.cloudflareinsights.com" />
+          <link rel="dns-prefetch" href="https://clerk-telemetry.com" />
+
           <meta name="google-site-verification" content="RV-BVBthjlDouZHZJbNOL0ts9uKXyoCQ2AF6Dyed4-0" />
           <meta name="msvalidate.01" content="C8F8E8A5B5F5A5B8C8D8E8F8A5B5C5D8" />
           <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />

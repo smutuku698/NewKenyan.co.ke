@@ -400,10 +400,15 @@ export default function HomePage() {
 
                   {/* Location */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="hero-location" className="block text-sm font-medium text-gray-700 mb-2">
                       Location
                     </label>
-                    <select className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-gray-900">
+                    <select
+                      id="hero-location"
+                      name="location"
+                      aria-label="Select location"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-gray-900"
+                    >
                       <option value="">All Locations</option>
                       <option value="nairobi">Nairobi</option>
                       <option value="mombasa">Mombasa</option>
@@ -415,10 +420,15 @@ export default function HomePage() {
 
                   {/* Category */}
                   <div>
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="hero-category" className="block text-sm font-medium text-gray-700 mb-2">
                       Category
                     </label>
-                    <select className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-gray-900">
+                    <select
+                      id="hero-category"
+                      name="category"
+                      aria-label="Select category"
+                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-gray-900"
+                    >
                       <option value="">All Categories</option>
                       <option value="properties">Properties</option>
                       <option value="jobs">Jobs</option>
@@ -428,7 +438,7 @@ export default function HomePage() {
                 </div>
 
                 {/* Search Button */}
-                <Button className="w-full mt-4 bg-green-600 hover:bg-green-700 text-white py-3 text-lg font-semibold rounded-lg shadow-lg">
+                <Button className="w-full mt-4 bg-green-700 hover:bg-green-800 text-white py-3 text-lg font-semibold rounded-lg shadow-lg">
                   Search Now
                 </Button>
               </div>

@@ -102,7 +102,7 @@ export default function PropertyFiltersComponent({
           <Sliders className="h-4 w-4" />
           <span>Filters</span>
           {hasActiveFilters && (
-            <span className="ml-1 bg-green-600 text-white text-xs px-2 py-0.5 rounded-full">
+            <span className="ml-1 bg-green-700 text-white text-xs px-2 py-0.5 rounded-full">
               {(selectedBedrooms.length + selectedAmenities.length +
                 (minPrice ? 1 : 0) + (maxPrice ? 1 : 0))}
             </span>
@@ -134,8 +134,8 @@ export default function PropertyFiltersComponent({
                     onClick={() => handleBedroomToggle(bedroom)}
                     className={`px-4 py-2 rounded-lg border text-sm font-medium transition-colors ${
                       selectedBedrooms.includes(bedroom)
-                        ? 'bg-green-600 text-white border-green-600'
-                        : 'bg-white text-gray-700 border-gray-300 hover:border-green-600'
+                        ? 'bg-green-700 text-white border-green-700'
+                        : 'bg-white text-gray-700 border-gray-300 hover:border-green-700'
                     }`}
                   >
                     {bedroom} {bedroom === 1 ? 'Bedroom' : 'Bedrooms'}
@@ -192,8 +192,8 @@ export default function PropertyFiltersComponent({
                     onClick={() => handleAmenityToggle(amenity)}
                     className={`px-3 py-1.5 rounded-full border text-xs font-medium transition-colors ${
                       selectedAmenities.includes(amenity)
-                        ? 'bg-green-600 text-white border-green-600'
-                        : 'bg-white text-gray-700 border-gray-300 hover:border-green-600'
+                        ? 'bg-green-700 text-white border-green-700'
+                        : 'bg-white text-gray-700 border-gray-300 hover:border-green-700'
                     }`}
                   >
                     {amenity}

@@ -80,7 +80,7 @@ const PropertyCard = ({
           {/* NEW Badge - Top Left - Sleek and narrow like Movoto */}
           {isNew && (
             <div className="absolute top-2.5 left-2.5 flex items-center gap-1.5">
-              <span className="bg-green-600 text-white text-[10px] font-bold px-2 py-0.5 rounded">
+              <span className="bg-green-700 text-white text-[10px] font-bold px-2 py-0.5 rounded">
                 NEW
               </span>
               <span className="bg-white text-gray-900 text-[10px] font-semibold px-2 py-0.5 rounded">

@@ -110,9 +110,9 @@ Best regards,`);
             <span className="truncate">Learn More</span>
           </Button>
         </Link>
-        <Button 
+        <Button
           onClick={handleApplyNow}
-          className="bg-green-600 hover:bg-green-700 text-white flex-1 text-sm min-w-0"
+          className="bg-green-700 hover:bg-green-800 text-white flex-1 text-sm min-w-0"
         >
           <span className="truncate">Apply Now</span>
         </Button>

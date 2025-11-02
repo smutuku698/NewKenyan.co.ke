@@ -261,7 +261,7 @@ export default function AddListingForm() {
                 </ul>
                 <div className="space-y-4">
                   <SignInButton mode="modal">
-                    <Button className="w-full bg-green-600 hover:bg-green-700 text-white py-3">
+                    <Button className="w-full bg-green-700 hover:bg-green-800 text-white py-3">
                       <UserPlus className="h-5 w-5 mr-2" />
                       Sign In to Add Business
                     </Button>
@@ -653,7 +653,7 @@ export default function AddListingForm() {
           <Button
             type="submit"
             disabled={isSubmitting}
-            className="w-full bg-green-600 hover:bg-green-700 text-white"
+            className="w-full bg-green-700 hover:bg-green-800 text-white"
           >
             {isSubmitting ? 'Submitting...' : '🎉 Anniversary Special: Pay KES 100 & Submit Business'}
           </Button>

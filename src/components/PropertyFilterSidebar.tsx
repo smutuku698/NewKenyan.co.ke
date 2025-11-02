@@ -117,7 +117,7 @@ export default function PropertyFilterSidebar({
             <h2 className="text-lg font-bold text-gray-900">Filter Properties</h2>
           </div>
           {activeFilterCount > 0 && (
-            <span className="bg-green-600 text-white text-xs font-semibold px-2 py-1 rounded-full">
+            <span className="bg-green-700 text-white text-xs font-semibold px-2 py-1 rounded-full">
               {activeFilterCount}
             </span>
           )}
@@ -152,8 +152,11 @@ export default function PropertyFilterSidebar({
               {/* County Filter */}
               {availableCounties.length > 0 && (
                 <div>
-                  <label className="text-xs text-gray-600 mb-1 block">County</label>
+                  <label htmlFor="county-filter" className="text-xs text-gray-600 mb-1 block">County</label>
                   <select
+                    id="county-filter"
+                    name="county"
+                    aria-label="Filter by county"
                     value={filters.county || ''}
                     onChange={(e) => updateFilter('county', e.target.value || undefined)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm"
@@ -171,8 +174,11 @@ export default function PropertyFilterSidebar({
               {/* City Filter */}
               {availableCities.length > 0 && (
                 <div>
-                  <label className="text-xs text-gray-600 mb-1 block">City / Area</label>
+                  <label htmlFor="city-filter" className="text-xs text-gray-600 mb-1 block">City / Area</label>
                   <select
+                    id="city-filter"
+                    name="city"
+                    aria-label="Filter by city or area"
                     value={filters.city || ''}
                     onChange={(e) => updateFilter('city', e.target.value || undefined)}
                     className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-sm"
@@ -211,7 +217,7 @@ export default function PropertyFilterSidebar({
                   onClick={() => updateFilter('propertyType', filters.propertyType === type ? undefined : type)}
                   className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                     filters.propertyType === type
-                      ? 'bg-green-600 text-white'
+                      ? 'bg-green-700 text-white'
                       : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                   }`}
                 >
@@ -288,7 +294,7 @@ export default function PropertyFilterSidebar({
                       onClick={() => updateFilter('bedrooms', filters.bedrooms === num ? undefined : num)}
                       className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                         filters.bedrooms === num
-                          ? 'bg-green-600 text-white'
+                          ? 'bg-green-700 text-white'
                           : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                       }`}
                     >
@@ -309,7 +315,7 @@ export default function PropertyFilterSidebar({
                       onClick={() => updateFilter('bathrooms', filters.bathrooms === num ? undefined : num)}
                       className={`px-3 py-2 rounded-lg text-sm font-medium transition-colors ${
                         filters.bathrooms === num
-                          ? 'bg-green-600 text-white'
+                          ? 'bg-green-700 text-white'
                           : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                       }`}
                     >
@@ -528,7 +534,7 @@ export default function PropertyFilterSidebar({
       <div className="p-4 border-t bg-gray-50">
         <Button
           onClick={() => onFilterChange(filters)}
-          className="w-full bg-green-600 hover:bg-green-700 text-white"
+          className="w-full bg-green-700 hover:bg-green-800 text-white"
         >
           <Filter className="h-4 w-4 mr-2" />
           Apply Filters {activeFilterCount > 0 && `(${activeFilterCount})`}

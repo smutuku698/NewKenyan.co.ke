@@ -1152,8 +1152,8 @@ export default function AdminDashboard() {
                           variant={currentPage === pageNum ? "default" : "outline"}
                           size="sm"
                           className={`w-8 h-8 p-0 ${
-                            currentPage === pageNum 
-                              ? "bg-green-600 hover:bg-green-700 text-white" 
+                            currentPage === pageNum
+                              ? "bg-green-700 hover:bg-green-800 text-white"
                               : ""
                           }`}
                         >

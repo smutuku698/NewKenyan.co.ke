@@ -9,7 +9,7 @@ import { propertyListingSchema, type PropertyListingInput } from '@/lib/validati
 import { supabase } from '@/lib/supabase';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Upload, MapPin, Phone, Mail, MessageCircle, Bed, Bath, Square, Calendar, CheckCircle, ArrowRight, Shield, UserPlus, Home, Users, CreditCard, Car, Building, Clock, DollarSign, MapPinned, Layers } from 'lucide-react';
+import { Upload, MapPin, Phone, Mail, MessageCircle, Bed, Bath, Square, Calendar, CheckCircle, ArrowRight, Shield, UserPlus, Home, Users, CreditCard, Car, Building, Clock, DollarSign, MapPinned, Layers, Star } from 'lucide-react';
 import { CONSTRUCTION_STATUS, NEARBY_FEATURES, EXTERNAL_FEATURES, INTERNAL_FEATURES, AMENITIES } from '@/constants/propertyFeatures';
 import PaymentModal from '@/components/PaymentModal';
 
@@ -47,6 +47,7 @@ export default function AddPropertyForm() {
     priceType: 'rent',
     isFurnished: false,
     petsAllowed: false,
+    rating: 0,
     amenities: [],
     nearbyFeatures: [],
     externalFeatures: [],
@@ -275,6 +276,7 @@ export default function AddPropertyForm() {
           available_from: validatedData.availableFrom ? new Date(validatedData.availableFrom).toISOString() : null,
           is_furnished: validatedData.isFurnished,
           pets_allowed: validatedData.petsAllowed,
+          rating: validatedData.rating || 0,
           construction_progress: validatedData.constructionProgress,
           completion_date: validatedData.completionDate ? new Date(validatedData.completionDate).toISOString() : null,
           payment_plan: validatedData.paymentPlan,
@@ -357,7 +359,7 @@ export default function AddPropertyForm() {
                 </ul>
                 <div className="space-y-4">
                   <SignInButton mode="modal">
-                    <Button className="w-full bg-green-600 hover:bg-green-700 text-white py-3">
+                    <Button className="w-full bg-green-700 hover:bg-green-800 text-white py-3">
                       <UserPlus className="h-5 w-5 mr-2" />
                       Sign In to List Property
                     </Button>
@@ -853,7 +855,7 @@ export default function AddPropertyForm() {
         {/* Property Features */}
         <div className="space-y-4">
           <h3 className="text-lg font-medium text-gray-900">Property Features</h3>
-          
+
           <div className="flex space-x-6">
             <label className="flex items-center">
               <input
@@ -876,6 +878,38 @@ export default function AddPropertyForm() {
               />
               <span className="ml-2 text-sm text-gray-700">Pets Allowed</span>
             </label>
+          </div>
+
+          {/* Property Quality Rating */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Property Quality Rating *
+            </label>
+            <div className="flex items-center space-x-2">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <button
+                  key={star}
+                  type="button"
+                  onClick={() => setFormData(prev => ({ ...prev, rating: star }))}
+                  className="focus:outline-none transition-colors"
+                >
+                  <Star
+                    className={`h-8 w-8 ${
+                      star <= (formData.rating || 0)
+                        ? 'text-yellow-400 fill-yellow-400'
+                        : 'text-gray-300 hover:text-yellow-200'
+                    }`}
+                  />
+                </button>
+              ))}
+              <span className="ml-2 text-sm text-gray-600">
+                {formData.rating ? `${formData.rating}.0` : 'Not rated'}
+              </span>
+            </div>
+            <p className="mt-1 text-xs text-gray-500">
+              Rate your property quality (1-5 stars). This helps buyers/renters understand the property condition.
+            </p>
+            {errors.rating && <p className="text-red-600 text-sm mt-1">{errors.rating}</p>}
           </div>
         </div>
 
@@ -1095,7 +1129,7 @@ export default function AddPropertyForm() {
           <Button
             type="submit"
             disabled={isSubmitting}
-            className="w-full bg-green-600 hover:bg-green-700 text-white"
+            className="w-full bg-green-700 hover:bg-green-800 text-white"
           >
             {isSubmitting ? 'Submitting...' : '🎉 Anniversary Special: Pay KES 100 & Submit Property'}
           </Button>

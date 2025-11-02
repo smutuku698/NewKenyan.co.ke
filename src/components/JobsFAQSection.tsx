@@ -103,10 +103,10 @@ const JobsFAQSection = () => {
               Our team is here to help you find the perfect job opportunity in Kenya
             </p>
             <div className="flex flex-col sm:flex-row gap-4 justify-center">
-              <Button variant="outline" className="border-2 border-green-600 text-green-600 hover:bg-green-600 hover:text-white" asChild>
+              <Button variant="outline" className="border-2 border-green-700 text-green-700 hover:bg-green-700 hover:text-white" asChild>
                 <Link href="mailto:hr@newkenyan.com">Email Our Job Team</Link>
               </Button>
-              <Button className="bg-green-600 hover:bg-green-700 text-white" asChild>
+              <Button className="bg-green-700 hover:bg-green-800 text-white" asChild>
                 <Link href="/jobs-in-kenya">Browse All Jobs</Link>
               </Button>
             </div>
