@@ -9,7 +9,9 @@ import JobCard from '@/components/JobCard';
 import BusinessCard from '@/components/BusinessCard';
 import PropertyCard from '@/components/PropertyCard';
 import BlogCard from '@/components/BlogCard';
-import PropertyFilterSidebar, { FilterState } from '@/components/PropertyFilterSidebar';
+import ToggleableFilterSidebar from '@/components/ToggleableFilterSidebar';
+import { KENYA_COUNTIES } from '@/components/CountyCrossLinks';
+import { FilterState } from '@/components/PropertyFilterSidebar';
 import { GridLoadingSkeleton } from '@/components/LoadingSkeleton';
 import { LazySection } from '@/components/LazySection';
 import WhatsAppButton from '@/components/WhatsAppButton';
@@ -500,26 +502,23 @@ export default function HomePage() {
                 </Button>
               </div>
 
-              {/* Two-column layout: Filter Sidebar + Properties */}
-              <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-                {/* Filter Sidebar - Sticky on desktop - NOW ON LEFT */}
-                <div className="lg:col-span-1 lg:order-2">
-                  <div className="sticky top-4">
-                    <PropertyFilterSidebar
-                      onFilterChange={handleFilterChange}
-                      availableCounties={Array.from(new Set(allProperties.map(p => p.county).filter(Boolean) as string[])).sort()}
-                      availableCities={availableLocations.length > 0 ? availableLocations : Array.from(new Set(allProperties.map(p => p.city))).sort()}
-                      availableAmenities={Array.from(new Set(allProperties.flatMap(p => p.amenities || []))).sort()}
-                      availableConstructionStatus={Array.from(new Set(allProperties.map(p => p.construction_progress).filter(Boolean) as string[])).sort()}
-                      availableNearbyFeatures={Array.from(new Set(allProperties.flatMap(p => p.nearby_features || []))).sort()}
-                      availableExternalFeatures={Array.from(new Set(allProperties.flatMap(p => p.external_features || []))).sort()}
-                      availableInternalFeatures={Array.from(new Set(allProperties.flatMap(p => p.internal_features || []))).sort()}
-                    />
-                  </div>
+              {/* Toggleable Filter Sidebar */}
+              <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
+                <div className="lg:col-span-1">
+                  <ToggleableFilterSidebar
+                    onFilterChange={handleFilterChange}
+                    availableCounties={KENYA_COUNTIES.map(c => c.name).sort()}
+                    availableCities={availableLocations.length > 0 ? availableLocations : Array.from(new Set(allProperties.map(p => p.city))).sort()}
+                    availableAmenities={Array.from(new Set(allProperties.flatMap(p => p.amenities || []))).sort()}
+                    availableConstructionStatus={Array.from(new Set(allProperties.map(p => p.construction_progress).filter(Boolean) as string[])).sort()}
+                    availableNearbyFeatures={Array.from(new Set(allProperties.flatMap(p => p.nearby_features || []))).sort()}
+                    availableExternalFeatures={Array.from(new Set(allProperties.flatMap(p => p.external_features || []))).sort()}
+                    availableInternalFeatures={Array.from(new Set(allProperties.flatMap(p => p.internal_features || []))).sort()}
+                  />
                 </div>
 
-                {/* Properties Grid - 3 columns on desktop - NOW ON RIGHT */}
-                <div className="lg:col-span-3 lg:order-1">
+                {/* Properties Grid - 4 columns on desktop */}
+                <div className="lg:col-span-4">
                   <div className="grid gap-4 sm:gap-6 md:grid-cols-2 lg:grid-cols-3">
                 {loading && properties.length === 0 ? (
                   <GridLoadingSkeleton type="property" count={12} />

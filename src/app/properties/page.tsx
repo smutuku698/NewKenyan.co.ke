@@ -136,19 +136,8 @@ export default function PropertiesPage() {
       <Header />
       
       {/* Hero Section with Search */}
-      <section className="relative bg-gray-900 text-white py-20">
-        <div className="absolute inset-0">
-          <Image
-            src="/images/hero-property.jpg"
-            alt="Beautiful Home Interior"
-            fill
-            className="object-cover opacity-70"
-            priority
-          />
-          <div className="absolute inset-0 bg-gray-900/50" />
-        </div>
-        
-        <div className="relative container mx-auto px-2 sm:px-4 text-center">
+      <section className="relative text-white py-16" style={{ backgroundColor: '#076146' }}>
+        <div className="container mx-auto px-2 sm:px-4 text-center">
           <h1 className="text-5xl font-bold mb-6 !text-white">
             Find Your Perfect Home
           </h1>

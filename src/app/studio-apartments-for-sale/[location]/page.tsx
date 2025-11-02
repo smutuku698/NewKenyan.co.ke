@@ -5,16 +5,19 @@ import Footer from '@/components/Footer';
 import Breadcrumb from '@/components/Breadcrumb';
 import InfinitePropertyList from '@/components/InfinitePropertyList';
 import InternalLinks from '@/components/InternalLinks';
-import LocationDirectory from '@/components/LocationDirectory';
+import PropertyTypeSwitcher from '@/components/PropertyTypeSwitcher';
+import CountyCrossLinks from '@/components/CountyCrossLinks';
+import RelatedLocations from '@/components/RelatedLocations';
 import { supabase } from '@/lib/supabase';
+import { Location, PropertyStats } from '@/lib/location-seo';
 import {
-  Location,
-  PropertyStats,
-  generateLocationMetadata,
-  generateH1,
-  generateBreadcrumbs,
-  generateLocationSchema
-} from '@/lib/location-seo';
+  generatePropertyMetadata,
+  generatePropertyH1,
+  generatePropertyBreadcrumbs,
+  generatePropertySchema,
+  generateAboutContent,
+  formatPrice
+} from '@/lib/property-page-generator';
 
 interface PropertyListing {
   id: string;
@@ -41,8 +44,13 @@ interface PageProps {
   params: { location: string };
 }
 
+// Property type configuration
+const PROPERTY_TYPE = 'studio-apartments';
+const TRANSACTION_TYPE = 'sale';
+const DB_QUERY = '%studio%';
+
 // ISR Configuration: Revalidate every 24 hours
-export const revalidate = 86400; // 24 hours in seconds
+export const revalidate = 86400;
 
 // Generate static params for all active locations
 export async function generateStaticParams() {
@@ -56,6 +64,7 @@ export async function generateStaticParams() {
   })) || [];
 }
 
+// Get location data from Supabase
 async function getLocation(slug: string): Promise<Location | null> {
   const { data, error } = await supabase
     .from('locations')
@@ -71,14 +80,16 @@ async function getLocation(slug: string): Promise<Location | null> {
   return data as Location;
 }
 
-async function getApartmentsForSale(location: Location): Promise<PropertyListing[]> {
+// Get properties
+async function getProperties(location: Location): Promise<PropertyListing[]> {
   let query = supabase
     .from('property_listings')
     .select('*')
     .eq('is_approved', true)
     .eq('price_type', 'For Sale')
-    .ilike('property_type', '%apartment%');
+    .ilike('property_type', DB_QUERY);
 
+  // Filter based on location type
   if (location.type === 'county') {
     query = query.eq('county', location.name);
   } else if (location.type === 'neighborhood') {
@@ -106,6 +117,7 @@ async function getApartmentsForSale(location: Location): Promise<PropertyListing
   return data || [];
 }
 
+// Calculate property statistics
 function calculateStats(properties: PropertyListing[]): PropertyStats {
   if (properties.length === 0) {
     return {
@@ -151,6 +163,28 @@ function calculateStats(properties: PropertyListing[]): PropertyStats {
   };
 }
 
+// Get related locations
+async function getRelatedLocations(location: Location) {
+  let query = supabase
+    .from('locations')
+    .select('name, slug, type, county, city')
+    .eq('is_active', true);
+
+  // Get locations in the same area
+  if (location.type === 'county') {
+    query = query.eq('county', location.name).neq('slug', location.slug);
+  } else {
+    query = query.eq('county', location.county).neq('slug', location.slug);
+  }
+
+  query = query.order('name').limit(50);
+
+  const { data, error } = await query;
+  if (error || !data) return [];
+  return data;
+}
+
+// Generate metadata
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const location = await getLocation(params.location);
 
@@ -161,50 +195,28 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     };
   }
 
-  const properties = await getApartmentsForSale(location);
+  const properties = await getProperties(location);
   const stats = calculateStats(properties);
 
-  return generateLocationMetadata(location, 'apartments', 'sale', stats);
+  return generatePropertyMetadata(location, PROPERTY_TYPE, TRANSACTION_TYPE, stats);
 }
 
-async function getAllLocations() {
-  const { data, error } = await supabase
-    .from('locations')
-    .select('name, slug, type, county, city')
-    .eq('is_active', true)
-    .order('name');
-
-  if (error || !data) {
-    return [];
-  }
-
-  return data;
-}
-
-export default async function ApartmentsForSalePage({ params }: PageProps) {
+export default async function StudioApartmentsForSalePage({ params }: PageProps) {
   const location = await getLocation(params.location);
 
   if (!location) {
     notFound();
   }
 
-  const properties = await getApartmentsForSale(location);
+  const properties = await getProperties(location);
   const stats = calculateStats(properties);
-  const allLocations = await getAllLocations();
+  const relatedLocations = await getRelatedLocations(location);
 
+  // Generate unique H1
   const h1VariationIndex = parseInt(location.id.slice(0, 8), 16) % 4;
-  const h1 = generateH1(location, 'apartments', 'sale', h1VariationIndex);
-
-  const breadcrumbItems = generateBreadcrumbs(location, 'apartments', 'sale');
-
-  const formatPrice = (price: number) => {
-    if (price >= 1000000) {
-      return `${(price / 1000000).toFixed(1)}M`;
-    } else if (price >= 1000) {
-      return `${(price / 1000).toFixed(0)}K`;
-    }
-    return price.toString();
-  };
+  const h1 = generatePropertyH1(location, PROPERTY_TYPE, TRANSACTION_TYPE, h1VariationIndex);
+  const breadcrumbItems = generatePropertyBreadcrumbs(location, PROPERTY_TYPE, TRANSACTION_TYPE);
+  const aboutContent = generateAboutContent(location, PROPERTY_TYPE, TRANSACTION_TYPE, stats);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -213,19 +225,20 @@ export default async function ApartmentsForSalePage({ params }: PageProps) {
       <main className="container mx-auto px-4 py-8">
         <Breadcrumb items={breadcrumbItems} className="mb-6" />
 
+        {/* Hero Section */}
         <div className="mb-8">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">{h1}</h1>
           <p className="text-lg text-gray-600 max-w-3xl">
-            {location.description || `Discover ${stats.totalCount} apartment${stats.totalCount !== 1 ? 's' : ''} for sale in ${location.name}.
-            Find modern flats, penthouses, and apartment units with verified listings and direct seller contact.`}
+            {aboutContent.paragraphs[0]}
           </p>
         </div>
 
+        {/* Quick Stats */}
         {stats.totalCount > 0 && (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
             <div className="bg-white p-4 rounded-lg shadow-sm border text-center">
               <div className="text-2xl font-bold text-green-600">{stats.totalCount}</div>
-              <div className="text-sm text-gray-600">Apartments Available</div>
+              <div className="text-sm text-gray-600">Studio Apartments</div>
             </div>
             <div className="bg-white p-4 rounded-lg shadow-sm border text-center">
               <div className="text-lg font-bold text-green-600">KES {formatPrice(stats.minPrice)}</div>
@@ -236,17 +249,22 @@ export default async function ApartmentsForSalePage({ params }: PageProps) {
               <div className="text-sm text-gray-600">Average Price</div>
             </div>
             <div className="bg-white p-4 rounded-lg shadow-sm border text-center">
-              <div className="text-lg font-bold text-green-600">
-                {Object.keys(stats.bedroomDistribution).length > 0
-                  ? `${Math.min(...Object.keys(stats.bedroomDistribution).map(Number))}-${Math.max(...Object.keys(stats.bedroomDistribution).map(Number))}`
-                  : 'Various'}
-              </div>
-              <div className="text-sm text-gray-600">Bedroom Options</div>
+              <div className="text-lg font-bold text-green-600">2.2%</div>
+              <div className="text-sm text-gray-600">Avg. Rental Yield</div>
             </div>
           </div>
         )}
 
-        {/* Infinite Scroll Properties List with Filters */}
+        {/* Property Type Switcher */}
+        <PropertyTypeSwitcher
+          currentPropertyType={PROPERTY_TYPE}
+          currentTransaction={TRANSACTION_TYPE}
+          locationSlug={location.slug}
+          locationName={location.name}
+          className="mb-8"
+        />
+
+        {/* Property Listings */}
         {properties.length > 0 ? (
           <InfinitePropertyList
             initialProperties={properties}
@@ -256,17 +274,17 @@ export default async function ApartmentsForSalePage({ params }: PageProps) {
               county: location.county,
               city: location.city || undefined
             }}
-            propertyType="apartment"
-            transactionType="sale"
+            propertyType="studio"
+            transactionType={TRANSACTION_TYPE}
             enableFilters={true}
           />
         ) : (
-          <div className="text-center py-12 mb-12">
+          <div className="text-center py-12 mb-12 bg-white rounded-lg shadow-sm">
             <h3 className="text-xl font-semibold text-gray-900 mb-2">
-              No apartments for sale found in {location.name}
+              No studio apartments for sale found in {location.name}
             </h3>
             <p className="text-gray-600 mb-6">
-              Be the first to list an apartment for sale in {location.name}!
+              Be the first to list a studio apartment for sale in {location.name}!
             </p>
             <a
               href="/add-listing"
@@ -277,41 +295,30 @@ export default async function ApartmentsForSalePage({ params }: PageProps) {
           </div>
         )}
 
+        {/* About Location */}
         <div className="bg-white p-8 rounded-lg shadow-sm mb-8">
-          <h2 className="text-2xl font-bold mb-4">About Apartments in {location.name}</h2>
+          <h2 className="text-2xl font-bold mb-4">{aboutContent.title}</h2>
           <div className="prose max-w-none text-gray-600">
-            <p className="mb-4">
-              {location.description || `${location.name} offers excellent investment opportunities for apartment buyers in ${location.county}, Kenya,
-              with modern developments and secure properties.`}
-            </p>
+            {aboutContent.paragraphs.map((paragraph, index) => (
+              <p key={index} className="mb-4">{paragraph}</p>
+            ))}
 
-            {location.type === 'county' && (
+            {aboutContent.features.length > 0 && (
               <>
-                <h3 className="text-lg font-semibold mt-6 mb-3">Why Buy an Apartment in {location.name} County?</h3>
+                <h3 className="text-lg font-semibold mt-6 mb-3">
+                  Why Buy a Studio Apartment in {location.name}?
+                </h3>
                 <ul className="list-disc pl-6 space-y-2">
-                  <li>Modern apartment buildings with secure facilities</li>
-                  <li>Strong rental yields for investment properties</li>
-                  <li>Lower maintenance compared to houses</li>
-                  <li>Access to shared amenities like gyms and pools</li>
+                  {aboutContent.features.map((feature, index) => (
+                    <li key={index}>{feature}</li>
+                  ))}
                 </ul>
               </>
             )}
 
-            {location.type === 'neighborhood' && (
+            {stats.popularAmenities.length > 0 && (
               <>
-                <h3 className="text-lg font-semibold mt-6 mb-3">Apartments in {location.name}</h3>
-                <ul className="list-disc pl-6 space-y-2">
-                  <li>Well-maintained apartment complexes</li>
-                  <li>24/7 security and gated communities</li>
-                  <li>Convenient access to urban amenities</li>
-                  <li>Great investment opportunities</li>
-                </ul>
-              </>
-            )}
-
-            {location.type === 'estate' && stats.popularAmenities.length > 0 && (
-              <>
-                <h3 className="text-lg font-semibold mt-6 mb-3">Apartment Features in {location.name}</h3>
+                <h3 className="text-lg font-semibold mt-6 mb-3">Popular Features</h3>
                 <div className="flex flex-wrap gap-2 mt-3">
                   {stats.popularAmenities.map((amenity) => (
                     <span
@@ -327,26 +334,35 @@ export default async function ApartmentsForSalePage({ params }: PageProps) {
           </div>
         </div>
 
+        {/* Related Locations */}
+        <RelatedLocations
+          currentLocation={location}
+          relatedLocations={relatedLocations}
+          propertyType={PROPERTY_TYPE}
+          transactionType={TRANSACTION_TYPE}
+          className="mb-8"
+        />
+
+        {/* County Cross Links */}
+        <CountyCrossLinks
+          currentCountySlug={location.type === 'county' ? location.slug : `${location.county.toLowerCase().replace(/\s+/g, '-')}-county`}
+          propertyType={PROPERTY_TYPE}
+          transactionType={TRANSACTION_TYPE}
+          className="mb-8"
+        />
+
+        {/* Schema.org JSON-LD */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
-            __html: JSON.stringify(generateLocationSchema(
+            __html: JSON.stringify(generatePropertySchema(
               location,
-              'apartments',
-              'sale',
+              PROPERTY_TYPE,
+              TRANSACTION_TYPE,
               stats,
               properties.slice(0, 10)
             ))
           }}
-        />
-
-        {/* Location Directory - Massive Internal Linking */}
-        <LocationDirectory
-          locations={allLocations}
-          currentLocationSlug={location.slug}
-          propertyType="apartments"
-          transactionType="sale"
-          className="mt-12"
         />
       </main>
 

@@ -4,6 +4,9 @@ import Link from 'next/link';
 import { supabase } from '@/lib/supabase';
 import PropertyCard from '@/components/PropertyCard';
 import LocationDirectory from '@/components/LocationDirectory';
+import CityPropertyTypeGrid from '@/components/CityPropertyTypeGrid';
+import Header from '@/components/Header';
+import Footer from '@/components/Footer';
 import { generateCityOverview, generateLocationFAQ, generateLocationSchema } from '@/lib/pillar-content';
 
 const VALID_CITIES = ['nairobi', 'mombasa'];
@@ -171,7 +174,10 @@ export default async function CityPage({ params }: CityPageProps) {
   const schema = generateLocationSchema({ name: cityName, type: 'city' }, stats);
 
   return (
-    <main className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50">
+      <Header />
+
+      <main>
       {/* Hero Section */}
       <div className="bg-gradient-to-r from-green-700 to-green-900 text-white py-16">
         <div className="max-w-6xl mx-auto px-4">
@@ -209,55 +215,12 @@ export default async function CityPage({ params }: CityPageProps) {
           </div>
         </section>
 
-        {/* Quick Links to Property Types */}
-        <section className="bg-white rounded-lg shadow-sm border p-8 mb-8">
-          <h2 className="text-2xl font-bold mb-6 text-gray-900">Browse by Property Type</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-            <Link
-              href={`/houses-for-sale?city=${cityName}`}
-              className="group bg-gradient-to-br from-blue-50 to-blue-100 hover:from-blue-100 hover:to-blue-200 p-6 rounded-lg border-2 border-blue-200 transition-all"
-            >
-              <div className="text-4xl mb-2">🏠</div>
-              <div className="font-bold text-lg text-gray-900 group-hover:text-blue-700">Houses for Sale</div>
-              <div className="text-sm text-gray-600 mt-1">
-                {stats.propertyTypes['House'] || 0} available
-              </div>
-            </Link>
-
-            <Link
-              href={`/houses-for-rent?city=${cityName}`}
-              className="group bg-gradient-to-br from-green-50 to-green-100 hover:from-green-100 hover:to-green-200 p-6 rounded-lg border-2 border-green-200 transition-all"
-            >
-              <div className="text-4xl mb-2">🏡</div>
-              <div className="font-bold text-lg text-gray-900 group-hover:text-green-700">Houses for Rent</div>
-              <div className="text-sm text-gray-600 mt-1">
-                {stats.propertyTypes['House'] || 0} available
-              </div>
-            </Link>
-
-            <Link
-              href={`/apartments-for-sale?city=${cityName}`}
-              className="group bg-gradient-to-br from-purple-50 to-purple-100 hover:from-purple-100 hover:to-purple-200 p-6 rounded-lg border-2 border-purple-200 transition-all"
-            >
-              <div className="text-4xl mb-2">🏢</div>
-              <div className="font-bold text-lg text-gray-900 group-hover:text-purple-700">Apartments for Sale</div>
-              <div className="text-sm text-gray-600 mt-1">
-                {stats.propertyTypes['Apartment'] || 0} available
-              </div>
-            </Link>
-
-            <Link
-              href={`/apartments-for-rent?city=${cityName}`}
-              className="group bg-gradient-to-br from-pink-50 to-pink-100 hover:from-pink-100 hover:to-pink-200 p-6 rounded-lg border-2 border-pink-200 transition-all"
-            >
-              <div className="text-4xl mb-2">🏘️</div>
-              <div className="font-bold text-lg text-gray-900 group-hover:text-pink-700">Apartments for Rent</div>
-              <div className="text-sm text-gray-600 mt-1">
-                {stats.propertyTypes['Apartment'] || 0} available
-              </div>
-            </Link>
-          </div>
-        </section>
+        {/* Comprehensive Property Type Grid */}
+        <CityPropertyTypeGrid
+          cityName={cityName}
+          citySlug={params.city.toLowerCase()}
+          className="mb-8"
+        />
 
         {/* Market Overview */}
         <section className="bg-white rounded-lg shadow-sm border p-8 mb-8">
@@ -400,7 +363,10 @@ export default async function CityPage({ params }: CityPageProps) {
           __html: JSON.stringify(schema)
         }}
       />
-    </main>
+      </main>
+
+      <Footer />
+    </div>
   );
 }
 

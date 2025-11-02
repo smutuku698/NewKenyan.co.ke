@@ -5,7 +5,9 @@ import Footer from '@/components/Footer';
 import Breadcrumb from '@/components/Breadcrumb';
 import InfinitePropertyList from '@/components/InfinitePropertyList';
 import InternalLinks from '@/components/InternalLinks';
-import LocationDirectory from '@/components/LocationDirectory';
+import PropertyTypeSwitcher from '@/components/PropertyTypeSwitcher';
+import CountyCrossLinks from '@/components/CountyCrossLinks';
+import RelatedLocations from '@/components/RelatedLocations';
 import { supabase } from '@/lib/supabase';
 import {
   Location,
@@ -15,6 +17,14 @@ import {
   generateBreadcrumbs,
   generateLocationSchema
 } from '@/lib/location-seo';
+import {
+  generatePropertyMetadata,
+  generatePropertyH1,
+  generatePropertyBreadcrumbs,
+  generatePropertySchema,
+  generateAboutContent,
+  formatPrice
+} from '@/lib/property-page-generator';
 
 interface PropertyListing {
   id: string;
@@ -164,20 +174,27 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const properties = await getApartmentsForSale(location);
   const stats = calculateStats(properties);
 
-  return generateLocationMetadata(location, 'apartments', 'sale', stats);
+  return generatePropertyMetadata(location, 'apartments', 'sale', stats);
 }
 
-async function getAllLocations() {
-  const { data, error } = await supabase
+// Get related locations
+async function getRelatedLocations(location: Location) {
+  let query = supabase
     .from('locations')
     .select('name, slug, type, county, city')
-    .eq('is_active', true)
-    .order('name');
+    .eq('is_active', true);
 
-  if (error || !data) {
-    return [];
+  // Get locations in the same area
+  if (location.type === 'county') {
+    query = query.eq('county', location.name).neq('slug', location.slug);
+  } else {
+    query = query.eq('county', location.county).neq('slug', location.slug);
   }
 
+  query = query.order('name').limit(50);
+
+  const { data, error } = await query;
+  if (error || !data) return [];
   return data;
 }
 
@@ -190,12 +207,13 @@ export default async function ApartmentsForSalePage({ params }: PageProps) {
 
   const properties = await getApartmentsForSale(location);
   const stats = calculateStats(properties);
-  const allLocations = await getAllLocations();
+  const relatedLocations = await getRelatedLocations(location);
 
   const h1VariationIndex = parseInt(location.id.slice(0, 8), 16) % 4;
-  const h1 = generateH1(location, 'apartments', 'sale', h1VariationIndex);
+  const h1 = generatePropertyH1(location, 'apartments', 'sale', h1VariationIndex);
 
-  const breadcrumbItems = generateBreadcrumbs(location, 'apartments', 'sale');
+  const breadcrumbItems = generatePropertyBreadcrumbs(location, 'apartments', 'sale');
+  const aboutContent = generateAboutContent(location, 'apartments', 'sale', stats);
 
   const formatPrice = (price: number) => {
     if (price >= 1000000) {
@@ -216,8 +234,7 @@ export default async function ApartmentsForSalePage({ params }: PageProps) {
         <div className="mb-8">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">{h1}</h1>
           <p className="text-lg text-gray-600 max-w-3xl">
-            {location.description || `Discover ${stats.totalCount} apartment${stats.totalCount !== 1 ? 's' : ''} for sale in ${location.name}.
-            Find modern flats, penthouses, and apartment units with verified listings and direct seller contact.`}
+            {aboutContent.paragraphs[0]}
           </p>
         </div>
 
@@ -245,6 +262,15 @@ export default async function ApartmentsForSalePage({ params }: PageProps) {
             </div>
           </div>
         )}
+
+        {/* Property Type Switcher */}
+        <PropertyTypeSwitcher
+          currentPropertyType="apartments"
+          currentTransaction="sale"
+          locationSlug={location.slug}
+          locationName={location.name}
+          className="mb-8"
+        />
 
         {/* Infinite Scroll Properties List with Filters */}
         {properties.length > 0 ? (
@@ -330,7 +356,7 @@ export default async function ApartmentsForSalePage({ params }: PageProps) {
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
-            __html: JSON.stringify(generateLocationSchema(
+            __html: JSON.stringify(generatePropertySchema(
               location,
               'apartments',
               'sale',
@@ -340,14 +366,7 @@ export default async function ApartmentsForSalePage({ params }: PageProps) {
           }}
         />
 
-        {/* Location Directory - Massive Internal Linking */}
-        <LocationDirectory
-          locations={allLocations}
-          currentLocationSlug={location.slug}
-          propertyType="apartments"
-          transactionType="sale"
-          className="mt-12"
-        />
+        
       </main>
 
       {/* Internal Links & Silo Structure */}

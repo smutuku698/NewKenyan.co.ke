@@ -56,7 +56,6 @@ export async function generateStaticParams() {
   })) || [];
 }
 
-// Get location data from Supabase
 async function getLocation(slug: string): Promise<Location | null> {
   const { data, error } = await supabase
     .from('locations')
@@ -72,16 +71,14 @@ async function getLocation(slug: string): Promise<Location | null> {
   return data as Location;
 }
 
-// Get properties for houses for sale
-async function getHousesForSale(location: Location): Promise<PropertyListing[]> {
+async function getApartmentsForRent(location: Location): Promise<PropertyListing[]> {
   let query = supabase
     .from('property_listings')
     .select('*')
     .eq('is_approved', true)
-    .eq('price_type', 'For Sale')
-    .ilike('property_type', '%house%');
+    .eq('price_type', 'For Rent')
+    .ilike('property_type', '%apartment%');
 
-  // Filter based on location type
   if (location.type === 'county') {
     query = query.eq('county', location.name);
   } else if (location.type === 'neighborhood') {
@@ -97,7 +94,7 @@ async function getHousesForSale(location: Location): Promise<PropertyListing[]> 
   query = query
     .order('is_featured', { ascending: false })
     .order('created_at', { ascending: false })
-    .limit(12); // Initial load - 12 properties
+    .limit(12);
 
   const { data, error } = await query;
 
@@ -109,7 +106,6 @@ async function getHousesForSale(location: Location): Promise<PropertyListing[]> 
   return data || [];
 }
 
-// Calculate property statistics
 function calculateStats(properties: PropertyListing[]): PropertyStats {
   if (properties.length === 0) {
     return {
@@ -127,7 +123,6 @@ function calculateStats(properties: PropertyListing[]): PropertyStats {
   const maxPrice = Math.max(...prices);
   const avgPrice = Math.floor(prices.reduce((a, b) => a + b, 0) / prices.length);
 
-  // Bedroom distribution
   const bedroomDistribution: Record<number, number> = {};
   properties.forEach(p => {
     if (p.bedrooms) {
@@ -135,7 +130,6 @@ function calculateStats(properties: PropertyListing[]): PropertyStats {
     }
   });
 
-  // Popular amenities
   const amenityCounts: Record<string, number> = {};
   properties.forEach(p => {
     p.amenities?.forEach(amenity => {
@@ -157,7 +151,6 @@ function calculateStats(properties: PropertyListing[]): PropertyStats {
   };
 }
 
-// Generate metadata
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const location = await getLocation(params.location);
 
@@ -168,10 +161,10 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     };
   }
 
-  const properties = await getHousesForSale(location);
+  const properties = await getApartmentsForRent(location);
   const stats = calculateStats(properties);
 
-  return generateLocationMetadata(location, 'houses', 'sale', stats);
+  return generateLocationMetadata(location, 'apartments', 'rent', stats);
 }
 
 async function getAllLocations() {
@@ -188,24 +181,22 @@ async function getAllLocations() {
   return data;
 }
 
-export default async function HousesForSalePage({ params }: PageProps) {
+export default async function ApartmentsForRentPage({ params }: PageProps) {
   const location = await getLocation(params.location);
 
   if (!location) {
     notFound();
   }
 
-  const properties = await getHousesForSale(location);
+  const properties = await getApartmentsForRent(location);
   const stats = calculateStats(properties);
   const allLocations = await getAllLocations();
 
-  // Generate unique H1 (use location ID hash for consistent variation)
   const h1VariationIndex = parseInt(location.id.slice(0, 8), 16) % 4;
-  const h1 = generateH1(location, 'houses', 'sale', h1VariationIndex);
+  const h1 = generateH1(location, 'apartments', 'rent', h1VariationIndex);
 
-  const breadcrumbItems = generateBreadcrumbs(location, 'houses', 'sale');
+  const breadcrumbItems = generateBreadcrumbs(location, 'apartments', 'rent');
 
-  // Format price
   const formatPrice = (price: number) => {
     if (price >= 1000000) {
       return `${(price / 1000000).toFixed(1)}M`;
@@ -222,29 +213,27 @@ export default async function HousesForSalePage({ params }: PageProps) {
       <main className="container mx-auto px-4 py-8">
         <Breadcrumb items={breadcrumbItems} className="mb-6" />
 
-        {/* Hero Section */}
         <div className="mb-8">
           <h1 className="text-4xl font-bold text-gray-900 mb-4">{h1}</h1>
           <p className="text-lg text-gray-600 max-w-3xl">
-            {location.description || `Discover ${stats.totalCount} house${stats.totalCount !== 1 ? 's' : ''} for sale in ${location.name}.
-            Find your dream home with verified listings, photos, and direct contact details.`}
+            {location.description || `Discover ${stats.totalCount} apartment${stats.totalCount !== 1 ? 's' : ''} for rent in ${location.name}.
+            Find modern rental apartments, bedsitters, and studio flats with verified listings and landlord contacts.`}
           </p>
         </div>
 
-        {/* Quick Stats */}
         {stats.totalCount > 0 && (
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
             <div className="bg-white p-4 rounded-lg shadow-sm border text-center">
               <div className="text-2xl font-bold text-green-600">{stats.totalCount}</div>
-              <div className="text-sm text-gray-600">Houses Available</div>
+              <div className="text-sm text-gray-600">Apartments Available</div>
             </div>
             <div className="bg-white p-4 rounded-lg shadow-sm border text-center">
-              <div className="text-lg font-bold text-green-600">KES {formatPrice(stats.minPrice)}</div>
-              <div className="text-sm text-gray-600">Starting Price</div>
+              <div className="text-lg font-bold text-green-600">KES {formatPrice(stats.minPrice)}/mo</div>
+              <div className="text-sm text-gray-600">Starting Rent</div>
             </div>
             <div className="bg-white p-4 rounded-lg shadow-sm border text-center">
-              <div className="text-lg font-bold text-green-600">KES {formatPrice(stats.avgPrice)}</div>
-              <div className="text-sm text-gray-600">Average Price</div>
+              <div className="text-lg font-bold text-green-600">KES {formatPrice(stats.avgPrice)}/mo</div>
+              <div className="text-sm text-gray-600">Average Rent</div>
             </div>
             <div className="bg-white p-4 rounded-lg shadow-sm border text-center">
               <div className="text-lg font-bold text-green-600">
@@ -267,17 +256,17 @@ export default async function HousesForSalePage({ params }: PageProps) {
               county: location.county,
               city: location.city || undefined
             }}
-            propertyType="house"
-            transactionType="sale"
+            propertyType="apartment"
+            transactionType="rent"
             enableFilters={true}
           />
         ) : (
           <div className="text-center py-12 mb-12">
             <h3 className="text-xl font-semibold text-gray-900 mb-2">
-              No houses for sale found in {location.name}
+              No apartments for rent found in {location.name}
             </h3>
             <p className="text-gray-600 mb-6">
-              Be the first to list a house for sale in {location.name}!
+              Be the first to list an apartment for rent in {location.name}!
             </p>
             <a
               href="/add-listing"
@@ -288,23 +277,22 @@ export default async function HousesForSalePage({ params }: PageProps) {
           </div>
         )}
 
-        {/* Location Information */}
         <div className="bg-white p-8 rounded-lg shadow-sm mb-8">
-          <h2 className="text-2xl font-bold mb-4">About {location.name}</h2>
+          <h2 className="text-2xl font-bold mb-4">Rent an Apartment in {location.name}</h2>
           <div className="prose max-w-none text-gray-600">
             <p className="mb-4">
-              {location.description || `${location.name} is a sought-after location in ${location.county}, Kenya,
-              offering excellent opportunities for homebuyers looking for houses for sale.`}
+              {location.description || `${location.name} offers a variety of apartments for rent in ${location.county}, Kenya,
+              from affordable bedsitters to luxury penthouses.`}
             </p>
 
             {location.type === 'county' && (
               <>
-                <h3 className="text-lg font-semibold mt-6 mb-3">Why Buy a House in {location.name} County?</h3>
+                <h3 className="text-lg font-semibold mt-6 mb-3">Why Rent an Apartment in {location.name} County?</h3>
                 <ul className="list-disc pl-6 space-y-2">
-                  <li>Diverse housing options from affordable to luxury homes</li>
-                  <li>Growing real estate market with strong investment potential</li>
-                  <li>Access to essential amenities and infrastructure</li>
-                  <li>Various residential areas catering to different lifestyles</li>
+                  <li>Modern apartment complexes with great amenities</li>
+                  <li>Flexible lease terms from short to long-term</li>
+                  <li>Secure gated communities with 24/7 security</li>
+                  <li>Lower utility costs and maintenance-free living</li>
                 </ul>
               </>
             )}
@@ -313,17 +301,17 @@ export default async function HousesForSalePage({ params }: PageProps) {
               <>
                 <h3 className="text-lg font-semibold mt-6 mb-3">Living in {location.name}</h3>
                 <ul className="list-disc pl-6 space-y-2">
-                  <li>Convenient access to shopping centers and markets</li>
-                  <li>Schools and educational institutions nearby</li>
-                  <li>Good transport connectivity</li>
-                  <li>Growing community with modern amenities</li>
+                  <li>Convenient location with easy access to amenities</li>
+                  <li>Well-maintained buildings with professional management</li>
+                  <li>Great for young professionals and families</li>
+                  <li>Access to public transport and major roads</li>
                 </ul>
               </>
             )}
 
             {location.type === 'estate' && stats.popularAmenities.length > 0 && (
               <>
-                <h3 className="text-lg font-semibold mt-6 mb-3">Popular Features in {location.name}</h3>
+                <h3 className="text-lg font-semibold mt-6 mb-3">Amenities in {location.name}</h3>
                 <div className="flex flex-wrap gap-2 mt-3">
                   {stats.popularAmenities.map((amenity) => (
                     <span
@@ -339,14 +327,13 @@ export default async function HousesForSalePage({ params }: PageProps) {
           </div>
         </div>
 
-        {/* Schema.org JSON-LD */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
             __html: JSON.stringify(generateLocationSchema(
               location,
-              'houses',
-              'sale',
+              'apartments',
+              'rent',
               stats,
               properties.slice(0, 10)
             ))
@@ -357,8 +344,8 @@ export default async function HousesForSalePage({ params }: PageProps) {
         <LocationDirectory
           locations={allLocations}
           currentLocationSlug={location.slug}
-          propertyType="houses"
-          transactionType="sale"
+          propertyType="apartments"
+          transactionType="rent"
           className="mt-12"
         />
       </main>
