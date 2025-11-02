@@ -238,11 +238,11 @@ export function generateBreadcrumbs(
     }
   ];
 
-  // Add parent location if it exists
+  // Add parent location if it exists (no href to avoid 404s)
   if (location.type !== 'county' && location.county) {
     items.push({
-      label: location.county,
-      href: `/${propertyType}-for-${transactionType}/${location.county.toLowerCase()}-county`
+      label: location.county
+      // Note: No href since county pages may not exist for all property types
     });
   }
 
