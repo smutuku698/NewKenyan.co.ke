@@ -86,8 +86,9 @@ export default function RootLayout({
 }>) {
   const publishableKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
 
+  // Temporarily disable Clerk until CORS issues are resolved
   // Check if key is valid (not placeholder)
-  const isValidKey = publishableKey && !publishableKey.includes('placeholder');
+  const isValidKey = false; // publishableKey && !publishableKey.includes('placeholder');
 
   // Make Clerk optional - if no valid key provided, run without authentication
   const content = (
