@@ -8,18 +8,59 @@ import type { NextRequest } from 'next/server';
 export default function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
-  // Redirect old domain content (sports, news, etc.) to jobs page with 301
-  const oldContentPatterns = [
+  // Redirect old domain content with smart categorization for SEO juice
+
+  // Sports content → Jobs (sports industry jobs, coaching, etc.)
+  const sportsPatterns = [
     /asian-champions-league/i,
     /football/i,
     /cricket/i,
     /rugby/i,
     /athletics/i,
     /al-hilal/i,
-    /kbc/i, // old news patterns
+    /kip-keino/i,
+    /kipchoge/i,
+    /boseman/i, // entertainment
   ];
 
-  if (oldContentPatterns.some(pattern => pattern.test(pathname))) {
+  // Business/Corporate news → Business Directory
+  const businessPatterns = [
+    /ktda/i,
+    /geothermal/i,
+    /tea-farmers/i,
+    /medical-insurance/i,
+    /broadcasting-corporation/i,
+  ];
+
+  // Health/Medical content → Jobs (healthcare jobs)
+  const healthPatterns = [
+    /covid/i,
+    /knh-workers/i,
+    /hospital/i,
+    /medical/i,
+  ];
+
+  // KBC/News general → Jobs
+  const newsPatterns = [
+    /kbc/i,
+    /jubilee-party/i,
+    /raila/i,
+    /muguka/i,
+  ];
+
+  if (sportsPatterns.some(pattern => pattern.test(pathname))) {
+    return NextResponse.redirect(new URL('/jobs-in-kenya', request.url), 301);
+  }
+
+  if (businessPatterns.some(pattern => pattern.test(pathname))) {
+    return NextResponse.redirect(new URL('/business-directory', request.url), 301);
+  }
+
+  if (healthPatterns.some(pattern => pattern.test(pathname))) {
+    return NextResponse.redirect(new URL('/jobs-in-kenya', request.url), 301);
+  }
+
+  if (newsPatterns.some(pattern => pattern.test(pathname))) {
     return NextResponse.redirect(new URL('/jobs-in-kenya', request.url), 301);
   }
 
