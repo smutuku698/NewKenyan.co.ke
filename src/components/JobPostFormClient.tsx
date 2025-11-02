@@ -35,7 +35,7 @@ interface JobFormData extends Record<string, unknown> {
   contact_phone: string;
 }
 
-function PostJobForm() {
+function PostJobFormInner() {
   const { user } = useUser();
   const searchParams = useSearchParams();
   const [formData, setFormData] = useState<JobFormData>({
@@ -660,10 +660,18 @@ Send your CV and cover letter to hr@company.co.ke with subject 'Marketing Manage
   );
 }
 
-export default function JobPostFormClient() {
+function PostJobForm() {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
-      <PostJobForm />
+    <Suspense fallback={
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div>Loading...</div>
+      </div>
+    }>
+      <PostJobFormInner />
     </Suspense>
   );
+}
+
+export default function JobPostFormClient() {
+  return <PostJobForm />;
 }
