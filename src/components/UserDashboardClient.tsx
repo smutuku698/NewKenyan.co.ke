@@ -148,7 +148,7 @@ const BusinessServicesWidget = () => {
   );
 };
 
-export default function UserDashboard() {
+export default function UserDashboardClient() {
   const { user } = useUser();
   const [activeTab, setActiveTab] = useState<'business' | 'property' | 'jobs'>('business');
   const [businessListings, setBusinessListings] = useState<BusinessListing[]>([]);
