@@ -5,7 +5,8 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import PaymentModal from '@/components/PaymentModal';
-import { useUser, SignInButton } from '@clerk/nextjs';
+import { useAuth } from '@/components/AuthProvider';
+import { SignInButton } from '@/components/SupabaseAuthWrapper';
 import { 
   CheckCircle, 
   Briefcase, 
@@ -36,7 +37,7 @@ interface JobFormData extends Record<string, unknown> {
 }
 
 function PostJobFormInner() {
-  const { user } = useUser();
+  const { user } = useAuth();
   const searchParams = useSearchParams();
   const [formData, setFormData] = useState<JobFormData>({
     job_title: '',

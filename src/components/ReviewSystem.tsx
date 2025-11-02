@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { useUser } from '@clerk/nextjs';
+import { useAuth } from '@/components/AuthProvider';
 import { supabase } from '@/lib/supabase';
 import { reviewSchema, type ReviewInput } from '@/lib/validations';
 import { Button } from '@/components/ui/button';
@@ -21,7 +21,7 @@ interface ReviewSystemProps {
 }
 
 export default function ReviewSystem({ businessId, businessName }: ReviewSystemProps) {
-  const { user } = useUser();
+  const { user } = useAuth();
   const [reviews, setReviews] = useState<Review[]>([]);
   const [userReview, setUserReview] = useState<Review | null>(null);
   const [newRating, setNewRating] = useState(0);

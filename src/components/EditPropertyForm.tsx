@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { useUser } from '@clerk/nextjs';
+import { useAuth } from '@/components/AuthProvider';
 import { propertyListingSchema, type PropertyListingInput } from '@/lib/validations';
 import { supabase } from '@/lib/supabase';
 import { Button } from '@/components/ui/button';
@@ -74,7 +74,7 @@ interface EditPropertyFormProps {
 
 export default function EditPropertyForm({ property }: EditPropertyFormProps) {
   const router = useRouter();
-  const { user } = useUser();
+  const { user } = useAuth();
   const [formData, setFormData] = useState<Partial<PropertyListingInput>>({});
   const [existingImages, setExistingImages] = useState<string[]>([]);
   const [newImages, setNewImages] = useState<File[]>([]);

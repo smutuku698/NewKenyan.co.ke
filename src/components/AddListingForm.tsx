@@ -3,7 +3,8 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useUser, SignInButton } from '@clerk/nextjs';
+import { useAuth } from '@/components/AuthProvider';
+import { SignInButton } from '@/components/SupabaseAuthWrapper';
 import { useRouter } from 'next/navigation';
 import { businessListingSchema, type BusinessListingInput } from '@/lib/validations';
 import { supabase } from '@/lib/supabase';
@@ -32,7 +33,7 @@ const BUSINESS_CATEGORIES = [
 ];
 
 export default function AddListingForm() {
-  const { user } = useUser();
+  const { user } = useAuth();
   const router = useRouter();
   const [formData, setFormData] = useState<Partial<BusinessListingInput>>({});
   const [images, setImages] = useState<File[]>([]);

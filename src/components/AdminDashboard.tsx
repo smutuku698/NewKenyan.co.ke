@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useUser } from '@clerk/nextjs';
+import { useAuth } from '@/components/AuthProvider';
 import { supabase } from '@/lib/supabase';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -102,7 +102,7 @@ interface JobListing {
 }
 
 export default function AdminDashboard() {
-  const { user } = useUser();
+  const { user } = useAuth();
   const [activeTab, setActiveTab] = useState<'business' | 'property' | 'jobs'>('business');
   const [viewMode, setViewMode] = useState<'pending' | 'all'>('pending');
   const [businessListings, setBusinessListings] = useState<BusinessListing[]>([]);
