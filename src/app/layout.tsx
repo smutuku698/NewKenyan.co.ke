@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, Manrope, Source_Sans_3 } from "next/font/google";
-import { ClerkProvider } from '@clerk/nextjs';
+import { AuthProvider } from '@/components/AuthProvider';
 import GoogleAnalytics from '@/components/GoogleAnalytics';
 import CookieConsent from '@/components/CookieConsent';
 import GoogleTagManager, { GoogleTagManagerNoScript } from '@/components/GoogleTagManager';
@@ -84,15 +84,8 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const publishableKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
-
-  // Temporarily disable Clerk until CORS issues are resolved
-  // Check if key is valid (not placeholder)
-  const isValidKey = false; // publishableKey && !publishableKey.includes('placeholder');
-
-  // Make Clerk optional - if no valid key provided, run without authentication
-  const content = (
-      <html lang="en">
+  return (
+    <html lang="en">
         <head>
           {/* Resource hints for critical origins */}
           <link rel="preconnect" href="https://gsdctfcfkrtuxnwapjcj.supabase.co" crossOrigin="anonymous" />
@@ -367,15 +360,11 @@ export default function RootLayout({
           <GoogleAnalytics />
           <SEOOptimizations />
           <SiteProtection />
-          {children}
+          <AuthProvider>
+            {children}
+          </AuthProvider>
           <CookieConsent />
         </body>
       </html>
   );
-
-  return isValidKey ? (
-    <ClerkProvider publishableKey={publishableKey!}>
-      {content}
-    </ClerkProvider>
-  ) : content;
 }

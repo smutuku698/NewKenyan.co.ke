@@ -1,11 +1,39 @@
-import { clerkMiddleware } from "@clerk/nextjs/server";
+import { createServerClient, type CookieOptions } from '@supabase/ssr'
 import { NextResponse } from 'next/server';
 import type { NextRequest } from 'next/server';
 
 /**
- * Combined middleware: Clerk authentication + hierarchical URL redirects
+ * Combined middleware: Supabase authentication + hierarchical URL redirects
  */
-export default function middleware(request: NextRequest) {
+export default async function middleware(request: NextRequest) {
+  let response = NextResponse.next({
+    request: {
+      headers: request.headers,
+    },
+  })
+
+  const supabase = createServerClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    {
+      cookies: {
+        getAll() {
+          return request.cookies.getAll()
+        },
+        setAll(cookiesToSet) {
+          cookiesToSet.forEach(({ name, value, options }) => request.cookies.set(name, value))
+          response = NextResponse.next({
+            request,
+          })
+          cookiesToSet.forEach(({ name, value, options }) =>
+            response.cookies.set(name, value, options)
+          )
+        },
+      },
+    }
+  )
+
+  await supabase.auth.getUser()
   const { pathname } = request.nextUrl;
 
   // Redirect old domain content with smart categorization for SEO juice
@@ -128,8 +156,8 @@ export default function middleware(request: NextRequest) {
     return NextResponse.redirect(url, 301);
   }
 
-  // Run Clerk middleware for authentication
-  return clerkMiddleware()(request);
+  // Return the response with Supabase cookies
+  return response;
 }
 
 export const config = {
