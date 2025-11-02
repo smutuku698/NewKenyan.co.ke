@@ -130,6 +130,38 @@ export const PROPERTY_TYPES: Record<string, PropertyTypeConfig> = {
     marketDemand: 'very-high',
   },
 
+  containerHouses: {
+    slug: 'container-houses',
+    name: 'Container House',
+    pluralName: 'Container Houses',
+    category: 'residential',
+    transactionTypes: ['sale'],
+    description: 'Modern container houses in Kenya - affordable, quick to build, and eco-friendly housing solutions',
+    keywords: [
+      'container houses',
+      'container houses in kenya',
+      'container houses prices',
+      'shipping container houses',
+      'fabricated container houses',
+      '3 bedroom container houses',
+      '4 bedroom container houses',
+      'container houses designs',
+      'low cost container houses',
+      'container houses for sale'
+    ],
+    searchTerms: [
+      'container houses',
+      'container house',
+      'shipping container house',
+      'fabricated container',
+      'prefab houses',
+      'modular houses',
+      'container homes'
+    ],
+    dbQuery: '%container%house%|%shipping container%|%prefab%|%modular house%',
+    marketDemand: 'very-high',
+  },
+
   servicedApartments: {
     slug: 'serviced-apartments',
     name: 'Serviced Apartment',
@@ -300,6 +332,7 @@ export const RESIDENTIAL_PROPERTY_TYPES = [
   PROPERTY_TYPES.townhouses,
   PROPERTY_TYPES.villas,
   PROPERTY_TYPES.bedsitters,
+  PROPERTY_TYPES.containerHouses,
   PROPERTY_TYPES.servicedApartments,
 ];
 
