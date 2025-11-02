@@ -36,8 +36,8 @@ async function getCityStats(cityName: string) {
     .eq('is_approved', true)
     .order('price');
 
-  const prices = priceData?.map(p => p.price) || [];
-  const averagePrice = prices.length > 0 ? Math.round(prices.reduce((a, b) => a + b, 0) / prices.length) : 0;
+  const prices = priceData?.map((p: { price: number }) => p.price) || [];
+  const averagePrice = prices.length > 0 ? Math.round(prices.reduce((a: number, b: number) => a + b, 0) / prices.length) : 0;
   const minPrice = prices.length > 0 ? Math.min(...prices) : 0;
   const maxPrice = prices.length > 0 ? Math.max(...prices) : 0;
 
@@ -49,7 +49,7 @@ async function getCityStats(cityName: string) {
     .eq('is_approved', true);
 
   const bedroomDistribution: Record<number, number> = {};
-  bedroomData?.forEach(item => {
+  bedroomData?.forEach((item: { bedrooms: number | null }) => {
     if (item.bedrooms) {
       bedroomDistribution[item.bedrooms] = (bedroomDistribution[item.bedrooms] || 0) + 1;
     }
@@ -63,7 +63,7 @@ async function getCityStats(cityName: string) {
     .eq('is_approved', true);
 
   const propertyTypes: Record<string, number> = {};
-  typeData?.forEach(item => {
+  typeData?.forEach((item: { property_type: string }) => {
     propertyTypes[item.property_type] = (propertyTypes[item.property_type] || 0) + 1;
   });
 
@@ -75,7 +75,7 @@ async function getCityStats(cityName: string) {
     .eq('is_approved', true);
 
   const amenityCounts: Record<string, number> = {};
-  amenitiesData?.forEach(item => {
+  amenitiesData?.forEach((item: { amenities: string[] | null }) => {
     item.amenities?.forEach((amenity: string) => {
       amenityCounts[amenity] = (amenityCounts[amenity] || 0) + 1;
     });
@@ -97,10 +97,23 @@ async function getCityStats(cityName: string) {
   };
 }
 
+// Fetch all locations
+async function getAllLocations() {
+  const { data, error } = await supabase
+    .from('locations')
+    .select('name, slug, type, county, city')
+    .eq('is_active', true)
+    .order('name');
+
+  if (error || !data) {
+    return [];
+  }
+
+  return data;
+}
+
 // Fetch featured properties for a city
 async function getFeaturedProperties(cityName: string, limit = 12) {
-  const supabase = await createClient();
-
   const { data, error } = await supabase
     .from('property_listings')
     .select('*')
@@ -152,6 +165,7 @@ export default async function CityPage({ params }: CityPageProps) {
   // Fetch data
   const stats = await getCityStats(cityName);
   const featuredProperties = await getFeaturedProperties(cityName);
+  const locations = await getAllLocations();
   const cityContent = generateCityOverview(cityName, stats);
   const faqs = generateLocationFAQ({ name: cityName, type: 'city' }, stats);
   const schema = generateLocationSchema({ name: cityName, type: 'city' }, stats);
@@ -375,7 +389,7 @@ export default async function CityPage({ params }: CityPageProps) {
           <h2 className="text-2xl font-bold mb-6 text-gray-900">
             Explore All {cityName} Areas
           </h2>
-          <LocationDirectory />
+          <LocationDirectory locations={locations} />
         </section>
       </div>
 

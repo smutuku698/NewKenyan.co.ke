@@ -1,5 +1,8 @@
 'use client';
 
+// Force dynamic rendering for edit property page
+export const dynamic = 'force-dynamic';
+
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useUser } from '@clerk/nextjs';
