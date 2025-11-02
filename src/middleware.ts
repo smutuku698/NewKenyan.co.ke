@@ -46,6 +46,34 @@ export default function middleware(request: NextRequest) {
     /jubilee-party/i,
     /raila/i,
     /muguka/i,
+    /mashujaa-day/i,
+    /heroic-movies/i,
+  ];
+
+  // Finance/Investment content → Business Directory
+  const financePatterns = [
+    /cytonn/i,
+    /fraud/i,
+    /shareholders/i,
+    /iias/i,
+    /investment/i,
+    /macau-casinos/i,
+    /gambling-revenue/i,
+  ];
+
+  // Food/Beverage/Lifestyle → Business Directory
+  const lifestylePatterns = [
+    /white-cap-lager/i,
+    /big-brunch/i,
+    /eatout/i,
+  ];
+
+  // International/Politics → Jobs
+  const politicsPatterns = [
+    /cuba-doctors/i,
+    /kenya-cuba/i,
+    /covid-19-news/i,
+    /women-covid/i,
   ];
 
   if (sportsPatterns.some(pattern => pattern.test(pathname))) {
@@ -61,6 +89,18 @@ export default function middleware(request: NextRequest) {
   }
 
   if (newsPatterns.some(pattern => pattern.test(pathname))) {
+    return NextResponse.redirect(new URL('/jobs-in-kenya', request.url), 301);
+  }
+
+  if (financePatterns.some(pattern => pattern.test(pathname))) {
+    return NextResponse.redirect(new URL('/business-directory', request.url), 301);
+  }
+
+  if (lifestylePatterns.some(pattern => pattern.test(pathname))) {
+    return NextResponse.redirect(new URL('/business-directory', request.url), 301);
+  }
+
+  if (politicsPatterns.some(pattern => pattern.test(pathname))) {
     return NextResponse.redirect(new URL('/jobs-in-kenya', request.url), 301);
   }
 
