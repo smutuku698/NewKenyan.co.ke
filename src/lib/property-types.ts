@@ -17,6 +17,7 @@ export interface PropertyTypeConfig {
   icon?: string; // Optional icon for UI
   avgYield?: number; // Average rental yield % (from KNBS report)
   marketDemand: 'very-high' | 'high' | 'medium' | 'low';
+  bedroomFilter?: number; // For bedroom-specific searches (e.g., 2, 3, 4, 5)
 }
 
 export const PROPERTY_TYPES: Record<string, PropertyTypeConfig> = {
@@ -242,6 +243,63 @@ export const PROPERTY_TYPES: Record<string, PropertyTypeConfig> = {
     searchTerms: ['land', 'plot', 'acre', 'shamba', 'title deed'],
     dbQuery: '%land%|%plot%',
     marketDemand: 'very-high',
+  },
+
+  // BEDROOM-SPECIFIC SEARCHES (High Volume)
+  twoBedroomHouses: {
+    slug: '2-bedroom-houses',
+    name: '2 Bedroom House',
+    pluralName: '2 Bedroom Houses',
+    category: 'residential',
+    transactionTypes: ['sale', 'rent'],
+    description: 'Affordable 2 bedroom houses perfect for small families and young couples',
+    keywords: ['2 bedroom houses', '2 bedroom houses for rent', '2 bedroom houses for sale', 'two bedroom houses', '2br houses'],
+    searchTerms: ['2 bedroom', 'two bedroom', '2br', '2 bed house'],
+    dbQuery: '%house%|%bungalow%|%maisonette%',
+    bedroomFilter: 2,
+    marketDemand: 'very-high',
+  },
+
+  threeBedroomHouses: {
+    slug: '3-bedroom-houses',
+    name: '3 Bedroom House',
+    pluralName: '3 Bedroom Houses',
+    category: 'residential',
+    transactionTypes: ['sale', 'rent'],
+    description: 'Spacious 3 bedroom houses ideal for growing families',
+    keywords: ['3 bedroom houses', '3 bedroom houses for rent', '3 bedroom houses for sale', 'three bedroom houses', '3br houses'],
+    searchTerms: ['3 bedroom', 'three bedroom', '3br', '3 bed house'],
+    dbQuery: '%house%|%bungalow%|%maisonette%',
+    bedroomFilter: 3,
+    marketDemand: 'very-high',
+  },
+
+  fourBedroomHouses: {
+    slug: '4-bedroom-houses',
+    name: '4 Bedroom House',
+    pluralName: '4 Bedroom Houses',
+    category: 'residential',
+    transactionTypes: ['sale', 'rent'],
+    description: 'Luxury 4 bedroom houses with ample space for larger families',
+    keywords: ['4 bedroom houses', '4 bedroom houses for rent', '4 bedroom houses for sale', 'four bedroom houses', '4br houses'],
+    searchTerms: ['4 bedroom', 'four bedroom', '4br', '4 bed house'],
+    dbQuery: '%house%|%bungalow%|%maisonette%|%villa%',
+    bedroomFilter: 4,
+    marketDemand: 'high',
+  },
+
+  fiveBedroomHouses: {
+    slug: '5-bedroom-houses',
+    name: '5 Bedroom House',
+    pluralName: '5 Bedroom Houses',
+    category: 'residential',
+    transactionTypes: ['sale', 'rent'],
+    description: 'Executive 5 bedroom houses offering premium living spaces',
+    keywords: ['5 bedroom houses', '5 bedroom houses for rent', '5 bedroom houses for sale', 'five bedroom houses', '5br houses'],
+    searchTerms: ['5 bedroom', 'five bedroom', '5br', '5 bed house'],
+    dbQuery: '%house%|%villa%|%maisonette%',
+    bedroomFilter: 5,
+    marketDemand: 'medium',
   },
 };
 
