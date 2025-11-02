@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import Header from '@/components/Header';
@@ -8,22 +8,98 @@ import Footer from '@/components/Footer';
 import JobCard from '@/components/JobCard';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import jobsData from '@/data/jobs.json';
-import { Search, MapPin, Building2, Users, ChevronDown, Briefcase } from 'lucide-react';
+import localJobsData from '../../../local-jobs.json';
+import { Search, MapPin, Building2, Users, ChevronDown, Briefcase, Filter, X } from 'lucide-react';
+import { slugify } from '@/lib/slugify';
+
+interface Job {
+  id: number;
+  date: string;
+  job_title: string;
+  nature_of_job: string;
+  industry: string;
+  salary: string;
+  job_location: string;
+  duties_and_responsibilities: string;
+  key_requirements_skills_qualification: string;
+  how_to_apply: string;
+}
 
 export default function JobsPageClient() {
   const [openFAQ, setOpenFAQ] = useState<number | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [showFilters, setShowFilters] = useState(false);
+  const [selectedLocation, setSelectedLocation] = useState<string>('');
+  const [selectedIndustry, setSelectedIndustry] = useState<string>('');
+  const [selectedJobType, setSelectedJobType] = useState<string>('');
+  const [salaryRange, setSalaryRange] = useState<string>('');
 
   const toggleFAQ = (index: number) => {
     setOpenFAQ(openFAQ === index ? null : index);
   };
 
+  // Parse date to sort jobs (most recent first)
+  const parseJobDate = (dateStr: string): Date => {
+    // Handle format like "31 October 2025"
+    const date = new Date(dateStr);
+    return isNaN(date.getTime()) ? new Date(0) : date;
+  };
+
+  // Sort jobs by date (most recent first)
+  const sortedJobs = useMemo(() => {
+    return [...localJobsData.jobs].sort((a, b) => {
+      const dateA = parseJobDate(a.date);
+      const dateB = parseJobDate(b.date);
+      return dateB.getTime() - dateA.getTime();
+    });
+  }, []);
+
+  // Get unique filter options
+  const locations = useMemo(() => {
+    const locs = new Set(sortedJobs.map(job => job.job_location));
+    return Array.from(locs).sort();
+  }, [sortedJobs]);
+
+  const industries = useMemo(() => {
+    const inds = new Set(sortedJobs.map(job => job.industry));
+    return Array.from(inds).sort();
+  }, [sortedJobs]);
+
+  const jobTypes = useMemo(() => {
+    const types = new Set(sortedJobs.map(job => job.nature_of_job));
+    return Array.from(types).sort();
+  }, [sortedJobs]);
+
+  // Filter jobs based on search and filters
+  const filteredJobs = useMemo(() => {
+    return sortedJobs.filter(job => {
+      const matchesSearch = !searchTerm ||
+        job.job_title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        job.job_location.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        job.industry.toLowerCase().includes(searchTerm.toLowerCase());
+
+      const matchesLocation = !selectedLocation || job.job_location === selectedLocation;
+      const matchesIndustry = !selectedIndustry || job.industry === selectedIndustry;
+      const matchesJobType = !selectedJobType || job.nature_of_job === selectedJobType;
+
+      return matchesSearch && matchesLocation && matchesIndustry && matchesJobType;
+    });
+  }, [sortedJobs, searchTerm, selectedLocation, selectedIndustry, selectedJobType]);
+
+  // Clear all filters
+  const clearFilters = () => {
+    setSearchTerm('');
+    setSelectedLocation('');
+    setSelectedIndustry('');
+    setSelectedJobType('');
+    setSalaryRange('');
+  };
+
   // Filter jobs by location for specific sections
-  const nairobiJobs = jobsData.jobs.filter(job => job.job_location.toLowerCase().includes('nairobi')).slice(0, 6);
-  const mombasaJobs = jobsData.jobs.filter(job => job.job_location.toLowerCase().includes('mombasa')).slice(0, 3);
-  const ngoJobs = jobsData.jobs.filter(job => 
-    job.industry.toLowerCase().includes('ngo') || 
+  const nairobiJobs = sortedJobs.filter(job => job.job_location.toLowerCase().includes('nairobi')).slice(0, 6);
+  const mombasaJobs = sortedJobs.filter(job => job.job_location.toLowerCase().includes('mombasa')).slice(0, 3);
+  const ngoJobs = sortedJobs.filter(job =>
+    job.industry.toLowerCase().includes('ngo') ||
     job.industry.toLowerCase().includes('foundation') ||
     job.job_title.toLowerCase().includes('ngo') ||
     job.duties_and_responsibilities.toLowerCase().includes('non-profit')
@@ -115,35 +191,148 @@ export default function JobsPageClient() {
           
           {/* All Jobs Section */}
           <section className="mb-16">
-            <div className="text-center mb-12">
+            <div className="text-center mb-8">
               <h2 className="text-4xl font-bold mb-4">All Job Opportunities in Kenya</h2>
               <p className="text-xl text-gray-600 max-w-3xl mx-auto">
-                Browse through our comprehensive collection of job vacancies across Kenya. From entry-level positions to executive roles, find your perfect career opportunity.
+                Browse through {localJobsData.total_jobs}+ verified job vacancies across Kenya. From entry-level positions to executive roles, find your perfect career opportunity.
               </p>
             </div>
 
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-              {jobsData.jobs.slice(0, 9).map((job, index) => (
-                <JobCard 
-                  key={index} 
-                  id={job.id}
-                  date={job.date}
-                  job_title={job.job_title}
-                  nature_of_job={job.nature_of_job}
-                  industry={job.industry}
-                  salary={job.salary}
-                  job_location={job.job_location}
-                  duties_and_responsibilities={job.duties_and_responsibilities}
-                  key_requirements_skills_qualification={job.key_requirements_skills_qualification}
-                  how_to_apply={job.how_to_apply}
-                />
-              ))}
+            {/* Filter Section */}
+            <div className="mb-8">
+              <div className="flex justify-between items-center mb-4">
+                <div className="flex items-center gap-3">
+                  <Button
+                    onClick={() => setShowFilters(!showFilters)}
+                    variant="outline"
+                    className="flex items-center gap-2"
+                  >
+                    <Filter className="h-4 w-4" />
+                    {showFilters ? 'Hide Filters' : 'Show Filters'}
+                  </Button>
+                  {(selectedLocation || selectedIndustry || selectedJobType || searchTerm) && (
+                    <Button
+                      onClick={clearFilters}
+                      variant="ghost"
+                      className="flex items-center gap-2 text-gray-600"
+                    >
+                      <X className="h-4 w-4" />
+                      Clear All
+                    </Button>
+                  )}
+                </div>
+                <p className="text-gray-600">
+                  Showing <span className="font-semibold">{filteredJobs.length}</span> jobs
+                </p>
+              </div>
+
+              {/* Collapsible Filters */}
+              {showFilters && (
+                <div className="bg-gray-50 rounded-lg p-6 border border-gray-200 mb-6">
+                  <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-4">
+                    {/* Location Filter */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <MapPin className="h-4 w-4 inline mr-1" />
+                        Location
+                      </label>
+                      <select
+                        value={selectedLocation}
+                        onChange={(e) => setSelectedLocation(e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500"
+                      >
+                        <option value="">All Locations</option>
+                        {locations.map((location) => (
+                          <option key={location} value={location}>
+                            {location}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    {/* Industry Filter */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <Building2 className="h-4 w-4 inline mr-1" />
+                        Industry
+                      </label>
+                      <select
+                        value={selectedIndustry}
+                        onChange={(e) => setSelectedIndustry(e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500"
+                      >
+                        <option value="">All Industries</option>
+                        {industries.map((industry) => (
+                          <option key={industry} value={industry}>
+                            {industry}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    {/* Job Type Filter */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <Briefcase className="h-4 w-4 inline mr-1" />
+                        Job Type
+                      </label>
+                      <select
+                        value={selectedJobType}
+                        onChange={(e) => setSelectedJobType(e.target.value)}
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md focus:ring-green-500 focus:border-green-500"
+                      >
+                        <option value="">All Job Types</option>
+                        {jobTypes.map((type) => (
+                          <option key={type} value={type}>
+                            {type}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    {/* Search Filter */}
+                    <div>
+                      <label className="block text-sm font-medium text-gray-700 mb-2">
+                        <Search className="h-4 w-4 inline mr-1" />
+                        Keyword Search
+                      </label>
+                      <Input
+                        placeholder="Job title, location..."
+                        value={searchTerm}
+                        onChange={(e) => setSearchTerm(e.target.value)}
+                        className="w-full"
+                      />
+                    </div>
+                  </div>
+                </div>
+              )}
             </div>
 
-            <div className="text-center">
-              <Button className="bg-green-600 hover:bg-green-700 text-white px-8 py-3">
-                View All {jobsData.jobs.length}+ Jobs
-              </Button>
+            {/* Jobs Grid */}
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+              {filteredJobs.length > 0 ? (
+                filteredJobs.map((job) => (
+                  <JobCard
+                    key={job.id}
+                    id={job.id}
+                    date={job.date}
+                    job_title={job.job_title}
+                    nature_of_job={job.nature_of_job}
+                    industry={job.industry}
+                    salary={job.salary}
+                    job_location={job.job_location}
+                    duties_and_responsibilities={job.duties_and_responsibilities}
+                    key_requirements_skills_qualification={job.key_requirements_skills_qualification}
+                    how_to_apply={job.how_to_apply}
+                  />
+                ))
+              ) : (
+                <div className="col-span-full text-center py-12">
+                  <p className="text-gray-600 text-lg">
+                    No jobs found matching your filters. Try adjusting your search criteria.
+                  </p>
+                </div>
+              )}
             </div>
           </section>
 
@@ -252,7 +441,7 @@ export default function JobsPageClient() {
                 <div className="bg-green-600 w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4">
                   <Briefcase className="h-8 w-8 text-white" />
                 </div>
-                <h3 className="text-2xl font-bold text-green-600 mb-2">{jobsData.jobs.length}+</h3>
+                <h3 className="text-2xl font-bold text-green-600 mb-2">{localJobsData.total_jobs}+</h3>
                 <p className="text-gray-600">Active Job Listings</p>
               </div>
 

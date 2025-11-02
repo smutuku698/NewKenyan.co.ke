@@ -4,7 +4,7 @@ import { Clock, MapPin, DollarSign, Heart, Share2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import Link from 'next/link';
-import { generateJobSlug } from '@/lib/utils';
+import { slugify } from '@/lib/slugify';
 
 interface JobCardProps {
   id: number;
@@ -30,16 +30,10 @@ const JobCard = ({
   duties_and_responsibilities,
 }: JobCardProps) => {
   const handleApplyNow = () => {
-    const subject = encodeURIComponent(`Application for ${job_title} - ${job_location}`);
-    const body = encodeURIComponent(`Dear HR Team,
-
-I am writing to apply for the ${job_title} position at ${job_location}.
-
-Please find my CV attached.
-
-Best regards,`);
-    
-    window.location.href = `mailto:hr@newkenyan.com?subject=${subject}&body=${body}`;
+    // Redirect to original job listing on JobVacancy.co.ke
+    const jobSlug = slugify(job_title);
+    const jobVacancyUrl = `https://jobvacancy.co.ke/jobs-in-kenya/${jobSlug}`;
+    window.open(jobVacancyUrl, '_blank');
   };
 
   const getShortDescription = (text: string) => {
@@ -105,7 +99,7 @@ Best regards,`);
 
       {/* Actions */}
       <div className="flex gap-2">
-        <Link href={`/jobs-in-kenya/${generateJobSlug(job_title, 'NewKenyan', job_location)}`} className="flex-1">
+        <Link href={`/jobs-in-kenya/${slugify(job_title)}`} className="flex-1">
           <Button variant="outline" className="w-full border-gray-300 hover:bg-gray-100 text-sm min-w-0">
             <span className="truncate">Learn More</span>
           </Button>
