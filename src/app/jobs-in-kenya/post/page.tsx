@@ -1,5 +1,8 @@
 'use client';
 
+//Don't pre-render this page at build time (requires auth)
+export const dynamic = 'force-dynamic';
+
 import { useState, useEffect, Suspense } from 'react';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';

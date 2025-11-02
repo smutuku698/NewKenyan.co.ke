@@ -1,7 +1,7 @@
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { createClient } from '@/lib/supabase/server';
+import { supabase } from '@/lib/supabase';
 import PropertyCard from '@/components/PropertyCard';
 import LocationDirectory from '@/components/LocationDirectory';
 import { generateCityOverview, generateLocationFAQ, generateLocationSchema } from '@/lib/pillar-content';
@@ -21,8 +21,6 @@ export async function generateStaticParams() {
 
 // Fetch property stats for a city
 async function getCityStats(cityName: string) {
-  const supabase = await createClient();
-
   // Get total count
   const { count: totalProperties } = await supabase
     .from('property_listings')

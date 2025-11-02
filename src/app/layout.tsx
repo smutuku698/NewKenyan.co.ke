@@ -86,7 +86,10 @@ export default function RootLayout({
 }>) {
   const publishableKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
 
-  // Make Clerk optional - if no key provided, run without authentication
+  // Check if key is valid (not placeholder)
+  const isValidKey = publishableKey && !publishableKey.includes('placeholder');
+
+  // Make Clerk optional - if no valid key provided, run without authentication
   const content = (
       <html lang="en">
         <head>
@@ -369,8 +372,8 @@ export default function RootLayout({
       </html>
   );
 
-  return publishableKey ? (
-    <ClerkProvider publishableKey={publishableKey}>
+  return isValidKey ? (
+    <ClerkProvider publishableKey={publishableKey!}>
       {content}
     </ClerkProvider>
   ) : content;

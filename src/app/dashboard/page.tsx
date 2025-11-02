@@ -3,6 +3,9 @@
 import { useState, useEffect } from 'react';
 import { useUser } from '@clerk/nextjs';
 import { supabase } from '@/lib/supabase';
+
+// Don't pre-render this page at build time (requires auth)
+export const dynamic = 'force-dynamic';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { 

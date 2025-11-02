@@ -34,7 +34,9 @@
       "Bash(done)",
       "Bash(cat:*)",
       "Bash(git fetch:*)",
-      "Bash(npx rg:*)"
+      "Bash(npx rg:*)",
+      "Bash(while read f)",
+      "Bash(do grep -l \"useUser\\|useAuth\\|@clerk\" $f)"
     ],
     "deny": [],
     "ask": []

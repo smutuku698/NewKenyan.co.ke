@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { SignInButton, SignedIn, SignedOut, UserButton } from '@clerk/nextjs';
+import { ClerkSignInButton as SignInButton, ClerkSignedIn as SignedIn, ClerkSignedOut as SignedOut, ClerkUserButton as UserButton } from './ClerkWrapper';
 import { Menu, X, Search, MapPin, ChevronDown, Building, Home, Briefcase, Heart, Globe, Settings } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
