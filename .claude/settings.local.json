@@ -32,7 +32,9 @@
       "Bash(for dir in houses-for-rent apartments-for-sale apartments-for-rent)",
       "Bash(do cp src/app/houses-for-sale/[location]/page.tsx src/app/$dir/[location]/page.tsx.backup)",
       "Bash(done)",
-      "Bash(cat:*)"
+      "Bash(cat:*)",
+      "Bash(git fetch:*)",
+      "Bash(npx rg:*)"
     ],
     "deny": [],
     "ask": []

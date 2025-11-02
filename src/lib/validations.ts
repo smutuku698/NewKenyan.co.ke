@@ -227,10 +227,16 @@ export const propertyListingSchema = z.object({
   
   isFurnished: z.boolean()
     .default(false),
-  
+
   petsAllowed: z.boolean()
     .default(false),
-  
+
+  rating: z.number()
+    .int('Rating must be a whole number')
+    .min(1, 'Please rate your property (1-5 stars)')
+    .max(5, 'Rating cannot exceed 5 stars')
+    .default(0),
+
   amenities: z.array(z.string())
     .default([]),
 
