@@ -8,6 +8,21 @@ import type { NextRequest } from 'next/server';
 export default function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
+  // Redirect old domain content (sports, news, etc.) to jobs page with 301
+  const oldContentPatterns = [
+    /asian-champions-league/i,
+    /football/i,
+    /cricket/i,
+    /rugby/i,
+    /athletics/i,
+    /al-hilal/i,
+    /kbc/i, // old news patterns
+  ];
+
+  if (oldContentPatterns.some(pattern => pattern.test(pathname))) {
+    return NextResponse.redirect(new URL('/jobs-in-kenya', request.url), 301);
+  }
+
   // Handle hierarchical property type URLs BEFORE Clerk
   // Pattern: /nairobi/westlands/apartments-for-rent → /apartments-for-rent/westlands-nairobi
   const hierarchicalPattern = /^\/(nairobi|mombasa)\/([a-z-]+)\/(houses-for-sale|houses-for-rent|apartments-for-sale|apartments-for-rent)\/?$/i;
