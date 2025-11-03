@@ -8,6 +8,7 @@ import InternalLinks from '@/components/InternalLinks';
 import PropertyTypeSwitcher from '@/components/PropertyTypeSwitcher';
 import CountyCrossLinks from '@/components/CountyCrossLinks';
 import RelatedLocations from '@/components/RelatedLocations';
+import CityPillarContentComponent from '@/components/CityPillarContent';
 import { supabase } from '@/lib/supabase';
 import { Location, PropertyStats } from '@/lib/location-seo';
 import {
@@ -18,6 +19,7 @@ import {
   generateAboutContent,
   formatPrice
 } from '@/lib/property-page-generator';
+import { getCityPillarContent, hasPillarContent } from '@/lib/city-pillar-content';
 
 interface PropertyListing {
   id: string;
@@ -215,6 +217,9 @@ export default async function HousesForSalePage({ params }: PageProps) {
   const breadcrumbItems = generatePropertyBreadcrumbs(location, 'houses', 'sale');
   const aboutContent = generateAboutContent(location, 'houses', 'sale', stats);
 
+  // Check for comprehensive pillar content (Nairobi & Mombasa)
+  const cityPillarContent = hasPillarContent(location) ? getCityPillarContent(location.name) : null;
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />
@@ -296,44 +301,51 @@ export default async function HousesForSalePage({ params }: PageProps) {
           </div>
         )}
 
-        {/* About Location */}
-        <div className="bg-white p-8 rounded-lg shadow-sm mb-8">
-          <h2 className="text-2xl font-bold mb-4">{aboutContent.title}</h2>
-          <div className="prose max-w-none text-gray-600">
-            {aboutContent.paragraphs.map((paragraph, index) => (
-              <p key={index} className="mb-4">{paragraph}</p>
-            ))}
-
-            {aboutContent.features.length > 0 && (
-              <>
-                <h3 className="text-lg font-semibold mt-6 mb-3">
-                  Why Buy a House in {location.name}?
-                </h3>
-                <ul className="list-disc pl-6 space-y-2">
-                  {aboutContent.features.map((feature, index) => (
-                    <li key={index}>{feature}</li>
-                  ))}
-                </ul>
-              </>
-            )}
-
-            {stats.popularAmenities.length > 0 && (
-              <>
-                <h3 className="text-lg font-semibold mt-6 mb-3">Popular Features</h3>
-                <div className="flex flex-wrap gap-2 mt-3">
-                  {stats.popularAmenities.map((amenity) => (
-                    <span
-                      key={amenity}
-                      className="px-3 py-1 bg-green-50 text-green-700 rounded-full text-sm"
-                    >
-                      {amenity}
-                    </span>
-                  ))}
-                </div>
-              </>
-            )}
+        {/* Comprehensive Pillar Content for Major Cities */}
+        {cityPillarContent ? (
+          <div className="mb-12">
+            <CityPillarContentComponent content={cityPillarContent} />
           </div>
-        </div>
+        ) : (
+          /* Basic About Location for other areas */
+          <div className="bg-white p-8 rounded-lg shadow-sm mb-8">
+            <h2 className="text-2xl font-bold mb-4">{aboutContent.title}</h2>
+            <div className="prose max-w-none text-gray-600">
+              {aboutContent.paragraphs.map((paragraph, index) => (
+                <p key={index} className="mb-4">{paragraph}</p>
+              ))}
+
+              {aboutContent.features.length > 0 && (
+                <>
+                  <h3 className="text-lg font-semibold mt-6 mb-3">
+                    Why Buy a House in {location.name}?
+                  </h3>
+                  <ul className="list-disc pl-6 space-y-2">
+                    {aboutContent.features.map((feature, index) => (
+                      <li key={index}>{feature}</li>
+                    ))}
+                  </ul>
+                </>
+              )}
+
+              {stats.popularAmenities.length > 0 && (
+                <>
+                  <h3 className="text-lg font-semibold mt-6 mb-3">Popular Features</h3>
+                  <div className="flex flex-wrap gap-2 mt-3">
+                    {stats.popularAmenities.map((amenity) => (
+                      <span
+                        key={amenity}
+                        className="px-3 py-1 bg-green-50 text-green-700 rounded-full text-sm"
+                      >
+                        {amenity}
+                      </span>
+                    ))}
+                  </div>
+                </>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* Related Locations */}
         <RelatedLocations
