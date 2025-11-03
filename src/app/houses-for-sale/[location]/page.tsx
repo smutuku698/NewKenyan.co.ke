@@ -9,6 +9,7 @@ import PropertyTypeSwitcher from '@/components/PropertyTypeSwitcher';
 import CountyCrossLinks from '@/components/CountyCrossLinks';
 import RelatedLocations from '@/components/RelatedLocations';
 import CityPillarContentComponent from '@/components/CityPillarContent';
+import CountyPillarContentComponent from '@/components/CountyPillarContent';
 import { supabase } from '@/lib/supabase';
 import { Location, PropertyStats } from '@/lib/location-seo';
 import {
@@ -20,6 +21,7 @@ import {
   formatPrice
 } from '@/lib/property-page-generator';
 import { getCityPillarContent, hasPillarContent } from '@/lib/city-pillar-content';
+import { getCountyContent, hasCountyContent } from '@/lib/county-content';
 
 interface PropertyListing {
   id: string;
@@ -217,8 +219,9 @@ export default async function HousesForSalePage({ params }: PageProps) {
   const breadcrumbItems = generatePropertyBreadcrumbs(location, 'houses', 'sale');
   const aboutContent = generateAboutContent(location, 'houses', 'sale', stats);
 
-  // Check for comprehensive pillar content (Nairobi & Mombasa)
+  // Check for comprehensive pillar content (Cities & Counties)
   const cityPillarContent = hasPillarContent(location) ? getCityPillarContent(location.name) : null;
+  const countyPillarContent = !cityPillarContent && hasCountyContent(location.name) ? getCountyContent(location.name) : null;
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -301,13 +304,19 @@ export default async function HousesForSalePage({ params }: PageProps) {
           </div>
         )}
 
-        {/* Comprehensive Pillar Content for Major Cities */}
+        {/* Comprehensive Pillar Content for Cities & Counties */}
         {cityPillarContent ? (
+          /* Major city content (Nairobi, Mombasa) */
           <div className="mb-12">
             <CityPillarContentComponent content={cityPillarContent} />
           </div>
+        ) : countyPillarContent ? (
+          /* County-level content for other counties */
+          <div className="mb-12">
+            <CountyPillarContentComponent content={countyPillarContent} />
+          </div>
         ) : (
-          /* Basic About Location for other areas */
+          /* Basic About Location for neighborhoods and estates */
           <div className="bg-white p-8 rounded-lg shadow-sm mb-8">
             <h2 className="text-2xl font-bold mb-4">{aboutContent.title}</h2>
             <div className="prose max-w-none text-gray-600">
