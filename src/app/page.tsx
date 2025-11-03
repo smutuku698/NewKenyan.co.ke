@@ -372,45 +372,45 @@ export default function HomePage() {
       </div>
       
       <main>
-        {/* Hero Section - Professional Redesign */}
-        <section className="relative text-white py-12" style={{ backgroundColor: '#076146' }}>
+        {/* Hero Section - Compact Professional Design */}
+        <section className="relative text-white py-6 md:py-8" style={{ backgroundColor: '#076146' }}>
           <div className="container mx-auto px-4">
-            {/* Title */}
-            <div className="text-center mb-8">
-              <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold mb-3 text-white">
+            {/* Title - More Compact */}
+            <div className="text-center mb-4 md:mb-6">
+              <h1 className="text-2xl md:text-3xl lg:text-4xl font-bold mb-2 text-white">
                 Find Jobs, Businesses & Properties in Kenya
               </h1>
-              <p className="text-green-50 text-base md:text-lg max-w-2xl mx-auto">
+              <p className="text-green-50 text-sm md:text-base max-w-2xl mx-auto">
                 Your trusted marketplace for real estate, job opportunities, and business listings across Kenya
               </p>
             </div>
 
-            {/* Professional Search Bar */}
-            <div className="max-w-4xl mx-auto mb-8">
-              <div className="bg-white rounded-2xl shadow-2xl p-6">
-                <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+            {/* Professional Search Bar - Compact */}
+            <div className="max-w-4xl mx-auto mb-4 md:mb-6">
+              <div className="bg-white rounded-xl shadow-2xl p-4 md:p-5">
+                <div className="grid grid-cols-1 md:grid-cols-4 gap-3">
                   {/* Search Input */}
                   <div className="md:col-span-2">
-                    <label className="block text-sm font-medium text-gray-700 mb-2">
+                    <label className="block text-xs font-medium text-gray-700 mb-1.5">
                       Search Properties, Jobs, or Businesses
                     </label>
                     <input
                       type="text"
                       placeholder="e.g., 3 bedroom house, marketing job..."
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-gray-900 placeholder-gray-400"
+                      className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-gray-900 placeholder-gray-400 text-sm"
                     />
                   </div>
 
                   {/* Location */}
                   <div>
-                    <label htmlFor="hero-location" className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="hero-location" className="block text-xs font-medium text-gray-700 mb-1.5">
                       Location
                     </label>
                     <select
                       id="hero-location"
                       name="location"
                       aria-label="Select location"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-gray-900"
+                      className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-gray-900 text-sm"
                     >
                       <option value="">All Locations</option>
                       <option value="nairobi">Nairobi</option>
@@ -423,14 +423,14 @@ export default function HomePage() {
 
                   {/* Category */}
                   <div>
-                    <label htmlFor="hero-category" className="block text-sm font-medium text-gray-700 mb-2">
+                    <label htmlFor="hero-category" className="block text-xs font-medium text-gray-700 mb-1.5">
                       Category
                     </label>
                     <select
                       id="hero-category"
                       name="category"
                       aria-label="Select category"
-                      className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-gray-900"
+                      className="w-full px-3 py-2.5 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent text-gray-900 text-sm"
                     >
                       <option value="">All Categories</option>
                       <option value="properties">Properties</option>
@@ -440,43 +440,43 @@ export default function HomePage() {
                   </div>
                 </div>
 
-                {/* Search Button */}
-                <Button className="w-full mt-4 bg-green-700 hover:bg-green-800 text-white py-3 text-lg font-semibold rounded-lg shadow-lg">
+                {/* Search Button - Compact */}
+                <Button className="w-full mt-3 bg-green-700 hover:bg-green-800 text-white py-2.5 text-base font-semibold rounded-lg shadow-lg">
                   Search Now
                 </Button>
               </div>
             </div>
 
-            {/* Quick Access Icons - Clickable Stats */}
-            <div className="grid grid-cols-3 gap-4 md:gap-8 max-w-2xl mx-auto">
+            {/* Quick Access Icons - More Compact */}
+            <div className="grid grid-cols-3 gap-3 md:gap-6 max-w-xl mx-auto pb-2">
               <Link href="/business-directory" className="text-center group cursor-pointer transition-transform hover:scale-105">
-                <div className="flex items-center justify-center w-14 h-14 md:w-16 md:h-16 bg-white/20 backdrop-blur-sm rounded-2xl mx-auto mb-2 group-hover:bg-white/30 transition-all shadow-lg">
-                  <Users className="h-7 w-7 md:h-8 md:w-8 text-white" />
+                <div className="flex items-center justify-center w-12 h-12 md:w-14 md:h-14 bg-white/20 backdrop-blur-sm rounded-xl mx-auto mb-1.5 group-hover:bg-white/30 transition-all shadow-lg">
+                  <Users className="h-6 w-6 md:h-7 md:w-7 text-white" />
                 </div>
-                <div className="text-xl md:text-2xl font-bold text-white mb-1">
+                <div className="text-lg md:text-xl font-bold text-white mb-0.5">
                   {heroStats.businesses.toLocaleString()}+
                 </div>
-                <div className="text-green-50 text-xs md:text-sm group-hover:underline">Businesses</div>
+                <div className="text-green-50 text-xs group-hover:underline">Businesses</div>
               </Link>
 
               <Link href="/jobs-in-kenya" className="text-center group cursor-pointer transition-transform hover:scale-105">
-                <div className="flex items-center justify-center w-14 h-14 md:w-16 md:h-16 bg-white/20 backdrop-blur-sm rounded-2xl mx-auto mb-2 group-hover:bg-white/30 transition-all shadow-lg">
-                  <Briefcase className="h-7 w-7 md:h-8 md:w-8 text-white" />
+                <div className="flex items-center justify-center w-12 h-12 md:w-14 md:h-14 bg-white/20 backdrop-blur-sm rounded-xl mx-auto mb-1.5 group-hover:bg-white/30 transition-all shadow-lg">
+                  <Briefcase className="h-6 w-6 md:h-7 md:w-7 text-white" />
                 </div>
-                <div className="text-xl md:text-2xl font-bold text-white mb-1">
+                <div className="text-lg md:text-xl font-bold text-white mb-0.5">
                   {heroStats.jobs.toLocaleString()}+
                 </div>
-                <div className="text-green-50 text-xs md:text-sm group-hover:underline">Jobs</div>
+                <div className="text-green-50 text-xs group-hover:underline">Jobs</div>
               </Link>
 
               <Link href="/properties" className="text-center group cursor-pointer transition-transform hover:scale-105">
-                <div className="flex items-center justify-center w-14 h-14 md:w-16 md:h-16 bg-white/20 backdrop-blur-sm rounded-2xl mx-auto mb-2 group-hover:bg-white/30 transition-all shadow-lg">
-                  <Home className="h-7 w-7 md:h-8 md:w-8 text-white" />
+                <div className="flex items-center justify-center w-12 h-12 md:w-14 md:h-14 bg-white/20 backdrop-blur-sm rounded-xl mx-auto mb-1.5 group-hover:bg-white/30 transition-all shadow-lg">
+                  <Home className="h-6 w-6 md:h-7 md:w-7 text-white" />
                 </div>
-                <div className="text-xl md:text-2xl font-bold text-white mb-1">
+                <div className="text-lg md:text-xl font-bold text-white mb-0.5">
                   {heroStats.properties.toLocaleString()}+
                 </div>
-                <div className="text-green-50 text-xs md:text-sm group-hover:underline">Properties</div>
+                <div className="text-green-50 text-xs group-hover:underline">Properties</div>
               </Link>
             </div>
           </div>
