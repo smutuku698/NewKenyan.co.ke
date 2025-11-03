@@ -42,7 +42,11 @@
       "Bash(then basename \"$file\" fi done)",
       "Bash(psql:*)",
       "Bash(npm uninstall:*)",
-      "Bash(dir:*)"
+      "Bash(dir:*)",
+      "Bash(findstr:*)",
+      "Bash(for dir in apartments-for-sale apartments-for-rent houses-for-rent)",
+      "Bash(do cp houses-for-sale/[location]/page.tsx \"$dir/[location]/page.tsx.new\")",
+      "Bash(git reset:*)"
     ],
     "deny": [],
     "ask": []
