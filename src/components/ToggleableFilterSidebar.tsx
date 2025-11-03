@@ -40,7 +40,7 @@ export default function ToggleableFilterSidebar(props: ToggleableFilterSidebarPr
 
   return (
     <>
-      {/* Filter Toggle Button - Fixed position */}
+      {/* Filter Toggle Button - Fixed position for mobile */}
       <div className="fixed bottom-20 right-4 z-40 lg:hidden">
         <Button
           onClick={() => setIsOpen(true)}
@@ -73,46 +73,42 @@ export default function ToggleableFilterSidebar(props: ToggleableFilterSidebarPr
         </Button>
       </div>
 
-      {/* Mobile Overlay */}
+      {/* Overlay for both mobile and desktop */}
       {isOpen && (
         <div
-          className="fixed inset-0 bg-black bg-opacity-50 z-50 lg:hidden"
+          className="fixed inset-0 bg-black bg-opacity-50 z-40"
           onClick={() => setIsOpen(false)}
         />
       )}
 
-      {/* Filter Sidebar - Slide in from right on mobile, toggle on desktop */}
-      <div
-        className={`
-          fixed lg:static inset-y-0 right-0 z-50
-          transform transition-transform duration-300 ease-in-out
-          w-full sm:w-96 lg:w-full
-          ${isOpen ? 'translate-x-0' : 'translate-x-full lg:translate-x-0'}
-          ${!isOpen && 'lg:hidden'}
-        `}
-      >
-        {/* Mobile Close Button */}
-        <div className="lg:hidden absolute top-4 left-4 z-10">
-          <Button
-            onClick={() => setIsOpen(false)}
-            variant="ghost"
-            size="icon"
-            className="bg-white rounded-full shadow-lg"
-            aria-label="Close filters"
-          >
-            <X className="h-6 w-6" />
-          </Button>
-        </div>
+      {/* Filter Sidebar - Slide in from right on mobile, overlay on desktop */}
+      {isOpen && (
+        <div
+          className="fixed inset-y-0 right-0 lg:left-0 lg:right-auto z-50 transform transition-transform duration-300 ease-in-out w-full sm:w-96 lg:w-80 xl:w-96"
+        >
+          {/* Close Button - visible on both mobile and desktop */}
+          <div className="absolute top-4 right-4 lg:left-4 lg:right-auto z-10">
+            <Button
+              onClick={() => setIsOpen(false)}
+              variant="ghost"
+              size="icon"
+              className="bg-white rounded-full shadow-lg hover:bg-gray-100"
+              aria-label="Close filters"
+            >
+              <X className="h-6 w-6" />
+            </Button>
+          </div>
 
-        {/* Filter Content */}
-        <div className="h-full overflow-hidden bg-white lg:bg-transparent">
-          <PropertyFilterSidebar
-            {...props}
-            onFilterChange={handleFilterChange}
-            className="h-full"
-          />
+          {/* Filter Content */}
+          <div className="h-full overflow-hidden bg-white shadow-2xl">
+            <PropertyFilterSidebar
+              {...props}
+              onFilterChange={handleFilterChange}
+              className="h-full"
+            />
+          </div>
         </div>
-      </div>
+      )}
     </>
   );
 }

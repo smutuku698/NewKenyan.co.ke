@@ -502,24 +502,20 @@ export default function HomePage() {
                 </Button>
               </div>
 
-              {/* Toggleable Filter Sidebar */}
-              <div className="grid grid-cols-1 lg:grid-cols-5 gap-6">
-                <div className="lg:col-span-1">
-                  <ToggleableFilterSidebar
-                    onFilterChange={handleFilterChange}
-                    availableCounties={KENYA_COUNTIES.map(c => c.name).sort()}
-                    availableCities={availableLocations.length > 0 ? availableLocations : Array.from(new Set(allProperties.map(p => p.city))).sort()}
-                    availableAmenities={Array.from(new Set(allProperties.flatMap(p => p.amenities || []))).sort()}
-                    availableConstructionStatus={Array.from(new Set(allProperties.map(p => p.construction_progress).filter(Boolean) as string[])).sort()}
-                    availableNearbyFeatures={Array.from(new Set(allProperties.flatMap(p => p.nearby_features || []))).sort()}
-                    availableExternalFeatures={Array.from(new Set(allProperties.flatMap(p => p.external_features || []))).sort()}
-                    availableInternalFeatures={Array.from(new Set(allProperties.flatMap(p => p.internal_features || []))).sort()}
-                  />
-                </div>
+              {/* Toggleable Filter Sidebar - Now overlays on top */}
+              <ToggleableFilterSidebar
+                onFilterChange={handleFilterChange}
+                availableCounties={KENYA_COUNTIES.map(c => c.name).sort()}
+                availableCities={availableLocations.length > 0 ? availableLocations : Array.from(new Set(allProperties.map(p => p.city))).sort()}
+                availableAmenities={Array.from(new Set(allProperties.flatMap(p => p.amenities || []))).sort()}
+                availableConstructionStatus={Array.from(new Set(allProperties.map(p => p.construction_progress).filter(Boolean) as string[])).sort()}
+                availableNearbyFeatures={Array.from(new Set(allProperties.flatMap(p => p.nearby_features || []))).sort()}
+                availableExternalFeatures={Array.from(new Set(allProperties.flatMap(p => p.external_features || []))).sort()}
+                availableInternalFeatures={Array.from(new Set(allProperties.flatMap(p => p.internal_features || []))).sort()}
+              />
 
-                {/* Properties Grid - 4 columns on desktop */}
-                <div className="lg:col-span-4">
-                  <div className="grid gap-4 sm:gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {/* Properties Grid - Full width with 4 columns on desktop */}
+              <div className="grid gap-4 sm:gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                 {loading && properties.length === 0 ? (
                   <GridLoadingSkeleton type="property" count={12} />
                 ) : properties.length > 0 ? (
@@ -592,25 +588,23 @@ export default function HomePage() {
                     No properties available at the moment. Check back soon!
                   </div>
                 )}
-                  </div>
-
-                  {/* Loading More Indicator */}
-                  {loadingMore && (
-                    <div className="mt-8">
-                      <GridLoadingSkeleton type="property" count={4} />
-                    </div>
-                  )}
-
-                  {/* End of Properties Message */}
-                  {!hasMoreProperties && properties.length > 0 && (
-                    <div className="text-center mt-12 py-6 border-t border-gray-200">
-                      <p className="text-gray-600 font-medium">
-                        You've reached the end of properties. Browse businesses and jobs below!
-                      </p>
-                    </div>
-                  )}
-                </div>
               </div>
+
+              {/* Loading More Indicator */}
+              {loadingMore && (
+                <div className="mt-8">
+                  <GridLoadingSkeleton type="property" count={4} />
+                </div>
+              )}
+
+              {/* End of Properties Message */}
+              {!hasMoreProperties && properties.length > 0 && (
+                <div className="text-center mt-12 py-6 border-t border-gray-200">
+                  <p className="text-gray-600 font-medium">
+                    You've reached the end of properties. Browse businesses and jobs below!
+                  </p>
+                </div>
+              )}
             </div>
 
             {/* Top Businesses - Only show when all properties are loaded */}
