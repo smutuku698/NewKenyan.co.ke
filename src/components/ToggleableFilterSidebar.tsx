@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, forwardRef, useImperativeHandle } from 'react';
 import { Filter, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import PropertyFilterSidebar from './PropertyFilterSidebar';
@@ -20,9 +20,17 @@ interface ToggleableFilterSidebarProps {
   availableInternalFeatures?: string[];
 }
 
-export default function ToggleableFilterSidebar(props: ToggleableFilterSidebarProps) {
+export interface ToggleableFilterSidebarRef {
+  openFilter: () => void;
+}
+
+const ToggleableFilterSidebar = forwardRef<ToggleableFilterSidebarRef, ToggleableFilterSidebarProps>((props, ref) => {
   const [isOpen, setIsOpen] = useState(false);
   const [activeFilters, setActiveFilters] = useState(0);
+
+  useImperativeHandle(ref, () => ({
+    openFilter: () => setIsOpen(true)
+  }));
 
   const handleFilterChange = (filters: FilterState) => {
     // Count active filters
@@ -40,39 +48,6 @@ export default function ToggleableFilterSidebar(props: ToggleableFilterSidebarPr
 
   return (
     <>
-      {/* Filter Toggle Button - Fixed position for mobile */}
-      <div className="fixed bottom-20 right-4 z-40 lg:hidden">
-        <Button
-          onClick={() => setIsOpen(true)}
-          className="bg-green-700 hover:bg-green-800 text-white rounded-full shadow-2xl w-14 h-14 flex items-center justify-center relative"
-          aria-label="Open filters"
-        >
-          <Filter className="h-6 w-6" />
-          {activeFilters > 0 && (
-            <span className="absolute -top-2 -right-2 bg-red-600 text-white text-xs font-bold rounded-full w-6 h-6 flex items-center justify-center">
-              {activeFilters}
-            </span>
-          )}
-        </Button>
-      </div>
-
-      {/* Desktop Filter Toggle Button */}
-      <div className="hidden lg:block mb-6">
-        <Button
-          onClick={() => setIsOpen(!isOpen)}
-          variant="outline"
-          className="w-full border-2 border-green-600 hover:bg-green-50 text-green-700 font-semibold"
-        >
-          <Filter className="h-4 w-4 mr-2" />
-          {isOpen ? 'Hide' : 'Show'} Filters
-          {activeFilters > 0 && (
-            <span className="ml-2 bg-green-700 text-white text-xs font-bold px-2 py-0.5 rounded-full">
-              {activeFilters}
-            </span>
-          )}
-        </Button>
-      </div>
-
       {/* Overlay for both mobile and desktop */}
       {isOpen && (
         <div
@@ -111,4 +86,8 @@ export default function ToggleableFilterSidebar(props: ToggleableFilterSidebarPr
       )}
     </>
   );
-}
+});
+
+ToggleableFilterSidebar.displayName = 'ToggleableFilterSidebar';
+
+export default ToggleableFilterSidebar;

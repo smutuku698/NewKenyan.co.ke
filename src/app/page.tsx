@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import Header from '@/components/Header';
@@ -9,19 +9,19 @@ import JobCard from '@/components/JobCard';
 import BusinessCard from '@/components/BusinessCard';
 import PropertyCard from '@/components/PropertyCard';
 import BlogCard from '@/components/BlogCard';
-import ToggleableFilterSidebar from '@/components/ToggleableFilterSidebar';
+import ToggleableFilterSidebar, { ToggleableFilterSidebarRef } from '@/components/ToggleableFilterSidebar';
 import { KENYA_COUNTIES } from '@/components/CountyCrossLinks';
 import { FilterState } from '@/components/PropertyFilterSidebar';
 import { GridLoadingSkeleton } from '@/components/LoadingSkeleton';
 import { LazySection } from '@/components/LazySection';
 import WhatsAppButton from '@/components/WhatsAppButton';
-import { 
-  sampleBusinesses, 
-  sampleBlogPosts, 
-  heroStats 
+import {
+  sampleBusinesses,
+  sampleBlogPosts,
+  heroStats
 } from '@/data/sampleData';
 import { supabase } from '@/lib/supabase';
-import { Users, Briefcase, Home, ArrowRight, Building2, BookOpen, ChevronDown } from 'lucide-react';
+import { Users, Briefcase, Home, ArrowRight, Building2, BookOpen, ChevronDown, Filter } from 'lucide-react';
 
 interface BusinessListing {
   id: string;
@@ -86,6 +86,7 @@ interface JobListing {
 }
 
 export default function HomePage() {
+  const filterRef = useRef<ToggleableFilterSidebarRef>(null);
   const [openFAQ, setOpenFAQ] = useState<number | null>(null);
   const [featuredBusinesses, setFeaturedBusinesses] = useState<BusinessListing[]>([]);
   const [properties, setProperties] = useState<PropertyListing[]>([]);
@@ -494,16 +495,30 @@ export default function HomePage() {
                   </div>
                   <h2 className="section-title">Properties for Sale & Rent in Kenya</h2>
                 </div>
-                <Button variant="outline" className="border-2 border-gray-300 hover:bg-gray-100" asChild>
-                  <Link href="/properties" className="flex items-center">
-                    View All
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </Link>
-                </Button>
+                <div className="flex items-center gap-3">
+                  {/* Filter Button */}
+                  <Button
+                    onClick={() => filterRef.current?.openFilter()}
+                    variant="outline"
+                    className="border-2 border-green-600 hover:bg-green-50 text-green-700 font-semibold"
+                  >
+                    <div className="flex items-center justify-center w-5 h-5 bg-green-600 rounded mr-2">
+                      <Filter className="h-3 w-3 text-white" />
+                    </div>
+                    Filter
+                  </Button>
+                  <Button variant="outline" className="border-2 border-gray-300 hover:bg-gray-100" asChild>
+                    <Link href="/properties" className="flex items-center">
+                      View All
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </Link>
+                  </Button>
+                </div>
               </div>
 
               {/* Toggleable Filter Sidebar - Now overlays on top */}
               <ToggleableFilterSidebar
+                ref={filterRef}
                 onFilterChange={handleFilterChange}
                 availableCounties={KENYA_COUNTIES.map(c => c.name).sort()}
                 availableCities={availableLocations.length > 0 ? availableLocations : Array.from(new Set(allProperties.map(p => p.city))).sort()}
