@@ -1,16 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import { auth } from '@clerk/nextjs/server';
+import { createClient as createServerClient } from '@/lib/supabase-server';
 
 export async function POST(request: NextRequest) {
   try {
     console.log('🔥 Property approval API called');
-    
+
     // Check if user is authenticated
-    const authResult = await auth();
-    const { userId } = authResult;
+    const supabase = await createServerClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    const userId = user?.id;
     console.log('👤 User ID:', userId);
-    
+
     if (!userId) {
       console.log('❌ No user ID - unauthorized');
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
@@ -19,7 +20,7 @@ export async function POST(request: NextRequest) {
     // Check if user is admin (temporarily allowing all authenticated users for testing)
     const isAdmin = true; // Change this in production
     console.log('👑 Admin check:', isAdmin);
-    
+
     if (!isAdmin) {
       return NextResponse.json({ error: 'Admin access required' }, { status: 403 });
     }

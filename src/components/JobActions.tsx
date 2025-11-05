@@ -46,9 +46,9 @@ Best regards,`);
   if (showInlineButton) {
     return (
       <div className="pt-6 border-t border-green-200">
-        <Button 
+        <Button
           onClick={handleApplyNow}
-          className="bg-green-600 hover:bg-green-700 text-white px-8 py-4 text-lg font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all"
+          className="bg-green-700 hover:bg-green-800 text-white px-8 py-4 text-lg font-semibold rounded-lg shadow-lg hover:shadow-xl transition-all"
         >
           Apply Now via Email
         </Button>
@@ -62,9 +62,9 @@ Best regards,`);
       <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
         <h3 className="text-xl font-bold text-gray-900 mb-4">Apply for this Job</h3>
         <p className="text-gray-600 mb-6">Ready to take the next step in your career in Kenya?</p>
-        <Button 
+        <Button
           onClick={handleApplyNow}
-          className="w-full bg-green-600 hover:bg-green-700 text-white py-3 font-semibold rounded-lg"
+          className="w-full bg-green-700 hover:bg-green-800 text-white py-3 font-semibold rounded-lg"
         >
           Apply Now
         </Button>

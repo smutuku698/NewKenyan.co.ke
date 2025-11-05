@@ -1,15 +1,17 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useUser, SignInButton } from '@clerk/nextjs';
+import { useAuth } from '@/components/AuthProvider';
+import { SignInButton } from '@/components/SupabaseAuthWrapper';
 import { useRouter } from 'next/navigation';
 import { propertyListingSchema, type PropertyListingInput } from '@/lib/validations';
 import { supabase } from '@/lib/supabase';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
-import { Upload, MapPin, Phone, Mail, MessageCircle, Bed, Bath, Square, Calendar, CheckCircle, ArrowRight, Shield, UserPlus, Home, Users, CreditCard, Car, Building } from 'lucide-react';
+import { Upload, MapPin, Phone, Mail, MessageCircle, Bed, Bath, Square, Calendar, CheckCircle, ArrowRight, Shield, UserPlus, Home, Users, CreditCard, Car, Building, Clock, DollarSign, MapPinned, Layers, Star } from 'lucide-react';
+import { CONSTRUCTION_STATUS, NEARBY_FEATURES, EXTERNAL_FEATURES, INTERNAL_FEATURES, AMENITIES } from '@/constants/propertyFeatures';
 import PaymentModal from '@/components/PaymentModal';
 
 const PROPERTY_TYPES = [
@@ -26,38 +28,36 @@ const PROPERTY_TYPES = [
   'Other'
 ];
 
-const COMMON_AMENITIES = [
-  'parking',
-  'security',
-  'gym',
-  'pool',
-  'garden',
-  'balcony',
-  'elevator',
-  'backup generator',
-  'wifi',
-  'furnished',
-  'air conditioning',
-  'heating',
-  'laundry',
-  'storage',
-  'rooftop terrace',
-  'servant quarter',
-  'clubhouse',
-  'playground'
+const KENYAN_COUNTIES = [
+  'Baringo', 'Bomet', 'Bungoma', 'Busia', 'Elgeyo-Marakwet', 'Embu', 'Garissa',
+  'Homa Bay', 'Isiolo', 'Kajiado', 'Kakamega', 'Kericho', 'Kiambu', 'Kilifi',
+  'Kirinyaga', 'Kisii', 'Kisumu', 'Kitui', 'Kwale', 'Laikipia', 'Lamu', 'Machakos',
+  'Makueni', 'Mandera', 'Marsabit', 'Meru', 'Migori', 'Mombasa', 'Murang\'a',
+  'Nairobi', 'Nakuru', 'Nandi', 'Narok', 'Nyamira', 'Nyandarua', 'Nyeri',
+  'Samburu', 'Siaya', 'Taita-Taveta', 'Tana River', 'Tharaka-Nithi', 'Trans-Nzoia',
+  'Turkana', 'Uasin Gishu', 'Vihiga', 'Wajir', 'West Pokot'
 ];
 
+// Use the comprehensive amenities list from constants
+const COMMON_AMENITIES = Array.from(AMENITIES);
+
 export default function AddPropertyForm() {
-  const { user } = useUser();
+  const { user } = useAuth();
   const router = useRouter();
   const [formData, setFormData] = useState<Partial<PropertyListingInput>>({
     priceType: 'rent',
     isFurnished: false,
     petsAllowed: false,
-    amenities: []
+    rating: 0,
+    amenities: [],
+    nearbyFeatures: [],
+    externalFeatures: [],
+    internalFeatures: []
   });
   const [images, setImages] = useState<File[]>([]);
   const [imagePreviews, setImagePreviews] = useState<string[]>([]);
+  const [availableLocations, setAvailableLocations] = useState<Array<{name: string, type: string, county: string}>>([]);
+  const [filteredLocations, setFilteredLocations] = useState<Array<{name: string, type: string, county: string}>>([]);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitMessage, setSubmitMessage] = useState('');
@@ -67,6 +67,33 @@ export default function AddPropertyForm() {
     validatedData: PropertyListingInput;
     imageFiles: File[];
   } | null>(null);
+
+  // Fetch available locations from database
+  useEffect(() => {
+    async function fetchLocations() {
+      const { data, error } = await supabase
+        .from('locations')
+        .select('name, type, county')
+        .eq('is_active', true)
+        .order('name');
+
+      if (!error && data) {
+        setAvailableLocations(data);
+        setFilteredLocations(data);
+      }
+    }
+    fetchLocations();
+  }, []);
+
+  // Filter locations based on selected county
+  useEffect(() => {
+    if (formData.county) {
+      const filtered = availableLocations.filter(loc => loc.county === formData.county);
+      setFilteredLocations(filtered);
+    } else {
+      setFilteredLocations(availableLocations);
+    }
+  }, [formData.county, availableLocations]);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value, type } = e.target;
@@ -93,6 +120,16 @@ export default function AddPropertyForm() {
         ? currentAmenities.filter(a => a !== amenity)
         : [...currentAmenities, amenity];
       return { ...prev, amenities: newAmenities };
+    });
+  };
+
+  const handleFeatureToggle = (feature: string, type: 'nearbyFeatures' | 'externalFeatures' | 'internalFeatures') => {
+    setFormData(prev => {
+      const currentFeatures = prev[type] || [];
+      const newFeatures = currentFeatures.includes(feature)
+        ? currentFeatures.filter(f => f !== feature)
+        : [...currentFeatures, feature];
+      return { ...prev, [type]: newFeatures };
     });
   };
 
@@ -240,6 +277,13 @@ export default function AddPropertyForm() {
           available_from: validatedData.availableFrom ? new Date(validatedData.availableFrom).toISOString() : null,
           is_furnished: validatedData.isFurnished,
           pets_allowed: validatedData.petsAllowed,
+          rating: validatedData.rating || 0,
+          construction_progress: validatedData.constructionProgress,
+          completion_date: validatedData.completionDate ? new Date(validatedData.completionDate).toISOString() : null,
+          payment_plan: validatedData.paymentPlan,
+          nearby_features: validatedData.nearbyFeatures || [],
+          external_features: validatedData.externalFeatures || [],
+          internal_features: validatedData.internalFeatures || [],
         });
 
       if (error) {
@@ -316,7 +360,7 @@ export default function AddPropertyForm() {
                 </ul>
                 <div className="space-y-4">
                   <SignInButton mode="modal">
-                    <Button className="w-full bg-green-600 hover:bg-green-700 text-white py-3">
+                    <Button className="w-full bg-green-700 hover:bg-green-800 text-white py-3">
                       <UserPlus className="h-5 w-5 mr-2" />
                       Sign In to List Property
                     </Button>
@@ -420,12 +464,15 @@ export default function AddPropertyForm() {
             type="text"
             value={formData.propertyTitle || ''}
             onChange={handleInputChange}
-            placeholder="e.g., Modern 2BR Apartment with City Views"
+            placeholder="e.g., Modern 3BR Apartment in Westlands, Nairobi"
             className={errors.propertyTitle ? 'border-red-300' : ''}
           />
           <div className="flex justify-between items-center mt-1">
             <div>
               {errors.propertyTitle && <p className="text-red-600 text-sm">{errors.propertyTitle}</p>}
+              <p className="text-sm text-gray-500 mt-1">
+                Examples: "Spacious 4BR House for Sale in Karen" or "Affordable 2BR Apartment in Kilimani"
+              </p>
             </div>
             <p className={`text-xs ${
               (formData.propertyTitle || '').length < 5 ? 'text-red-500' : 'text-gray-500'
@@ -630,47 +677,70 @@ export default function AddPropertyForm() {
               type="text"
               value={formData.address || ''}
               onChange={handleInputChange}
-              placeholder="e.g., Kilimani Road, Apartment 15B or P.O Box 1234"
+              placeholder="e.g., Valley Arcade, Gitanga Road or Ring Road Kilimani"
               className={errors.address ? 'border-red-300' : ''}
             />
             <p className="text-sm text-gray-500 mt-1">
-              Examples: &quot;123 Ngong Road, Kilimani&quot; or &quot;P.O Box 5678, CBD&quot; or &quot;Plot 42, Karen Estate&quot;
+              Provide the specific street or building name. Examples: "Valley Arcade, Gitanga Road", "Links Road, Nyali", "Ring Road Kilimani"
             </p>
             {errors.address && <p className="text-red-600 text-sm mt-1">{errors.address}</p>}
           </div>
 
           <div>
-            <label htmlFor="city" className="block text-sm font-medium text-gray-700 mb-2">
-              City *
+            <label htmlFor="county" className="block text-sm font-medium text-gray-700 mb-2">
+              County *
             </label>
-            <Input
-              id="city"
-              name="city"
-              type="text"
-              value={formData.city || ''}
+            <select
+              id="county"
+              name="county"
+              value={formData.county || ''}
               onChange={handleInputChange}
-              placeholder="City"
-              className={errors.city ? 'border-red-300' : ''}
-            />
-            {errors.city && <p className="text-red-600 text-sm mt-1">{errors.city}</p>}
+              className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 ${
+                errors.county ? 'border-red-300' : ''
+              }`}
+            >
+              <option value="">Select County</option>
+              {KENYAN_COUNTIES.map(county => (
+                <option key={county} value={county}>{county}</option>
+              ))}
+            </select>
+            <p className="text-sm text-gray-500 mt-1">
+              Select the county where the property is located
+            </p>
+            {errors.county && <p className="text-red-600 text-sm mt-1">{errors.county}</p>}
           </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label htmlFor="county" className="block text-sm font-medium text-gray-700 mb-2">
-              County
+            <label htmlFor="city" className="block text-sm font-medium text-gray-700 mb-2">
+              City / Neighborhood *
             </label>
-            <Input
-              id="county"
-              name="county"
-              type="text"
-              value={formData.county || ''}
+            <select
+              id="city"
+              name="city"
+              value={formData.city || ''}
               onChange={handleInputChange}
-              placeholder="County (optional)"
-              className={errors.county ? 'border-red-300' : ''}
-            />
-            {errors.county && <p className="text-red-600 text-sm mt-1">{errors.county}</p>}
+              disabled={!formData.county}
+              className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 ${
+                errors.city ? 'border-red-300' : ''
+              } ${!formData.county ? 'bg-gray-100 cursor-not-allowed' : ''}`}
+            >
+              <option value="">
+                {formData.county ? 'Select City/Neighborhood' : 'Select County First'}
+              </option>
+              {filteredLocations.map(location => (
+                <option key={location.name} value={location.name}>
+                  {location.name} ({location.type})
+                </option>
+              ))}
+            </select>
+            <p className="text-sm text-gray-500 mt-1">
+              {formData.county
+                ? 'Choose from available locations in selected county'
+                : 'Select a county first to see available locations'}
+            </p>
+            {errors.city && <p className="text-red-600 text-sm mt-1">{errors.city}</p>}
           </div>
 
           <div>
@@ -786,7 +856,7 @@ export default function AddPropertyForm() {
         {/* Property Features */}
         <div className="space-y-4">
           <h3 className="text-lg font-medium text-gray-900">Property Features</h3>
-          
+
           <div className="flex space-x-6">
             <label className="flex items-center">
               <input
@@ -810,6 +880,38 @@ export default function AddPropertyForm() {
               <span className="ml-2 text-sm text-gray-700">Pets Allowed</span>
             </label>
           </div>
+
+          {/* Property Quality Rating */}
+          <div>
+            <label className="block text-sm font-medium text-gray-700 mb-2">
+              Property Quality Rating *
+            </label>
+            <div className="flex items-center space-x-2">
+              {[1, 2, 3, 4, 5].map((star) => (
+                <button
+                  key={star}
+                  type="button"
+                  onClick={() => setFormData(prev => ({ ...prev, rating: star }))}
+                  className="focus:outline-none transition-colors"
+                >
+                  <Star
+                    className={`h-8 w-8 ${
+                      star <= (formData.rating || 0)
+                        ? 'text-yellow-400 fill-yellow-400'
+                        : 'text-gray-300 hover:text-yellow-200'
+                    }`}
+                  />
+                </button>
+              ))}
+              <span className="ml-2 text-sm text-gray-600">
+                {formData.rating ? `${formData.rating}.0` : 'Not rated'}
+              </span>
+            </div>
+            <p className="mt-1 text-xs text-gray-500">
+              Rate your property quality (1-5 stars). This helps buyers/renters understand the property condition.
+            </p>
+            {errors.rating && <p className="text-red-600 text-sm mt-1">{errors.rating}</p>}
+          </div>
         </div>
 
         {/* Amenities */}
@@ -824,7 +926,151 @@ export default function AddPropertyForm() {
                   onChange={() => handleAmenityToggle(amenity)}
                   className="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded"
                 />
-                <span className="ml-2 text-sm text-gray-700 capitalize">{amenity}</span>
+                <span className="ml-2 text-sm text-gray-700">{amenity}</span>
+              </label>
+            ))}
+          </div>
+        </div>
+
+        {/* Construction & Payment Information */}
+        <div className="space-y-4 border-t pt-6">
+          <h3 className="text-lg font-medium text-gray-900 flex items-center">
+            <Clock className="h-5 w-5 mr-2 text-green-600" />
+            Construction & Payment Details
+          </h3>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label htmlFor="constructionProgress" className="block text-sm font-medium text-gray-700 mb-2">
+                Construction Status
+              </label>
+              <select
+                id="constructionProgress"
+                name="constructionProgress"
+                value={formData.constructionProgress || ''}
+                onChange={handleInputChange}
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500"
+              >
+                <option value="">Select Status</option>
+                {CONSTRUCTION_STATUS.map(status => (
+                  <option key={status} value={status}>{status}</option>
+                ))}
+              </select>
+              <p className="text-sm text-gray-500 mt-1">
+                Current construction or availability status
+              </p>
+            </div>
+
+            <div>
+              <label htmlFor="completionDate" className="block text-sm font-medium text-gray-700 mb-2">
+                <Calendar className="inline h-4 w-4 mr-1" />
+                Completion Date
+              </label>
+              <Input
+                id="completionDate"
+                name="completionDate"
+                type="date"
+                value={formData.completionDate || ''}
+                onChange={handleInputChange}
+                className={errors.completionDate ? 'border-red-300' : ''}
+              />
+              <p className="text-sm text-gray-500 mt-1">
+                Expected or actual completion date
+              </p>
+              {errors.completionDate && <p className="text-red-600 text-sm mt-1">{errors.completionDate}</p>}
+            </div>
+          </div>
+
+          <div>
+            <label htmlFor="paymentPlan" className="block text-sm font-medium text-gray-700 mb-2">
+              <DollarSign className="inline h-4 w-4 mr-1" />
+              Payment Plan
+            </label>
+            <textarea
+              id="paymentPlan"
+              name="paymentPlan"
+              value={formData.paymentPlan || ''}
+              onChange={handleInputChange}
+              rows={3}
+              placeholder="E.g., Minimum deposit of 20%, with the balance payable within 3 years"
+              className={`w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 ${
+                errors.paymentPlan ? 'border-red-300' : ''
+              }`}
+            />
+            <p className="text-sm text-gray-500 mt-1">
+              Describe the payment terms and options available
+            </p>
+            {errors.paymentPlan && <p className="text-red-600 text-sm mt-1">{errors.paymentPlan}</p>}
+          </div>
+        </div>
+
+        {/* Nearby Features */}
+        <div className="border-t pt-6">
+          <h3 className="text-lg font-medium text-gray-900 mb-4 flex items-center">
+            <MapPinned className="h-5 w-5 mr-2 text-green-600" />
+            Nearby Features
+          </h3>
+          <p className="text-sm text-gray-600 mb-4">
+            Select amenities and points of interest near the property
+          </p>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+            {Array.from(NEARBY_FEATURES).map(feature => (
+              <label key={feature} className="flex items-center">
+                <input
+                  type="checkbox"
+                  checked={(formData.nearbyFeatures || []).includes(feature)}
+                  onChange={() => handleFeatureToggle(feature, 'nearbyFeatures')}
+                  className="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded"
+                />
+                <span className="ml-2 text-sm text-gray-700">{feature}</span>
+              </label>
+            ))}
+          </div>
+        </div>
+
+        {/* External Features */}
+        <div className="border-t pt-6">
+          <h3 className="text-lg font-medium text-gray-900 mb-4 flex items-center">
+            <Home className="h-5 w-5 mr-2 text-green-600" />
+            External Features
+          </h3>
+          <p className="text-sm text-gray-600 mb-4">
+            Select external features and facilities available
+          </p>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+            {Array.from(EXTERNAL_FEATURES).map(feature => (
+              <label key={feature} className="flex items-center">
+                <input
+                  type="checkbox"
+                  checked={(formData.externalFeatures || []).includes(feature)}
+                  onChange={() => handleFeatureToggle(feature, 'externalFeatures')}
+                  className="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded"
+                />
+                <span className="ml-2 text-sm text-gray-700">{feature}</span>
+              </label>
+            ))}
+          </div>
+        </div>
+
+        {/* Internal Features */}
+        <div className="border-t pt-6">
+          <h3 className="text-lg font-medium text-gray-900 mb-4 flex items-center">
+            <Layers className="h-5 w-5 mr-2 text-green-600" />
+            Internal Features
+          </h3>
+          <p className="text-sm text-gray-600 mb-4">
+            Select internal features and appliances included
+          </p>
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2">
+            {Array.from(INTERNAL_FEATURES).map(feature => (
+              <label key={feature} className="flex items-center">
+                <input
+                  type="checkbox"
+                  checked={(formData.internalFeatures || []).includes(feature)}
+                  onChange={() => handleFeatureToggle(feature, 'internalFeatures')}
+                  className="h-4 w-4 text-green-600 focus:ring-green-500 border-gray-300 rounded"
+                />
+                <span className="ml-2 text-sm text-gray-700">{feature}</span>
               </label>
             ))}
           </div>
@@ -884,7 +1130,7 @@ export default function AddPropertyForm() {
           <Button
             type="submit"
             disabled={isSubmitting}
-            className="w-full bg-green-600 hover:bg-green-700 text-white"
+            className="w-full bg-green-700 hover:bg-green-800 text-white"
           >
             {isSubmitting ? 'Submitting...' : '🎉 Anniversary Special: Pay KES 100 & Submit Property'}
           </Button>

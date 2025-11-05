@@ -1,8 +1,11 @@
 'use client';
 
+// Force dynamic rendering for edit property page
+export const dynamic = 'force-dynamic';
+
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { useUser } from '@clerk/nextjs';
+import { useAuth } from '@/components/AuthProvider';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { supabase } from '@/lib/supabase';
@@ -33,7 +36,7 @@ interface PropertyListing {
 export default function EditPropertyPage() {
   const params = useParams();
   const router = useRouter();
-  const { user } = useUser();
+  const { user } = useAuth();
   const [property, setProperty] = useState<PropertyListing | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');

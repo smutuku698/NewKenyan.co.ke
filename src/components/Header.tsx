@@ -3,230 +3,103 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
-import { SignInButton, SignedIn, SignedOut, UserButton } from '@clerk/nextjs';
-import { Menu, X, Search, MapPin, ChevronDown, Building, Home, Briefcase, Heart, Globe, Settings } from 'lucide-react';
+import { ClerkSignInButton as SignInButton, ClerkSignedIn as SignedIn, ClerkSignedOut as SignedOut, ClerkUserButton as UserButton } from './ClerkWrapper';
+import { Menu, X } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 const Header = () => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
-  const [isPostDropdownOpen, setIsPostDropdownOpen] = useState(false);
-  const [isServicesDropdownOpen, setIsServicesDropdownOpen] = useState(false);
   const currentPath = usePathname();
 
   const navigation = [
-    { name: 'Home', displayName: 'Home', path: '/' },
-    { name: 'Business\nDirectory', displayName: 'Business Directory', path: '/business-directory' },
-    { name: 'Jobs in\nKenya', displayName: 'Jobs in Kenya', path: '/jobs-in-kenya' },
-    { name: 'Properties\nFor Sale/Rent', displayName: 'Properties For Sale/Rent', path: '/properties' },
-    { name: 'Services', displayName: 'Services', path: '#', hasDropdown: true },
-    { name: 'Blog', displayName: 'Blog', path: '/blog' },
+    { name: 'Buy', displayName: 'Buy', path: '/properties?type=sale' },
+    { name: 'Sell', displayName: 'Sell', path: '/properties/add' },
+    { name: 'Rent', displayName: 'Rent', path: '/properties?type=rent' },
+    { name: 'Business', displayName: 'Business', path: '/business-directory' },
+    { name: 'Jobs', displayName: 'Jobs', path: '/jobs-in-kenya' },
+    { name: 'Agent', displayName: 'Agent', path: '/real-estate-services' },
   ];
 
   return (
-    <header className="sticky top-0 z-50 w-full bg-gradient-to-r from-green-600 via-green-700 to-emerald-800 shadow-lg">
-      <div className="container mx-auto px-3 sm:px-6 lg:px-8 max-w-7xl">
-        <div className="flex min-h-20 py-3 items-center justify-between gap-4">
+    <header className="sticky top-0 z-50 w-full bg-white border-b border-gray-200 shadow-sm">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
+        <div className="flex min-h-16 items-center justify-between gap-6">
           {/* Logo */}
-          <Link href="/" className="flex items-center space-x-3 group">
-            <div className="h-12 w-12 bg-white rounded-xl flex items-center justify-center shadow-lg group-hover:scale-105 transition-transform duration-200 relative">
+          <Link href="/" className="flex items-center space-x-2 group flex-shrink-0">
+            <div className="h-10 w-10 bg-green-600 rounded-lg flex items-center justify-center shadow-sm group-hover:bg-green-700 transition-colors duration-200">
               {/* Red Map Pin matching favicon */}
-              <svg className="h-8 w-8" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" fill="#ef4444" stroke="#dc2626" strokeWidth="1"/>
                 <circle cx="12" cy="9" r="2.5" fill="white"/>
                 <ellipse cx="12" cy="21" rx="3" ry="1" fill="#22c55e" opacity="0.8"/>
               </svg>
             </div>
             <div className="flex flex-col">
-              <span className="text-xl lg:text-2xl font-heading font-bold text-white drop-shadow-md">
+              <span className="text-base lg:text-lg font-heading font-bold text-gray-900">
                 NewKenyan.com
               </span>
-              <span className="text-xs text-green-100 font-body font-medium tracking-wider">
-                KENYA&apos;S BUSINESS HUB
+              <span className="text-[9px] text-gray-600 font-body font-medium tracking-wide hidden sm:block">
+                NEWKENYAN PROPERTIES
               </span>
             </div>
           </Link>
 
           {/* Desktop Navigation */}
-          <nav className="hidden lg:flex items-center space-x-4 flex-1 justify-center max-w-2xl">
+          <nav className="hidden lg:flex items-center space-x-1 flex-1 justify-end">
             {navigation.map((item) => (
-              item.hasDropdown ? (
-                <div key={item.path} className="relative">
-                  <button
-                    onClick={() => setIsServicesDropdownOpen(!isServicesDropdownOpen)}
-                    className={`btn-text font-semibold transition-all duration-200 hover:scale-105 text-center flex flex-col items-center leading-tight ${
-                      currentPath.startsWith('/website-services') || currentPath.startsWith('/real-estate-services')
-                        ? 'text-white bg-white/20 px-3 py-2 rounded-lg backdrop-blur-sm shadow-lg'
-                        : 'text-green-50 hover:text-white hover:bg-white/10 px-3 py-2 rounded-lg'
-                    }`}
-                  >
-                    <span className="whitespace-pre-line text-xs leading-tight">{item.name}</span>
-                    <ChevronDown className="h-3 w-3 mt-0.5" />
-                  </button>
-                  {isServicesDropdownOpen && (
-                    <div className="absolute top-full left-0 mt-2 w-56 bg-white border border-gray-200 rounded-xl shadow-xl z-50 backdrop-blur-lg">
-                      <div className="py-2">
-                        <Link 
-                          href="/website-services"
-                          className="flex items-center px-4 py-3 text-sm font-medium text-gray-700 hover:bg-green-50 hover:text-green-700 transition-colors duration-200"
-                          onClick={() => setIsServicesDropdownOpen(false)}
-                        >
-                          <Globe className="h-5 w-5 mr-3 text-green-600" />
-                          Website & SEO Services
-                        </Link>
-                        <Link 
-                          href="/real-estate-services"
-                          className="flex items-center px-4 py-3 text-sm font-medium text-gray-700 hover:bg-green-50 hover:text-green-700 transition-colors duration-200"
-                          onClick={() => setIsServicesDropdownOpen(false)}
-                        >
-                          <Home className="h-5 w-5 mr-3 text-green-600" />
-                          Real Estate Services
-                        </Link>
-                      </div>
-                    </div>
-                  )}
-                </div>
-              ) : (
-                <Link
-                  key={item.path}
-                  href={item.path}
-                  className={`btn-text font-semibold transition-all duration-200 hover:scale-105 text-center px-3 py-2 rounded-lg ${
-                    currentPath === item.path
-                      ? 'text-white bg-white/20 backdrop-blur-sm shadow-lg'
-                      : 'text-green-50 hover:text-white hover:bg-white/10'
-                  }`}
-                >
-                  <span className="whitespace-pre-line text-xs leading-tight block">{item.name}</span>
-                </Link>
-              )
+              <Link
+                key={item.path}
+                href={item.path}
+                className={`px-4 py-2 text-sm font-medium transition-colors duration-200 rounded-md ${
+                  currentPath === item.path || currentPath.startsWith(item.path.split('?')[0])
+                    ? 'text-gray-900 bg-gray-100'
+                    : 'text-gray-700 hover:text-gray-900 hover:bg-gray-50'
+                }`}
+              >
+                {item.name}
+              </Link>
             ))}
           </nav>
 
           {/* Desktop Actions */}
-          <div className="hidden md:flex items-center space-x-3 flex-shrink-0">
-            <Button 
-              variant="ghost" 
-              size="sm"
-              className="text-white hover:bg-white/20 hover:text-white backdrop-blur-sm transition-all duration-200"
-            >
-              <Search className="h-4 w-4" />
-            </Button>
-            <Link href="/favorites">
-              <Button 
-                variant="ghost" 
-                size="sm"
-                className="text-white hover:bg-white/20 hover:text-white backdrop-blur-sm transition-all duration-200"
-                title="My Favorite Properties"
-              >
-                <Heart className="h-4 w-4" />
-              </Button>
-            </Link>
+          <div className="hidden lg:flex items-center space-x-3 flex-shrink-0">
             <SignedIn>
               <Link href="/dashboard">
-                <Button 
-                  variant="outline" 
+                <Button
+                  variant="ghost"
                   size="sm"
-                  className="border-white/30 text-white bg-transparent hover:bg-white hover:text-green-700 backdrop-blur-sm font-semibold transition-all duration-200 px-4"
+                  className="text-gray-700 hover:text-gray-900 hover:bg-gray-100 font-medium"
                 >
                   Dashboard
                 </Button>
               </Link>
-              <div className="relative">
-                <Button 
-                  size="sm"
-                  className="bg-white text-green-700 hover:bg-green-50 hover:text-green-800 font-bold px-4 shadow-lg transition-all duration-200 hover:scale-105"
-                  onClick={() => setIsPostDropdownOpen(!isPostDropdownOpen)}
-                >
-                  Post Listing
-                  <ChevronDown className="h-3 w-3 ml-2" />
-                </Button>
-                {isPostDropdownOpen && (
-                  <div className="absolute right-0 mt-2 w-56 bg-white border border-gray-200 rounded-xl shadow-xl z-50 backdrop-blur-lg">
-                    <div className="py-2">
-                      <Link 
-                        href="/add-listing"
-                        className="flex items-center px-4 py-3 text-sm font-medium text-gray-700 hover:bg-green-50 hover:text-green-700 transition-colors duration-200"
-                        onClick={() => setIsPostDropdownOpen(false)}
-                      >
-                        <Building className="h-5 w-5 mr-3 text-green-600" />
-                        Business Listing
-                      </Link>
-                      <Link 
-                        href="/properties/add"
-                        className="flex items-center px-4 py-3 text-sm font-medium text-gray-700 hover:bg-green-50 hover:text-green-700 transition-colors duration-200"
-                        onClick={() => setIsPostDropdownOpen(false)}
-                      >
-                        <Home className="h-5 w-5 mr-3 text-green-600" />
-                        Property Listing
-                      </Link>
-                      <Link 
-                        href="/jobs-in-kenya/post"
-                        className="flex items-center px-4 py-3 text-sm font-medium text-gray-700 hover:bg-green-50 hover:text-green-700 transition-colors duration-200"
-                        onClick={() => setIsPostDropdownOpen(false)}
-                      >
-                        <Briefcase className="h-5 w-5 mr-3 text-green-600" />
-                        Job Listing
-                      </Link>
-                    </div>
-                  </div>
-                )}
-              </div>
-              <UserButton 
+              <UserButton
                 appearance={{
                   elements: {
-                    avatarBox: "w-9 h-9 ring-2 ring-white/30 hover:ring-white/50 transition-all duration-200"
+                    avatarBox: "w-8 h-8 ring-2 ring-gray-200 hover:ring-gray-300 transition-all duration-200"
                   }
                 }}
               />
             </SignedIn>
             <SignedOut>
               <SignInButton>
-                <Button 
-                  variant="outline"
-                  size="lg"
-                  className="border-white/60 text-white bg-white/10 hover:bg-white hover:text-green-700 backdrop-blur-sm font-semibold transition-all duration-200 shadow-lg"
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="text-gray-700 hover:text-gray-900 hover:bg-gray-100 font-medium"
                 >
                   Sign In
                 </Button>
               </SignInButton>
-              <div className="relative">
-                <Button 
-                  className="bg-white text-green-700 hover:bg-green-50 hover:text-green-800 font-bold px-6 py-2 text-base shadow-lg transition-all duration-200 hover:scale-105"
-                  onClick={() => setIsPostDropdownOpen(!isPostDropdownOpen)}
+              <Link href="/properties/add">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="border-gray-300 text-gray-900 hover:bg-gray-50 font-medium rounded-full px-5"
                 >
-                  Post Listing
-                  <ChevronDown className="h-4 w-4 ml-2" />
+                  Join
                 </Button>
-                {isPostDropdownOpen && (
-                  <div className="absolute right-0 mt-2 w-56 bg-white border border-gray-200 rounded-xl shadow-xl z-50 backdrop-blur-lg">
-                    <div className="py-2">
-                      <Link 
-                        href="/add-listing"
-                        className="flex items-center px-4 py-3 text-sm font-medium text-gray-700 hover:bg-green-50 hover:text-green-700 transition-colors duration-200"
-                        onClick={() => setIsPostDropdownOpen(false)}
-                      >
-                        <Building className="h-5 w-5 mr-3 text-green-600" />
-                        Business Listing
-                      </Link>
-                      <Link 
-                        href="/properties/add"
-                        className="flex items-center px-4 py-3 text-sm font-medium text-gray-700 hover:bg-green-50 hover:text-green-700 transition-colors duration-200"
-                        onClick={() => setIsPostDropdownOpen(false)}
-                      >
-                        <Home className="h-5 w-5 mr-3 text-green-600" />
-                        Property Listing
-                      </Link>
-                      <Link 
-                        href="/jobs-in-kenya/post"
-                        className="flex items-center px-4 py-3 text-sm font-medium text-gray-700 hover:bg-green-50 hover:text-green-700 transition-colors duration-200"
-                        onClick={() => setIsPostDropdownOpen(false)}
-                      >
-                        <Briefcase className="h-5 w-5 mr-3 text-green-600" />
-                        Job Listing
-                      </Link>
-                    </div>
-                  </div>
-                )}
-              </div>
+              </Link>
             </SignedOut>
           </div>
 
@@ -235,7 +108,7 @@ const Header = () => {
             <Button
               variant="ghost"
               size="sm"
-              className="text-white hover:bg-white/20 hover:text-white transition-all duration-200"
+              className="text-gray-700 hover:bg-gray-100 hover:text-gray-900"
               onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
             >
               {isMobileMenuOpen ? (
@@ -249,158 +122,63 @@ const Header = () => {
 
         {/* Mobile Navigation */}
         {isMobileMenuOpen && (
-          <div className="lg:hidden">
-            <div className="mx-2 mt-4 mb-2 bg-white/95 backdrop-blur-lg border border-white/20 rounded-xl shadow-2xl overflow-hidden">
-              <div className="px-4 py-4 space-y-2">
-                {navigation.map((item) => (
-                  item.hasDropdown ? (
-                    <div key={item.path} className="space-y-1">
-                      <div className="px-4 py-2 text-sm font-semibold text-gray-600 bg-gray-100 rounded-lg">
-                        {item.displayName}
-                      </div>
-                      <Link
-                        href="/website-services"
-                        className="flex items-center px-6 py-2 text-sm font-medium text-gray-700 hover:text-white hover:bg-gradient-to-r hover:from-green-500 hover:to-green-600 hover:shadow-md rounded-lg transition-all duration-200"
-                        onClick={() => setIsMobileMenuOpen(false)}
-                      >
-                        <Globe className="h-4 w-4 mr-3 text-green-600" />
-                        Website & SEO
-                      </Link>
-                      <Link
-                        href="/real-estate-services"
-                        className="flex items-center px-6 py-2 text-sm font-medium text-gray-700 hover:text-white hover:bg-gradient-to-r hover:from-green-500 hover:to-green-600 hover:shadow-md rounded-lg transition-all duration-200"
-                        onClick={() => setIsMobileMenuOpen(false)}
-                      >
-                        <Home className="h-4 w-4 mr-3 text-green-600" />
-                        Real Estate Sales
-                      </Link>
-                    </div>
-                  ) : (
-                    <Link
-                      key={item.path}
-                      href={item.path}
-                      className={`block px-4 py-3 body-large font-semibold transition-all duration-200 rounded-lg ${
-                        currentPath === item.path
-                          ? 'text-white bg-gradient-to-r from-green-600 to-green-700 shadow-lg'
-                          : 'text-gray-700 hover:text-white hover:bg-gradient-to-r hover:from-green-500 hover:to-green-600 hover:shadow-md'
-                      }`}
-                      onClick={() => setIsMobileMenuOpen(false)}
-                    >
-                      {item.displayName}
-                    </Link>
-                  )
-                ))}
-              </div>
-              
-              <div className="border-t border-gray-200 px-4 py-4 space-y-3 bg-gray-50/50">
-                <Button 
-                  variant="outline" 
-                  className="w-full justify-center font-semibold border-green-200 text-green-700 hover:bg-green-50 hover:border-green-300"
+          <div className="lg:hidden border-t border-gray-200">
+            <div className="px-4 py-4 space-y-1">
+              {navigation.map((item) => (
+                <Link
+                  key={item.path}
+                  href={item.path}
+                  className={`block px-4 py-3 text-sm font-medium rounded-md ${
+                    currentPath === item.path || currentPath.startsWith(item.path.split('?')[0])
+                      ? 'text-gray-900 bg-gray-100'
+                      : 'text-gray-700 hover:text-gray-900 hover:bg-gray-50'
+                  }`}
+                  onClick={() => setIsMobileMenuOpen(false)}
                 >
-                  <Search className="h-4 w-4 mr-2" />
-                  Search
-                </Button>
-                <Link href="/favorites">
-                  <Button 
-                    variant="outline" 
-                    className="w-full justify-center font-semibold border-red-200 text-red-700 hover:bg-red-50 hover:border-red-300"
-                    onClick={() => setIsMobileMenuOpen(false)}
-                  >
-                    <Heart className="h-4 w-4 mr-2" />
-                    My Favorites
-                  </Button>
+                  {item.displayName}
                 </Link>
-                
+              ))}
+
+              <div className="border-t border-gray-200 pt-4 mt-4 space-y-2">
                 <SignedIn>
                   <Link href="/dashboard">
-                    <Button 
-                      variant="outline" 
-                      className="w-full justify-center font-semibold border-blue-200 text-blue-700 hover:bg-blue-50 hover:border-blue-300"
+                    <Button
+                      variant="outline"
+                      className="w-full justify-center font-medium border-gray-300"
+                      onClick={() => setIsMobileMenuOpen(false)}
                     >
                       Dashboard
                     </Button>
                   </Link>
-                  
-                  <div className="space-y-2">
-                    <Link href="/add-listing">
-                      <Button 
-                        variant="outline" 
-                        className="w-full justify-start font-medium border-green-200 text-green-700 hover:bg-green-50 hover:border-green-300"
-                      >
-                        <Building className="h-5 w-5 mr-3" />
-                        Post Business Listing
-                      </Button>
-                    </Link>
-                    <Link href="/properties/add">
-                      <Button 
-                        variant="outline" 
-                        className="w-full justify-start font-medium border-green-200 text-green-700 hover:bg-green-50 hover:border-green-300"
-                      >
-                        <Home className="h-5 w-5 mr-3" />
-                        Post Property Listing
-                      </Button>
-                    </Link>
-                    <Link href="/jobs-in-kenya/post">
-                      <Button 
-                        variant="outline" 
-                        className="w-full justify-start font-medium border-green-200 text-green-700 hover:bg-green-50 hover:border-green-300"
-                      >
-                        <Briefcase className="h-5 w-5 mr-3" />
-                        Post Job Listing
-                      </Button>
-                    </Link>
-                  </div>
-                  
-                  <div className="flex justify-center pt-4">
-                    <UserButton 
+                  <div className="flex justify-center pt-2">
+                    <UserButton
                       appearance={{
                         elements: {
-                          avatarBox: "w-12 h-12 ring-2 ring-green-200 hover:ring-green-300 transition-all duration-200"
+                          avatarBox: "w-10 h-10 ring-2 ring-gray-200"
                         }
                       }}
                     />
                   </div>
                 </SignedIn>
-                
+
                 <SignedOut>
                   <SignInButton>
-                    <Button 
-                      variant="outline" 
-                      className="w-full justify-center font-semibold border-blue-200 text-blue-700 hover:bg-blue-50 hover:border-blue-300"
+                    <Button
+                      variant="outline"
+                      className="w-full justify-center font-medium border-gray-300"
                     >
                       Sign In
                     </Button>
                   </SignInButton>
-                  
-                  <div className="space-y-2">
-                    <Link href="/add-listing">
-                      <Button 
-                        variant="outline" 
-                        className="w-full justify-start font-medium border-green-200 text-green-700 hover:bg-green-50 hover:border-green-300"
-                      >
-                        <Building className="h-5 w-5 mr-3" />
-                        Post Business Listing
-                      </Button>
-                    </Link>
-                    <Link href="/properties/add">
-                      <Button 
-                        variant="outline" 
-                        className="w-full justify-start font-medium border-green-200 text-green-700 hover:bg-green-50 hover:border-green-300"
-                      >
-                        <Home className="h-5 w-5 mr-3" />
-                        Post Property Listing
-                      </Button>
-                    </Link>
-                    <Link href="/jobs-in-kenya/post">
-                      <Button 
-                        variant="outline" 
-                        className="w-full justify-start font-medium border-green-200 text-green-700 hover:bg-green-50 hover:border-green-300"
-                      >
-                        <Briefcase className="h-5 w-5 mr-3" />
-                        Post Job Listing
-                      </Button>
-                    </Link>
-                  </div>
+                  <Link href="/properties/add">
+                    <Button
+                      variant="outline"
+                      className="w-full justify-center font-medium border-gray-300 rounded-full"
+                      onClick={() => setIsMobileMenuOpen(false)}
+                    >
+                      Join
+                    </Button>
+                  </Link>
                 </SignedOut>
               </div>
             </div>

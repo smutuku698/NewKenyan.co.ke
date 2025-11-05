@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Inter, Manrope, Source_Sans_3 } from "next/font/google";
-import { ClerkProvider } from '@clerk/nextjs';
+import { AuthProvider } from '@/components/AuthProvider';
 import GoogleAnalytics from '@/components/GoogleAnalytics';
 import CookieConsent from '@/components/CookieConsent';
 import GoogleTagManager, { GoogleTagManagerNoScript } from '@/components/GoogleTagManager';
@@ -84,16 +84,15 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const publishableKey = process.env.NEXT_PUBLIC_CLERK_PUBLISHABLE_KEY;
-
-  if (!publishableKey) {
-    throw new Error('Missing Publishable Key')
-  }
-
   return (
-    <ClerkProvider publishableKey={publishableKey}>
-      <html lang="en">
+    <html lang="en">
         <head>
+          {/* Resource hints for critical origins */}
+          <link rel="preconnect" href="https://gsdctfcfkrtuxnwapjcj.supabase.co" crossOrigin="anonymous" />
+          <link rel="preconnect" href="https://cheerful-llama-11.clerk.accounts.dev" />
+          <link rel="dns-prefetch" href="https://static.cloudflareinsights.com" />
+          <link rel="dns-prefetch" href="https://clerk-telemetry.com" />
+
           <meta name="google-site-verification" content="RV-BVBthjlDouZHZJbNOL0ts9uKXyoCQ2AF6Dyed4-0" />
           <meta name="msvalidate.01" content="C8F8E8A5B5F5A5B8C8D8E8F8A5B5C5D8" />
           <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
@@ -361,10 +360,11 @@ export default function RootLayout({
           <GoogleAnalytics />
           <SEOOptimizations />
           <SiteProtection />
-          {children}
+          <AuthProvider>
+            {children}
+          </AuthProvider>
           <CookieConsent />
         </body>
       </html>
-    </ClerkProvider>
   );
 }

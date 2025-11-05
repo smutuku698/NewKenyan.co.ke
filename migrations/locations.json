@@ -1,0 +1,75 @@
+{
+  "kenya": {
+    "counties": [
+      "Baringo", "Bomet", "Bungoma", "Busia", "Elgeyo-Marakwet", "Embu",
+      "Garissa", "Homa Bay", "Isiolo", "Kajiado", "Kakamega", "Kericho",
+      "Kiambu", "Kilifi", "Kirinyaga", "Kisii", "Kisumu", "Kitui", "Kwale",
+      "Laikipia", "Lamu", "Machakos", "Makueni", "Mandera", "Marsabit",
+      "Meru", "Migori", "Mombasa", "Muranga", "Nairobi", "Nakuru",
+      "Nandi", "Narok", "Nyamira", "Nyandarua", "Nyeri", "Samburu",
+      "Siaya", "Taita Taveta", "Tana River", "Tharaka-Nithi", "Trans Nzoia",
+      "Turkana", "Uasin Gishu", "Vihiga", "Wajir", "West Pokot"
+    ],
+
+    "cities": {
+      "Nairobi": {
+        "page_types": [
+          "houses-for-sale",
+          "houses-for-rent",
+          "apartments-for-sale",
+          "apartments-for-rent"
+        ],
+        "neighborhoods": [
+          "Airbase", "Baba Dogo", "California", "Chokaa", "Eastleigh North",
+          "Eastleigh South", "Embakasi", "Gatina", "Githurai", "Hamza",
+          "Harambee", "Highridge", "Huruma", "Imara Daima", "Kahawa North",
+          "Kahawa West", "Kangemi", "Karen", "Kariobangi North",
+          "Kariobangi South", "Karura", "Kasarani", "Kawangware", "Kayole",
+          "Kiamaiko", "Kibera", "Kileleshwa", "Kilimani", "Kitisuru",
+          "Komarock", "Korogocho", "Kwa Njenga", "Kware", "Kwa Reuben",
+          "Landimawe", "Lavington", "Lower Savannah", "Makadara",
+          "Makongeni", "Maringo", "Mathare", "Matopeni", "Maziwa", "Mihango",
+          "Mlango Kubwa", "Mountain View", "Mowlem", "Mugumo-Ini (Langata)",
+          "Muthaiga", "Mutuini", "Mwiki", "Nairobi Central", "Nairobi South",
+          "Nairobi West", "Ngando", "Ngara", "Ngei", "Njiru", "Pangani",
+          "Parklands", "Pumwani", "Riruta", "Riruta Satellite", "Roysambu",
+          "Ruai", "Sarang'Ombe", "Spring Valley", "Umoja", "Upper Savanna",
+          "Utalii", "Utawala", "Uthiru/Ruthimitu", "Viwandani", "Waithaka",
+          "Westlands", "Woodley", "Zimmerman", "Ziwani/Kariokor"
+        ],
+        "estates": [
+          "Akiba Estate", "Almond Grove Estate", "Asali Estate", "Avenue Park",
+          "Balozi Estate", "Braeburn Garden Estate", "Buruburu Estate",
+          "Cedar Court Garden Estate", "City Park", "City Park Estate",
+          "Delta Plains Estate", "Enzi Heights", "Forest Road",
+          "Fourways Junction Estate", "Garden Estate", "Gated Communities",
+          "Gitanga Road", "Githunguri Road", "Green 2 Estate", "Green Estate",
+          "Harambee Estate", "Hazina Estate", "Jogoo Road", "Kenyatta University",
+          "Kingara Road", "Lower Kabete Road", "Mogotio Road", "Mpaka Road",
+          "Nairobi Chapel", "Nairobi National Park", "Nasra Gardens Estate",
+          "Nextgen Park", "Nyayo Stadium", "Park Road", "Peponi Road", "Redhill",
+          "Riara Road", "Ridgeways", "Riverside Pearl Residence", "Rosslyn Academy",
+          "Rosslyn Riviera Mall", "Safari Park View Estate", "Strathmore University",
+          "Thome Estate", "University of Nairobi", "Westgate Shopping Mall",
+          "Wilson Airport"
+        ]
+      },
+
+      "Mombasa": {
+        "page_types": [
+          "houses-for-sale",
+          "houses-for-rent",
+          "apartments-for-sale",
+          "apartments-for-rent"
+        ],
+        "neighborhoods": [
+          "Bamburi", "Bofu", "Changamwe", "Ganjoni", "Jomvu Kuu", "Junda",
+          "Kadzandani", "Kipevu", "Likoni", "Magogoni", "Majengo", "Mikindani",
+          "Miritini", "Mji Wa Kale/Makadara", "Mkomani", "Mtongwe", "Mwakirunge",
+          "Port Reitz", "Shanzu", "Shika Adabu", "Shimanzi", "Timbwani", "Tononoka",
+          "Tudor", "Ziwa La Ng'Ombe"
+        ]
+      }
+    }
+  }
+}

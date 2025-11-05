@@ -1,8 +1,8 @@
+'use client';
+
 import Image from 'next/image';
 import Link from 'next/link';
-import { Bed, Bath, MapPin, Phone, MessageCircle, Heart, Share2, Calendar } from 'lucide-react';
-import { Button } from '@/components/ui/button';
-import { Badge } from '@/components/ui/badge';
+import { Heart } from 'lucide-react';
 import { generatePropertySlug } from '@/lib/utils';
 
 interface PropertyCardProps {
@@ -18,7 +18,9 @@ interface PropertyCardProps {
   amenities: string[];
   contactPhone: string;
   whatsappNumber?: string;
+  squareFeet?: number;
   createdAt?: string;
+  isFeatured?: boolean;
 }
 
 const PropertyCard = ({
@@ -31,133 +33,125 @@ const PropertyCard = ({
   location,
   city,
   images,
-  amenities,
-  whatsappNumber,
+  squareFeet,
   createdAt,
+  isFeatured = false,
 }: PropertyCardProps) => {
   const formatPrice = (price: number) => {
-    return `KSh ${price.toLocaleString()}`;
-  };
-
-  const formatDate = (dateString?: string) => {
-    if (!dateString) return 'Recently';
-
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffTime = Math.abs(now.getTime() - date.getTime());
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-
-    if (diffDays === 0) return 'Today';
-    if (diffDays === 1) return 'Yesterday';
-    if (diffDays < 7) return `${diffDays} days ago`;
-    if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks ago`;
-    if (diffDays < 365) return `${Math.floor(diffDays / 30)} months ago`;
-
-    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+    return `KES ${price.toLocaleString()}`;
   };
 
   const slug = generatePropertySlug(title, type, city, bedrooms);
-  
-  return (
-    <Link href={`/properties/${slug}`}>
-      <div className="bg-white border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow cursor-pointer flex flex-col h-full">
-      {/* Image */}
-      <div className="relative h-48 sm:h-56 md:h-64 flex-shrink-0">
-        {images[0] ? (
-          <Image
-            src={images[0]}
-            alt={title}
-            fill
-            className="object-cover"
-            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-          />
-        ) : (
-          <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-            <span className="text-gray-400 text-sm">No Image</span>
-          </div>
-        )}
-        <div className="absolute top-2 left-2 flex flex-col gap-1 max-w-[60%]">
-          <Badge className="bg-blue-100 text-blue-800 text-xs truncate">{type}</Badge>
-          <Badge className="bg-white/95 text-gray-700 text-xs flex items-center gap-1 shadow-sm backdrop-blur-sm">
-            <Calendar className="h-3 w-3 text-orange-600" />
-            <span>{formatDate(createdAt)}</span>
-          </Badge>
-        </div>
-        <div className="absolute top-2 right-2 flex space-x-1">
-          <Button variant="ghost" size="sm" className="bg-white/80 hover:bg-white p-2">
-            <Heart className="h-4 w-4 flex-shrink-0" />
-          </Button>
-          <Button variant="ghost" size="sm" className="bg-white/80 hover:bg-white p-2">
-            <Share2 className="h-4 w-4 flex-shrink-0" />
-          </Button>
-        </div>
-      </div>
 
-      {/* Content */}
-      <div className="p-4 sm:p-5 flex flex-col flex-grow">
-        {/* Header */}
-        <div className="mb-3">
-          <h3 className="text-base sm:text-lg font-semibold mb-2 line-clamp-2 min-h-[3rem] text-gray-900 leading-tight">
+  // Calculate hours since posted
+  const getHoursSincePosted = () => {
+    if (!createdAt) return null;
+    const now = new Date();
+    const posted = new Date(createdAt);
+    const hours = Math.floor((now.getTime() - posted.getTime()) / (1000 * 60 * 60));
+
+    if (hours < 1) return 'JUST NOW';
+    if (hours < 24) return `${hours} HOUR${hours === 1 ? '' : 'S'}`;
+    const days = Math.floor(hours / 24);
+    if (days < 7) return `${days} DAY${days === 1 ? '' : 'S'}`;
+    return null;
+  };
+
+  const hoursSincePosted = getHoursSincePosted();
+  const isNew = hoursSincePosted !== null;
+
+  return (
+    <Link href={`/properties/${slug}`} className="block group">
+      <div className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 border border-gray-100">
+        {/* Image Container - Landscape aspect ratio like Movoto */}
+        <div className="relative w-full aspect-[16/10] bg-gray-200">
+          {images[0] ? (
+            <Image
+              src={images[0]}
+              alt={title}
+              fill
+              className="object-cover group-hover:scale-105 transition-transform duration-300"
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            />
+          ) : (
+            <div className="w-full h-full bg-gray-200 flex items-center justify-center">
+              <span className="text-gray-400 text-sm">No Image</span>
+            </div>
+          )}
+
+          {/* NEW Badge - Top Left - Sleek and narrow like Movoto */}
+          {isNew && (
+            <div className="absolute top-2.5 left-2.5 flex items-center gap-1.5">
+              <span className="bg-green-700 text-white text-[10px] font-bold px-2 py-0.5 rounded">
+                NEW
+              </span>
+              <span className="bg-white text-gray-900 text-[10px] font-semibold px-2 py-0.5 rounded">
+                {hoursSincePosted}
+              </span>
+            </div>
+          )}
+
+          {/* Favorite Icon - Top Right */}
+          <button
+            onClick={(e) => {
+              e.preventDefault();
+              // Add favorite functionality
+            }}
+            className="absolute top-3 right-3 bg-white hover:bg-gray-100 p-2 rounded-full shadow-md transition-colors"
+            aria-label="Add to favorites"
+          >
+            <Heart className="h-5 w-5 text-gray-700" />
+          </button>
+        </div>
+
+        {/* Content */}
+        <div className="p-4">
+          {/* Price - Bold and Large */}
+          <div className="mb-2">
+            <p className="text-2xl font-bold text-gray-900">{formatPrice(price)}</p>
+          </div>
+
+          {/* Property Title */}
+          <h3 className="text-base font-semibold text-gray-900 mb-2 line-clamp-2 leading-tight">
             {title}
           </h3>
-          <p className="text-lg sm:text-xl font-bold text-green-600 truncate">{formatPrice(price)}</p>
-          <p className="text-xs sm:text-sm text-gray-600">per month</p>
-        </div>
 
-        {/* Property Details */}
-        <div className="flex items-center gap-3 mb-3 flex-wrap">
-          {bedrooms !== undefined && bedrooms !== null && (
-            <div className="flex items-center text-gray-600 text-xs sm:text-sm whitespace-nowrap">
-              <Bed className="h-4 w-4 mr-1 flex-shrink-0" />
-              <span className="truncate">{bedrooms} bed{bedrooms > 1 ? 's' : ''}</span>
-            </div>
-          )}
-          {bathrooms !== undefined && bathrooms !== null && (
-            <div className="flex items-center text-gray-600 text-xs sm:text-sm whitespace-nowrap">
-              <Bath className="h-4 w-4 mr-1 flex-shrink-0" />
-              <span className="truncate">{bathrooms} bath{bathrooms > 1 ? 's' : ''}</span>
-            </div>
-          )}
-        </div>
-
-        {/* Location */}
-        <div className="flex items-start text-gray-600 text-xs sm:text-sm mb-3 min-h-[2.5rem]">
-          <MapPin className="h-4 w-4 mr-2 flex-shrink-0 mt-0.5" />
-          <span className="line-clamp-2 break-words">{location}</span>
-        </div>
-
-        {/* Amenities */}
-        {amenities && amenities.length > 0 && (
-          <div className="mb-4 min-h-[2rem]">
-            <div className="flex flex-wrap gap-1">
-              {amenities.slice(0, 3).map((amenity, index) => (
-                <Badge key={index} variant="secondary" className="text-xs truncate max-w-[7rem]">
-                  {amenity}
-                </Badge>
-              ))}
-              {amenities.length > 3 && (
-                <Badge variant="outline" className="text-xs whitespace-nowrap">
-                  +{amenities.length - 3} more
-                </Badge>
-              )}
-            </div>
+          {/* Bedroom, Bathroom, Sq Ft - Inline with custom icons */}
+          <div className="flex items-center gap-3 mb-2 text-gray-700">
+            {bedrooms !== undefined && bedrooms !== null && (
+              <div className="flex items-center gap-1">
+                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M20 9V6c0-1.1-.9-2-2-2H6c-1.1 0-2 .9-2 2v3c-1.1 0-2 .9-2 2v5h1.33L4 19h1l.67-3h12.67l.66 3h1l.67-3H22v-5c0-1.1-.9-2-2-2zm-4-3h2v3h-2V6zm-4 0h2v3h-2V6zM8 6h2v3H8V6zM6 6h2v3H6V6z"/>
+                </svg>
+                <span className="text-sm font-medium">{bedrooms} Bd</span>
+              </div>
+            )}
+            {bathrooms !== undefined && bathrooms !== null && (
+              <div className="flex items-center gap-1">
+                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M7 7h10v2H7zm0 6h10v-2H7zm12-8c-.55 0-1 .45-1 1 0 .28-.22.5-.5.5s-.5-.22-.5-.5c0-1.1.9-2 2-2s2 .9 2 2v10c0 1.1-.9 2-2 2H5c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2s2 .9 2 2c0 .28-.22.5-.5.5S6 6.28 6 6c0-.55-.45-1-1-1s-1 .45-1 1v10c0 .55.45 1 1 1h14c.55 0 1-.45 1-1V6c0-.55-.45-1-1-1z"/>
+                </svg>
+                <span className="text-sm font-medium">{bathrooms} Ba</span>
+              </div>
+            )}
+            {squareFeet && (
+              <div className="flex items-center gap-1">
+                <span className="text-sm font-medium">{squareFeet.toLocaleString()}</span>
+                <span className="text-xs text-gray-600">Sq Ft</span>
+              </div>
+            )}
           </div>
-        )}
 
-        {/* Actions */}
-        <div className="flex gap-2 mt-auto">
-          <Button variant="outline" className="flex-1 border-gray-300 hover:bg-gray-50 min-w-0 text-xs sm:text-sm h-9" size="sm">
-            <Phone className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1 flex-shrink-0" />
-            <span className="truncate">Call</span>
-          </Button>
-          {whatsappNumber && (
-            <Button className="bg-green-600 hover:bg-green-700 text-white flex-1 min-w-0 text-xs sm:text-sm h-9" size="sm">
-              <MessageCircle className="h-3.5 w-3.5 sm:h-4 sm:w-4 mr-1 flex-shrink-0" />
-              <span className="truncate">WhatsApp</span>
-            </Button>
-          )}
+          {/* Property Type */}
+          <p className="text-sm text-gray-600 mb-2">
+            {type}
+          </p>
+
+          {/* Address */}
+          <p className="text-sm text-gray-600 line-clamp-1">
+            {location}
+          </p>
         </div>
-      </div>
       </div>
     </Link>
   );

@@ -2,6 +2,9 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import AddPropertyForm from '@/components/AddPropertyForm';
 
+// Force dynamic rendering for add property page
+export const dynamic = 'force-dynamic';
+
 export default function AddPropertyPage() {
   return (
     <div className="min-h-screen bg-white">

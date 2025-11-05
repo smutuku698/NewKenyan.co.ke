@@ -1,8 +1,7 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
@@ -11,16 +10,19 @@ import JobCard from '@/components/JobCard';
 import BusinessCard from '@/components/BusinessCard';
 import PropertyCard from '@/components/PropertyCard';
 import BlogCard from '@/components/BlogCard';
+import ToggleableFilterSidebar, { ToggleableFilterSidebarRef } from '@/components/ToggleableFilterSidebar';
+import { KENYA_COUNTIES } from '@/components/CountyCrossLinks';
+import { FilterState } from '@/components/PropertyFilterSidebar';
 import { GridLoadingSkeleton } from '@/components/LoadingSkeleton';
 import { LazySection } from '@/components/LazySection';
-import ScrollToTop from '@/components/ScrollToTop';
+import WhatsAppButton from '@/components/WhatsAppButton';
 import {
   sampleBusinesses,
   sampleBlogPosts,
   heroStats
 } from '@/data/sampleData';
 import { supabase } from '@/lib/supabase';
-import { Users, Briefcase, Home, ArrowRight, Building2, BookOpen, ChevronDown } from 'lucide-react';
+import { Users, Briefcase, Home, ArrowRight, Building2, BookOpen, ChevronDown, Filter } from 'lucide-react';
 
 interface BusinessListing {
   id: string;
@@ -49,6 +51,7 @@ interface PropertyListing {
   price_type: string;
   bedrooms: number | null;
   bathrooms: number | null;
+  square_feet: number | null;
   address: string;
   city: string;
   county: string | null;
@@ -60,6 +63,12 @@ interface PropertyListing {
   is_approved: boolean;
   is_featured: boolean;
   created_at: string;
+  construction_progress?: string | null;
+  completion_date?: string | null;
+  payment_plan?: string | null;
+  nearby_features?: string[];
+  external_features?: string[];
+  internal_features?: string[];
 }
 
 interface JobListing {
@@ -78,18 +87,45 @@ interface JobListing {
 }
 
 export default function HomePage() {
+  const filterRef = useRef<ToggleableFilterSidebarRef>(null);
   const [openFAQ, setOpenFAQ] = useState<number | null>(null);
   const [featuredBusinesses, setFeaturedBusinesses] = useState<BusinessListing[]>([]);
   const [properties, setProperties] = useState<PropertyListing[]>([]);
+  const [allProperties, setAllProperties] = useState<PropertyListing[]>([]);
   const [featuredJobs, setFeaturedJobs] = useState<JobListing[]>([]);
+  const [availableLocations, setAvailableLocations] = useState<string[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [hasMoreProperties, setHasMoreProperties] = useState(true);
   const [page, setPage] = useState(0);
+  const [filters, setFilters] = useState<FilterState>({});
   const PROPERTIES_PER_PAGE = 12;
 
   const toggleFAQ = (index: number) => {
     setOpenFAQ(openFAQ === index ? null : index);
+  };
+
+  // Fetch locations on mount
+  useEffect(() => {
+    fetchLocations();
+  }, []);
+
+  // Fetch available locations from locations table
+  const fetchLocations = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('locations')
+        .select('name, type')
+        .eq('is_active', true)
+        .order('name');
+
+      if (!error && data) {
+        const locationNames = data.map(l => l.name);
+        setAvailableLocations(locationNames);
+      }
+    } catch (error) {
+      console.error('Error fetching locations:', error);
+    }
   };
 
   // Fetch initial properties
@@ -111,7 +147,7 @@ export default function HomePage() {
 
       const { data, error, count } = await supabase
         .from('property_listings')
-        .select('id, property_title, property_type, description, price, price_type, bedrooms, bathrooms, address, city, county, contact_phone, contact_email, whatsapp_number, amenities, images, is_approved, is_featured, created_at', { count: 'exact' })
+        .select('id, property_title, property_type, description, price, price_type, bedrooms, bathrooms, square_feet, address, city, county, contact_phone, contact_email, whatsapp_number, amenities, images, is_approved, is_featured, created_at, construction_progress, completion_date, payment_plan, nearby_features, external_features, internal_features', { count: 'exact' })
         .eq('is_approved', true)
         .order('is_featured', { ascending: false })
         .order('created_at', { ascending: false })
@@ -119,10 +155,15 @@ export default function HomePage() {
 
       if (error) throw error;
 
+      const fetchedProperties = data || [];
+
       if (pageNum === 0) {
-        setProperties(data || []);
+        setAllProperties(fetchedProperties);
+        setProperties(applyFilters(fetchedProperties, filters));
       } else {
-        setProperties(prev => [...prev, ...(data || [])]);
+        const newAllProperties = [...allProperties, ...fetchedProperties];
+        setAllProperties(newAllProperties);
+        setProperties(applyFilters(newAllProperties, filters));
       }
 
       // Check if there are more properties to load
@@ -139,6 +180,77 @@ export default function HomePage() {
       setLoading(false);
       setLoadingMore(false);
     }
+  };
+
+  // Apply filters to properties
+  const applyFilters = (props: PropertyListing[], filterState: FilterState): PropertyListing[] => {
+    return props.filter(property => {
+      // County filter
+      if (filterState.county && property.county !== filterState.county) return false;
+
+      // City filter
+      if (filterState.city && property.city !== filterState.city) return false;
+
+      // Property type filter
+      if (filterState.propertyType && property.property_type !== filterState.propertyType) return false;
+
+      // Price filters
+      if (filterState.priceMin && property.price < filterState.priceMin) return false;
+      if (filterState.priceMax && property.price > filterState.priceMax) return false;
+
+      // Bedroom filter
+      if (filterState.bedrooms !== undefined && (property.bedrooms || 0) < filterState.bedrooms) return false;
+
+      // Bathroom filter
+      if (filterState.bathrooms !== undefined && (property.bathrooms || 0) < filterState.bathrooms) return false;
+
+      // Square feet filters
+      if (filterState.squareFeetMin && (property.square_feet || 0) < filterState.squareFeetMin) return false;
+      if (filterState.squareFeetMax && (property.square_feet || 0) > filterState.squareFeetMax) return false;
+
+      // Construction status filter
+      if (filterState.constructionStatus && property.construction_progress !== filterState.constructionStatus) return false;
+
+      // Amenities filter
+      if (filterState.amenities && filterState.amenities.length > 0) {
+        const hasAllAmenities = filterState.amenities.every(amenity =>
+          (property.amenities || []).some(propAmenity => propAmenity.toLowerCase().includes(amenity.toLowerCase()))
+        );
+        if (!hasAllAmenities) return false;
+      }
+
+      // Nearby features filter
+      if (filterState.nearbyFeatures && filterState.nearbyFeatures.length > 0) {
+        const hasAllFeatures = filterState.nearbyFeatures.every(feature =>
+          (property.nearby_features || []).some(propFeature => propFeature.toLowerCase().includes(feature.toLowerCase()))
+        );
+        if (!hasAllFeatures) return false;
+      }
+
+      // External features filter
+      if (filterState.externalFeatures && filterState.externalFeatures.length > 0) {
+        const hasAllFeatures = filterState.externalFeatures.every(feature =>
+          (property.external_features || []).some(propFeature => propFeature.toLowerCase().includes(feature.toLowerCase()))
+        );
+        if (!hasAllFeatures) return false;
+      }
+
+      // Internal features filter
+      if (filterState.internalFeatures && filterState.internalFeatures.length > 0) {
+        const hasAllFeatures = filterState.internalFeatures.every(feature =>
+          (property.internal_features || []).some(propFeature => propFeature.toLowerCase().includes(feature.toLowerCase()))
+        );
+        if (!hasAllFeatures) return false;
+      }
+
+      return true;
+    });
+  };
+
+  // Handle filter changes
+  const handleFilterChange = (newFilters: FilterState) => {
+    setFilters(newFilters);
+    setProperties(applyFilters(allProperties, newFilters));
   };
 
   // Fetch businesses and jobs (shown after all properties)
@@ -259,7 +371,7 @@ export default function HomePage() {
           </div>
         </div>
       </div>
-
+      
       <main>
         {/* New Hero Section */}
         <HeroSection />
@@ -277,14 +389,41 @@ export default function HomePage() {
                   </div>
                   <h2 className="section-title">Properties for Sale & Rent in Kenya</h2>
                 </div>
-                <Button variant="outline" className="border-2 border-gray-300 hover:bg-gray-100" asChild>
-                  <Link href="/properties" className="flex items-center">
-                    View All
-                    <ArrowRight className="ml-2 h-4 w-4" />
-                  </Link>
-                </Button>
+                <div className="flex items-center gap-3">
+                  {/* Filter Button */}
+                  <Button
+                    onClick={() => filterRef.current?.openFilter()}
+                    variant="outline"
+                    className="border-2 border-green-600 hover:bg-green-50 text-green-700 font-semibold"
+                  >
+                    <div className="flex items-center justify-center w-5 h-5 bg-green-600 rounded mr-2">
+                      <Filter className="h-3 w-3 text-white" />
+                    </div>
+                    Filter
+                  </Button>
+                  <Button variant="outline" className="border-2 border-gray-300 hover:bg-gray-100" asChild>
+                    <Link href="/properties" className="flex items-center">
+                      View All
+                      <ArrowRight className="ml-2 h-4 w-4" />
+                    </Link>
+                  </Button>
+                </div>
               </div>
 
+              {/* Toggleable Filter Sidebar - Now overlays on top */}
+              <ToggleableFilterSidebar
+                ref={filterRef}
+                onFilterChange={handleFilterChange}
+                availableCounties={KENYA_COUNTIES.map(c => c.name).sort()}
+                availableCities={availableLocations.length > 0 ? availableLocations : Array.from(new Set(allProperties.map(p => p.city))).sort()}
+                availableAmenities={Array.from(new Set(allProperties.flatMap(p => p.amenities || []))).sort()}
+                availableConstructionStatus={Array.from(new Set(allProperties.map(p => p.construction_progress).filter(Boolean) as string[])).sort()}
+                availableNearbyFeatures={Array.from(new Set(allProperties.flatMap(p => p.nearby_features || []))).sort()}
+                availableExternalFeatures={Array.from(new Set(allProperties.flatMap(p => p.external_features || []))).sort()}
+                availableInternalFeatures={Array.from(new Set(allProperties.flatMap(p => p.internal_features || []))).sort()}
+              />
+
+              {/* Properties Grid - Full width with 4 columns on desktop */}
               <div className="grid gap-4 sm:gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                 {loading && properties.length === 0 ? (
                   <GridLoadingSkeleton type="property" count={12} />
@@ -298,6 +437,7 @@ export default function HomePage() {
                       price={property.price}
                       bedrooms={property.bedrooms || undefined}
                       bathrooms={property.bathrooms || undefined}
+                      squareFeet={property.square_feet || undefined}
                       location={`${property.city}${property.county ? `, ${property.county}` : ''}`}
                       city={property.city}
                       images={property.images}
@@ -305,8 +445,53 @@ export default function HomePage() {
                       contactPhone={property.contact_phone}
                       whatsappNumber={property.whatsapp_number || undefined}
                       createdAt={property.created_at}
+                      isFeatured={property.is_featured}
                     />
                   ))
+                ) : Object.keys(filters).length > 0 && allProperties.length > 0 ? (
+                  <>
+                    {/* No results message */}
+                    <div className="col-span-full text-center py-8">
+                      <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-6 mb-8">
+                        <p className="text-gray-700 text-lg font-medium mb-2">
+                          No properties match your filters
+                        </p>
+                        <p className="text-gray-600 text-sm">
+                          Try adjusting your search criteria or browse our suggested properties below
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Show alternative/suggested properties */}
+                    <div className="col-span-full">
+                      <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center">
+                        <Home className="h-5 w-5 mr-2 text-green-600" />
+                        Suggested Properties You May Like
+                      </h3>
+                      <div className="grid gap-4 sm:gap-6 md:grid-cols-2 lg:grid-cols-3">
+                        {allProperties.slice(0, 6).map((property) => (
+                          <PropertyCard
+                            key={property.id}
+                            id={property.id}
+                            title={property.property_title}
+                            type={property.property_type}
+                            price={property.price}
+                            bedrooms={property.bedrooms || undefined}
+                            bathrooms={property.bathrooms || undefined}
+                            squareFeet={property.square_feet || undefined}
+                            location={`${property.city}${property.county ? `, ${property.county}` : ''}`}
+                            city={property.city}
+                            images={property.images}
+                            amenities={property.amenities}
+                            contactPhone={property.contact_phone}
+                            whatsappNumber={property.whatsapp_number || undefined}
+                            createdAt={property.created_at}
+                            isFeatured={property.is_featured}
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  </>
                 ) : (
                   <div className="col-span-full text-center py-8 text-gray-500">
                     No properties available at the moment. Check back soon!
@@ -610,7 +795,7 @@ export default function HomePage() {
         </LazySection>
       </main>
 
-      <ScrollToTop />
+      <WhatsAppButton />
       <Footer />
     </div>
   );

@@ -164,8 +164,34 @@ const Footer = () => {
           </div>
         </div>
 
-        {/* Bottom Border */}
+        {/* Disclaimer Section */}
         <div className="border-t border-gray-800 mt-8 pt-8">
+          <div className="bg-gray-800/50 rounded-lg p-6 mb-6">
+            <h3 className="text-lg font-semibold text-white mb-3 flex items-center">
+              <svg className="h-5 w-5 mr-2 text-yellow-500" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+              </svg>
+              Important Disclaimer
+            </h3>
+            <div className="text-gray-400 text-sm space-y-2">
+              <p>
+                <strong className="text-gray-300">Advertised Listings:</strong> All property listings, job postings, and business advertisements on NewKenyan.com are submitted by third-party advertisers and individual users. NewKenyan.com acts solely as a platform to connect buyers, sellers, employers, and service providers.
+              </p>
+              <p>
+                <strong className="text-gray-300">Verification & Due Diligence:</strong> While we make reasonable efforts to review listings, we do not guarantee the accuracy, completeness, or legitimacy of any advertisement. Users are strongly advised to conduct their own independent verification, due diligence, and physical inspections before making any commitments or payments.
+              </p>
+              <p>
+                <strong className="text-gray-300">No Liability:</strong> NewKenyan.com and Legit Hustles shall not be held liable for any losses, damages, or disputes arising from transactions conducted through this platform. We recommend meeting in safe public locations, verifying ownership documents, and consulting legal professionals when necessary.
+              </p>
+              <p>
+                <strong className="text-gray-300">Report Suspicious Activity:</strong> If you encounter fraudulent listings or suspicious activity, please contact us immediately at <a href="mailto:info@newkenyan.com" className="text-green-500 hover:text-green-400 underline">info@newkenyan.com</a> or call <a href="tel:+254736407642" className="text-green-500 hover:text-green-400 underline">+254 736 407 642</a>.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        {/* Bottom Border */}
+        <div className="border-t border-gray-800 pt-8">
           <div className="flex flex-col md:flex-row justify-between items-center">
             <p className="text-gray-400 text-sm mb-4 md:mb-0">
               © 2024 NewKenyan.com by Legit Hustles. All rights reserved.

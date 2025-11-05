@@ -1,16 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import { auth } from '@clerk/nextjs/server';
+import { createClient as createServerClient } from '@/lib/supabase-server';
 
 export async function POST(request: NextRequest) {
   try {
     // Check if user is authenticated
-    const authResult = await auth();
-    const { userId } = authResult;
-    
-    if (!userId) {
+    const supabase = await createServerClient();
+    const { data: { user } } = await supabase.auth.getUser();
+
+    if (!user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
+
+    const userId = user.id;
 
     // Create admin Supabase client with service role key
     const supabaseAdmin = createClient(

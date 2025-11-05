@@ -9,6 +9,7 @@ import {
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import Breadcrumb from '@/components/Breadcrumb';
+import NeighborhoodLinks from '@/components/NeighborhoodLinks';
 import PropertyDetailClient from './PropertyDetailClient';
 
 // Revalidate pages every 24 hours (86400 seconds) for ISR
@@ -42,6 +43,12 @@ interface PropertyListing {
   is_featured: boolean;
   views_count: number;
   user_id: string;
+  construction_progress?: string | null;
+  completion_date?: string | null;
+  payment_plan?: string | null;
+  nearby_features?: string[];
+  external_features?: string[];
+  internal_features?: string[];
 }
 
 async function getPropertyBySlug(slug: string): Promise<PropertyListing | null> {
@@ -244,72 +251,15 @@ export default async function PropertyPage({ params }: PageProps) {
         {/* Property details component */}
         <PropertyDetailClient property={property} similarProperties={similarProperties} />
 
-        {/* Local SEO content */}
-        <div className="mt-12 bg-gray-50 p-8 rounded-lg">
-          <h3 className="text-2xl font-bold mb-4">
-            About Properties in {property.city}
-          </h3>
-          <div className="prose max-w-none text-gray-600">
-            <p>
-              {property.city} offers excellent property opportunities with this {property.property_type.toLowerCase()} 
-              being a prime example. Located in {property.address}, this property provides 
-              {property.bedrooms ? ` ${property.bedrooms} bedrooms` : ''} 
-              {property.bathrooms ? ` and ${property.bathrooms} bathrooms` : ''} 
-              for comfortable living.
-            </p>
-            
-            {property.amenities.length > 0 && (
-              <div className="mt-4">
-                <h4 className="text-lg font-semibold mb-2">Property Features:</h4>
-                <ul className="list-disc pl-6">
-                  {property.amenities.slice(0, 5).map((amenity, index) => (
-                    <li key={index}>{amenity}</li>
-                  ))}
-                </ul>
-              </div>
-            )}
-            
-            <div className="mt-4">
-              <h4 className="text-lg font-semibold mb-2">
-                Why Choose Properties in {property.city}?
-              </h4>
-              <ul className="list-disc pl-6">
-                <li>Strategic location with good transport links</li>
-                <li>Growing property values and investment potential</li>
-                <li>Access to amenities and business opportunities</li>
-                <li>Safe and secure neighborhoods</li>
-              </ul>
-            </div>
-          </div>
-        </div>
-
-        {/* FAQ Section */}
-        <div className="mt-12">
-          <h3 className="text-2xl font-bold mb-6">
-            Frequently Asked Questions about {property.property_type}s in {property.city}
-          </h3>
-          <div className="space-y-4">
-            {[
-              {
-                question: `What is the average rent for ${property.property_type.toLowerCase()}s in ${property.city}?`,
-                answer: `Property prices in ${property.city} vary based on location, size, and amenities. This ${property.property_type.toLowerCase()} is priced at KES ${property.price.toLocaleString()} which is competitive for the area.`
-              },
-              {
-                question: `Are there other ${property.bedrooms}-bedroom properties available in ${property.city}?`,
-                answer: `Yes, we have various ${property.bedrooms}-bedroom properties available in ${property.city}. Browse our listings to find options that match your budget and preferences.`
-              },
-              {
-                question: `How do I schedule a viewing for this property?`,
-                answer: `Contact the property owner directly using the phone number or WhatsApp contact provided. They will be happy to arrange a convenient viewing time.`
-              }
-            ].map((faq, index) => (
-              <div key={index} className="bg-white p-6 rounded-lg shadow-sm border">
-                <h4 className="font-semibold text-gray-900 mb-2">{faq.question}</h4>
-                <p className="text-gray-600">{faq.answer}</p>
-              </div>
-            ))}
-          </div>
-        </div>
+        {/* Neighborhood Links - Internal Linking */}
+        {property.county && (
+          <NeighborhoodLinks
+            county={property.county}
+            currentCity={property.city}
+            propertyType={property.property_type.toLowerCase().includes('apartment') ? 'apartment' : 'house'}
+            className="mt-12"
+          />
+        )}
 
         {/* Schema Markup */}
         <script

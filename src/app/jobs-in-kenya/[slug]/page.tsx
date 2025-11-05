@@ -5,23 +5,24 @@ import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { 
-  ArrowLeft, 
-  MapPin, 
-  Clock, 
-  Building2, 
-  DollarSign, 
+import {
+  ArrowLeft,
+  MapPin,
+  Clock,
+  Building2,
+  DollarSign,
   Calendar,
   CheckCircle,
   Shield,
-  Briefcase
+  Briefcase,
+  ExternalLink
 } from 'lucide-react';
-import jobsData from '@/data/jobs.json';
-import { 
-  generateJobSlug, 
-  generateJobMetaTags, 
-  generateJobHeadings 
+import localJobsData from '../../../../local-jobs.json';
+import {
+  generateJobMetaTags,
+  generateJobHeadings
 } from '@/lib/utils';
+import { slugify } from '@/lib/slugify';
 import Breadcrumb from '@/components/Breadcrumb';
 import JobActions from '@/components/JobActions';
 import MoreJobsSection from '@/components/MoreJobsSection';
@@ -31,18 +32,29 @@ interface JobDetailsPageProps {
   params: Promise<{ slug: string }>;
 }
 
+// Helper function to generate slug from job title
+function generateJobSlugFromTitle(jobTitle: string): string {
+  return slugify(jobTitle);
+}
+
+// Generate canonical URL to jobvacancy.co.ke
+function getJobVacancyCanonicalUrl(jobTitle: string): string {
+  const slug = generateJobSlugFromTitle(jobTitle);
+  return `https://jobvacancy.co.ke/jobs-in-kenya/${slug}`;
+}
+
 // Generate static params for SEO and crawlability
 export async function generateStaticParams() {
-  return jobsData.jobs.map((job) => ({
-    slug: generateJobSlug(job.job_title, 'NewKenyan', job.job_location),
+  return localJobsData.jobs.map((job) => ({
+    slug: generateJobSlugFromTitle(job.job_title),
   }));
 }
 
 // Generate metadata for SEO
 export async function generateMetadata({ params }: JobDetailsPageProps): Promise<Metadata> {
   const { slug } = await params;
-  const job = jobsData.jobs.find(j => generateJobSlug(j.job_title, 'NewKenyan', j.job_location) === slug);
-  
+  const job = localJobsData.jobs.find(j => generateJobSlugFromTitle(j.job_title) === slug);
+
   if (!job) {
     return {
       title: 'Job Not Found - Jobs in Kenya | NewKenyan.com',
@@ -57,7 +69,8 @@ export async function generateMetadata({ params }: JobDetailsPageProps): Promise
     job.salary
   );
 
-  const canonicalSlug = generateJobSlug(job.job_title, 'NewKenyan', job.job_location);
+  // Canonical URL points to jobvacancy.co.ke (original source)
+  const canonicalUrl = getJobVacancyCanonicalUrl(job.job_title);
 
   return {
     title: metaTags.title,
@@ -67,7 +80,7 @@ export async function generateMetadata({ params }: JobDetailsPageProps): Promise
       title: metaTags.title,
       description: metaTags.description,
       type: 'article',
-      url: `https://newkenyan.com/jobs-in-kenya/${canonicalSlug}`,
+      url: `https://newkenyan.com/jobs-in-kenya/${slug}`,
       siteName: 'NewKenyan.com',
       locale: 'en_KE',
     },
@@ -77,7 +90,7 @@ export async function generateMetadata({ params }: JobDetailsPageProps): Promise
       description: metaTags.description,
     },
     alternates: {
-      canonical: `https://newkenyan.com/jobs-in-kenya/${canonicalSlug}`,
+      canonical: canonicalUrl, // Points to jobvacancy.co.ke
     },
     robots: {
       index: true,
@@ -88,7 +101,7 @@ export async function generateMetadata({ params }: JobDetailsPageProps): Promise
 
 export default async function JobDetailsPage({ params }: JobDetailsPageProps) {
   const { slug } = await params;
-  const job = jobsData.jobs.find(j => generateJobSlug(j.job_title, 'NewKenyan', j.job_location) === slug);
+  const job = localJobsData.jobs.find(j => generateJobSlugFromTitle(j.job_title) === slug);
 
   if (!job) {
     notFound();
@@ -109,6 +122,7 @@ export default async function JobDetailsPage({ params }: JobDetailsPageProps) {
   ];
 
   const currentUrl = `https://newkenyan.com/jobs-in-kenya/${slug}`;
+  const canonicalUrl = getJobVacancyCanonicalUrl(job.job_title);
   const shareText = `${job.job_title} job in ${job.job_location} - Jobs in Kenya`;
 
   // Process how_to_apply text to replace emails with hr@newkenyan.com
@@ -176,6 +190,24 @@ export default async function JobDetailsPage({ params }: JobDetailsPageProps) {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               {/* Main Content */}
               <div className="lg:col-span-2">
+                {/* Original Source Badge */}
+                <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-4 flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <ExternalLink className="h-4 w-4 text-blue-600" />
+                    <p className="text-sm text-blue-800">
+                      Original job listing from <span className="font-semibold">JobVacancy.co.ke</span>
+                    </p>
+                  </div>
+                  <a
+                    href={canonicalUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-blue-600 hover:text-blue-800 text-sm font-medium hover:underline"
+                  >
+                    View Original
+                  </a>
+                </div>
+
                 {/* Job Header Card */}
                 <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-8 mb-8">
                   <div className="flex flex-col md:flex-row md:items-start md:justify-between mb-6">
