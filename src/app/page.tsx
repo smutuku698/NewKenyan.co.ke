@@ -6,6 +6,7 @@ import Image from 'next/image';
 import { Button } from '@/components/ui/button';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import HeroSection from '@/components/HeroSection';
 import JobCard from '@/components/JobCard';
 import BusinessCard from '@/components/BusinessCard';
 import PropertyCard from '@/components/PropertyCard';
@@ -13,10 +14,10 @@ import BlogCard from '@/components/BlogCard';
 import { GridLoadingSkeleton } from '@/components/LoadingSkeleton';
 import { LazySection } from '@/components/LazySection';
 import ScrollToTop from '@/components/ScrollToTop';
-import { 
-  sampleBusinesses, 
-  sampleBlogPosts, 
-  heroStats 
+import {
+  sampleBusinesses,
+  sampleBlogPosts,
+  heroStats
 } from '@/data/sampleData';
 import { supabase } from '@/lib/supabase';
 import { Users, Briefcase, Home, ArrowRight, Building2, BookOpen, ChevronDown } from 'lucide-react';
@@ -58,6 +59,7 @@ interface PropertyListing {
   images: string[];
   is_approved: boolean;
   is_featured: boolean;
+  created_at: string;
 }
 
 interface JobListing {
@@ -109,7 +111,7 @@ export default function HomePage() {
 
       const { data, error, count } = await supabase
         .from('property_listings')
-        .select('id, property_title, property_type, description, price, price_type, bedrooms, bathrooms, address, city, county, contact_phone, contact_email, whatsapp_number, amenities, images, is_approved, is_featured', { count: 'exact' })
+        .select('id, property_title, property_type, description, price, price_type, bedrooms, bathrooms, address, city, county, contact_phone, contact_email, whatsapp_number, amenities, images, is_approved, is_featured, created_at', { count: 'exact' })
         .eq('is_approved', true)
         .order('is_featured', { ascending: false })
         .order('created_at', { ascending: false })
@@ -257,70 +259,10 @@ export default function HomePage() {
           </div>
         </div>
       </div>
-      
+
       <main>
-        {/* Hero Section */}
-        <section className="relative bg-gray-900 text-white py-20">
-          <div className="absolute inset-0">
-            <Image
-              src="/images/hero-kenya.webp"
-              alt="Beautiful Kenya landscape showing houses for rent and sale in Nairobi"
-              fill
-              className="object-cover opacity-60"
-              priority
-              sizes="100vw"
-              quality={75}
-            />
-            <div className="absolute inset-0 bg-gray-900/40" />
-          </div>
-          
-          <div className="relative container mx-auto px-4 text-center">
-            <h1 className="display-title mb-6 text-white">
-              Find Jobs, Businesses & Properties in Kenya
-            </h1>
-            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center mb-12 px-4">
-              <Button className="bg-green-600 hover:bg-green-700 text-white px-4 sm:px-8 py-3 text-base sm:text-lg w-full sm:w-auto font-semibold" asChild>
-                <Link href="/properties/rent">Find Houses for Rent</Link>
-              </Button>
-              <Button variant="outline" className="border-2 border-white text-white hover:bg-white hover:text-gray-900 px-4 sm:px-8 py-3 text-base sm:text-lg bg-transparent w-full sm:w-auto font-semibold transition-all duration-200" asChild>
-                <Link href="/jobs-in-kenya">Browse Jobs in Kenya</Link>
-              </Button>
-            </div>
-
-            {/* Stats */}
-            <div className="grid grid-cols-3 gap-8 max-w-2xl mx-auto">
-              <Link href="/business-directory" className="text-center group cursor-pointer transition-transform hover:scale-105">
-                <div className="flex items-center justify-center w-12 h-12 bg-green-600 rounded-full mx-auto mb-2 group-hover:bg-green-700 transition-colors">
-                  <Users className="h-6 w-6 text-white" />
-                </div>
-                <div className="text-xl sm:text-2xl font-bold text-white mb-1">
-                  {heroStats.businesses.toLocaleString()}+
-                </div>
-                <div className="text-white text-sm group-hover:underline">Businesses</div>
-              </Link>
-
-              <Link href="/jobs-in-kenya" className="text-center group cursor-pointer transition-transform hover:scale-105">
-                <div className="flex items-center justify-center w-12 h-12 bg-blue-600 rounded-full mx-auto mb-2 group-hover:bg-blue-700 transition-colors">
-                  <Briefcase className="h-6 w-6 text-white" />
-                </div>
-                <div className="text-xl sm:text-2xl font-bold text-white mb-1">
-                  {heroStats.jobs.toLocaleString()}+
-                </div>
-                <div className="text-white text-sm group-hover:underline">Jobs</div>
-              </Link>
-
-              <Link href="/properties" className="text-center group cursor-pointer transition-transform hover:scale-105">
-                <div className="flex items-center justify-center w-12 h-12 bg-orange-600 rounded-full mx-auto mb-2 group-hover:bg-orange-700 transition-colors">
-                  <Home className="h-6 w-6 text-white" />
-                </div>
-                <div className="text-xl sm:text-2xl font-bold text-white mb-1">
-                  {heroStats.properties.toLocaleString()}+
-                </div>
-                <div className="text-white text-sm group-hover:underline">Properties</div>
-              </Link>
-            </div>
-          </div>
-        </section>
+        {/* New Hero Section */}
+        <HeroSection />
 
         {/* Properties Section with Infinite Scroll */}
         <section className="py-16 bg-gray-50">
@@ -362,6 +304,7 @@ export default function HomePage() {
                       amenities={property.amenities}
                       contactPhone={property.contact_phone}
                       whatsappNumber={property.whatsapp_number || undefined}
+                      createdAt={property.created_at}
                     />
                   ))
                 ) : (

@@ -152,3 +152,35 @@ COMMENT ON FUNCTION increment_daily_property_views() IS 'Adds 200 views daily to
 COMMENT ON FUNCTION run_daily_view_increment() IS 'Manually triggers the daily view increment for testing';
 COMMENT ON FUNCTION simulate_property_approval(UUID) IS 'Test function to simulate property approval and view boost';
 COMMENT ON FUNCTION reset_property_views(UUID) IS 'Reset property view tracking for testing purposes';
+
+
+
+
+
+--not yet added superbase table for real estate companies input.
+
+CREATE TABLE real_estate_companies (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  company_name TEXT NOT NULL,
+  company_type TEXT NOT NULL,
+  description TEXT NOT NULL,
+  address TEXT NOT NULL,
+  city TEXT NOT NULL,
+  phone TEXT NOT NULL,
+  email TEXT NOT NULL,
+  website TEXT,
+  whatsapp_number TEXT,
+  services TEXT[] NOT NULL,
+  specializations TEXT[] NOT NULL,
+  year_established INTEGER,
+  employee_count INTEGER,
+  google_maps_link TEXT,
+  logo TEXT,
+  social_media JSONB,
+  is_approved BOOLEAN DEFAULT FALSE,
+  is_verified BOOLEAN DEFAULT FALSE,
+  rating DECIMAL DEFAULT 0,
+  review_count INTEGER DEFAULT 0,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);

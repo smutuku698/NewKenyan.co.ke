@@ -1,6 +1,6 @@
 import Image from 'next/image';
 import Link from 'next/link';
-import { Bed, Bath, MapPin, Phone, MessageCircle, Heart, Share2 } from 'lucide-react';
+import { Bed, Bath, MapPin, Phone, MessageCircle, Heart, Share2, Calendar } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { generatePropertySlug } from '@/lib/utils';
@@ -18,6 +18,7 @@ interface PropertyCardProps {
   amenities: string[];
   contactPhone: string;
   whatsappNumber?: string;
+  createdAt?: string;
 }
 
 const PropertyCard = ({
@@ -32,9 +33,27 @@ const PropertyCard = ({
   images,
   amenities,
   whatsappNumber,
+  createdAt,
 }: PropertyCardProps) => {
   const formatPrice = (price: number) => {
     return `KSh ${price.toLocaleString()}`;
+  };
+
+  const formatDate = (dateString?: string) => {
+    if (!dateString) return 'Recently';
+
+    const date = new Date(dateString);
+    const now = new Date();
+    const diffTime = Math.abs(now.getTime() - date.getTime());
+    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+    if (diffDays === 0) return 'Today';
+    if (diffDays === 1) return 'Yesterday';
+    if (diffDays < 7) return `${diffDays} days ago`;
+    if (diffDays < 30) return `${Math.floor(diffDays / 7)} weeks ago`;
+    if (diffDays < 365) return `${Math.floor(diffDays / 30)} months ago`;
+
+    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
   };
 
   const slug = generatePropertySlug(title, type, city, bedrooms);
@@ -57,8 +76,12 @@ const PropertyCard = ({
             <span className="text-gray-400 text-sm">No Image</span>
           </div>
         )}
-        <div className="absolute top-2 left-2 max-w-[60%]">
+        <div className="absolute top-2 left-2 flex flex-col gap-1 max-w-[60%]">
           <Badge className="bg-blue-100 text-blue-800 text-xs truncate">{type}</Badge>
+          <Badge className="bg-white/95 text-gray-700 text-xs flex items-center gap-1 shadow-sm backdrop-blur-sm">
+            <Calendar className="h-3 w-3 text-orange-600" />
+            <span>{formatDate(createdAt)}</span>
+          </Badge>
         </div>
         <div className="absolute top-2 right-2 flex space-x-1">
           <Button variant="ghost" size="sm" className="bg-white/80 hover:bg-white p-2">
