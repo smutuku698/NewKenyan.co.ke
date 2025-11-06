@@ -23,6 +23,7 @@ import {
 } from '@/data/sampleData';
 import { supabase } from '@/lib/supabase';
 import { Users, Briefcase, Home, ArrowRight, Building2, BookOpen, ChevronDown, Filter } from 'lucide-react';
+import { PopularSearchesSection, BrowseByBudgetSection, FeaturedNeighborhoodsSection, QuickAccessLinksSection } from '@/components/SEOSections';
 
 interface BusinessListing {
   id: string;
@@ -376,6 +377,15 @@ export default function HomePage() {
         {/* New Hero Section */}
         <HeroSection />
 
+        {/* Popular Searches Section - Week 1 Quick Win */}
+        <PopularSearchesSection />
+
+        {/* Browse by Budget Section - Week 1 Quick Win */}
+        <BrowseByBudgetSection />
+
+        {/* Featured Neighborhoods Section - Week 1 Quick Win */}
+        <FeaturedNeighborhoodsSection />
+
         {/* Properties Section with Infinite Scroll */}
         <section className="py-16 bg-gray-50">
           <div className="container mx-auto px-3">
@@ -387,7 +397,7 @@ export default function HomePage() {
                   <div className="flex items-center justify-center w-10 h-10 bg-orange-100 rounded-lg">
                     <Home className="h-5 w-5 text-orange-600" />
                   </div>
-                  <h2 className="section-title">Houses for Rent in Nairobi & Apartments for Sale in Kenya</h2>
+                  <h2 className="section-title">Latest Properties: Apartments for Rent & Houses for Sale in Kenya</h2>
                 </div>
                 <div className="flex items-center gap-3">
                   {/* Filter Button */}
@@ -801,6 +811,11 @@ export default function HomePage() {
             </div>
           </div>
         </section>
+        </LazySection>
+
+        {/* Quick Access Links Section - Week 1 Quick Win */}
+        <LazySection>
+        <QuickAccessLinksSection />
         </LazySection>
 
         {/* FAQ Section */}

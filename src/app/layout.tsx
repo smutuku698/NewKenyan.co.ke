@@ -31,15 +31,15 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://newkenyan.com'),
-  title: "Houses for Rent in Nairobi & Jobs in Kenya | NewKenyan.com",
-  description: "Find houses for rent in Nairobi, apartments for sale, land, jobs & businesses across Kenya. Over 6,500+ verified property listings. Browse bedsitters from KES 5,000/month.",
-  keywords: "houses for rent in nairobi, apartments for rent in nairobi, houses for sale in kenya, bedsitters in nairobi, 2 bedroom houses for rent, jobs in kenya, land for sale kenya, office space for rent nairobi, apartments for sale kenya, commercial properties kenya",
+  title: "Apartments for Rent Nairobi | Houses for Sale Kenya | 6,500+ Listings",
+  description: "Find apartments for rent in Nairobi, houses for sale in Kenya & bedsitters from KES 5,000/month. Browse 2 & 3 bedroom apartments in Westlands, Kilimani, Karen. 6,500+ verified property listings.",
+  keywords: "apartments for rent nairobi, houses for sale in nairobi, bedsitter nairobi, 2 bedroom apartment nairobi, houses for rent in nairobi, land for sale in kenya, apartments for rent westlands, apartments kilimani, bedsitter kasarani, 3 bedroom house for rent, office space for rent nairobi, cheap apartments for rent nairobi",
   authors: [{ name: "Legit Hustles" }],
   creator: "NewKenyan.com",
   publisher: "Legit Hustles",
   openGraph: {
-    title: "Houses for Rent in Nairobi & Jobs in Kenya | NewKenyan.com",
-    description: "Find houses for rent in Nairobi, apartments for sale, land, jobs & businesses across Kenya. Over 6,500+ verified property listings.",
+    title: "Apartments for Rent Nairobi | Houses for Sale Kenya | 6,500+ Listings",
+    description: "Find apartments for rent in Nairobi, houses for sale in Kenya & bedsitters from KES 5,000/month. Browse 2 & 3 bedroom apartments in Westlands, Kilimani, Karen.",
     url: "https://newkenyan.com",
     siteName: "NewKenyan.com",
     type: "website",
@@ -55,8 +55,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Houses for Rent in Nairobi & Jobs in Kenya | NewKenyan.com",
-    description: "Find houses for rent in Nairobi, apartments for sale, land & jobs across Kenya. 6,500+ verified listings.",
+    title: "Apartments for Rent Nairobi | Houses for Sale Kenya | 6,500+ Listings",
+    description: "Find apartments for rent in Nairobi, houses for sale & bedsitters from KES 5,000/month. Browse 2 & 3 bedroom apartments in Westlands, Kilimani.",
     images: ["https://newkenyan.com/og-image.jpg"],
     site: "@newkenyan",
     creator: "@newkenyan",
