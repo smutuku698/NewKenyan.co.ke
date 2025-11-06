@@ -26,7 +26,7 @@ const Header = () => {
         <div className="flex min-h-16 items-center justify-between gap-6">
           {/* Logo */}
           <Link href="/" className="flex items-center space-x-2 group flex-shrink-0">
-            <div className="h-10 w-10 bg-green-600 rounded-lg flex items-center justify-center shadow-sm group-hover:bg-green-700 transition-colors duration-200">
+            <div className="h-10 w-10 rounded-lg flex items-center justify-center shadow-sm transition-colors duration-200" style={{ backgroundColor: '#076146' }}>
               {/* Red Map Pin matching favicon */}
               <svg className="h-6 w-6" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                 <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z" fill="#ef4444" stroke="#dc2626" strokeWidth="1"/>

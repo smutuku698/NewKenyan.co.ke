@@ -3,13 +3,54 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Search, MapPin, Home, DollarSign, TrendingUp, Users, Award } from 'lucide-react';
+import { Search, MapPin, Home, TrendingUp, Users, Award } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+
+// Location suggestions for autocomplete
+const locationSuggestions = [
+  'Nairobi', 'Mombasa', 'Kisumu', 'Nakuru', 'Eldoret', 'Thika', 'Kitale',
+  'Malindi', 'Garissa', 'Kakamega', 'Machakos', 'Meru', 'Nyeri', 'Kericho',
+  'Westlands', 'Kilimani', 'Karen', 'Lavington', 'Kileleshwa', 'Parklands'
+];
+
+// Property type options
+const propertyTypes = [
+  { value: 'all', label: 'All Property Types' },
+  { value: 'House', label: 'Houses' },
+  { value: 'Apartment', label: 'Apartments' },
+  { value: 'Land', label: 'Land' },
+  { value: 'Commercial', label: 'Commercial Property' },
+  { value: 'Bedsitter', label: 'Bedsitters' },
+  { value: 'Maisonette', label: 'Maisonettes' },
+  { value: 'Bungalow', label: 'Bungalows' },
+  { value: 'Townhouse', label: 'Townhouses' },
+  { value: 'Villa', label: 'Villas' }
+];
 
 export default function HeroSection() {
   const [searchQuery, setSearchQuery] = useState('');
   const [propertyType, setPropertyType] = useState('all');
   const [location, setLocation] = useState('');
+  const [showLocationSuggestions, setShowLocationSuggestions] = useState(false);
+  const [filteredLocations, setFilteredLocations] = useState<string[]>([]);
+
+  const handleLocationChange = (value: string) => {
+    setLocation(value);
+    if (value.length > 0) {
+      const filtered = locationSuggestions.filter(loc =>
+        loc.toLowerCase().includes(value.toLowerCase())
+      );
+      setFilteredLocations(filtered);
+      setShowLocationSuggestions(true);
+    } else {
+      setShowLocationSuggestions(false);
+    }
+  };
+
+  const selectLocation = (loc: string) => {
+    setLocation(loc);
+    setShowLocationSuggestions(false);
+  };
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
@@ -24,42 +65,60 @@ export default function HeroSection() {
 
   return (
     <section className="relative bg-gradient-to-b from-[#FFF9F5] to-white overflow-hidden">
-      <div className="container mx-auto px-4 py-12 md:py-20">
-        <div className="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+      <div className="container mx-auto px-4 py-6 md:py-10">
+        <div className="grid lg:grid-cols-2 gap-6 lg:gap-8 items-center">
 
           {/* LEFT COLUMN - Text & Search */}
-          <div className="space-y-6 lg:space-y-8 z-10">
+          <div className="space-y-4 lg:space-y-5 z-10">
             {/* Small Badge */}
             <div className="inline-flex items-center gap-2 bg-orange-50 border border-orange-200 rounded-full px-4 py-2 text-sm">
               <Award className="h-4 w-4 text-orange-600" />
               <span className="text-orange-800 font-medium">8 Years of Trusted Service</span>
             </div>
 
-            {/* Main Heading */}
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold leading-tight text-gray-900">
+            {/* Main Heading - Reduced size */}
+            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight text-gray-900">
               Find Your Dream
               <span className="block text-orange-600">Home in Kenya</span>
             </h1>
 
-            {/* Subtext */}
-            <p className="text-lg md:text-xl text-gray-600 leading-relaxed max-w-xl">
+            {/* Subtext - Reduced */}
+            <p className="text-base md:text-lg text-gray-600 leading-relaxed max-w-xl">
               Discover thousands of properties, jobs, and businesses across Kenya.
-              Your trusted marketplace for real estate and career opportunities.
             </p>
 
-            {/* Search Bar */}
+            {/* Search Bar with Autocomplete */}
             <form onSubmit={handleSearch} className="bg-white rounded-2xl shadow-lg p-2 md:p-3 border border-gray-100">
               <div className="flex flex-col md:flex-row gap-2">
-                {/* Location Input */}
-                <div className="flex items-center gap-2 flex-1 bg-gray-50 rounded-lg px-4 py-3">
-                  <MapPin className="h-5 w-5 text-gray-400" />
-                  <input
-                    type="text"
-                    placeholder="Location"
-                    value={location}
-                    onChange={(e) => setLocation(e.target.value)}
-                    className="bg-transparent outline-none w-full text-gray-700 placeholder-gray-400"
-                  />
+                {/* Location Input with Autocomplete */}
+                <div className="relative flex-1">
+                  <div className="flex items-center gap-2 bg-gray-50 rounded-lg px-4 py-3">
+                    <MapPin className="h-5 w-5 text-gray-400" />
+                    <input
+                      type="text"
+                      placeholder="Enter location"
+                      value={location}
+                      onChange={(e) => handleLocationChange(e.target.value)}
+                      onFocus={() => location && setShowLocationSuggestions(true)}
+                      onBlur={() => setTimeout(() => setShowLocationSuggestions(false), 200)}
+                      className="bg-transparent outline-none w-full text-gray-700 placeholder-gray-400"
+                      list="locations"
+                    />
+                  </div>
+                  {/* Location Suggestions Dropdown */}
+                  {showLocationSuggestions && filteredLocations.length > 0 && (
+                    <div className="absolute z-50 w-full mt-1 bg-white border border-gray-200 rounded-lg shadow-lg max-h-48 overflow-y-auto">
+                      {filteredLocations.map((loc, idx) => (
+                        <div
+                          key={idx}
+                          onClick={() => selectLocation(loc)}
+                          className="px-4 py-2 hover:bg-orange-50 cursor-pointer text-gray-700 text-sm"
+                        >
+                          {loc}
+                        </div>
+                      ))}
+                    </div>
+                  )}
                 </div>
 
                 {/* Property Type Select */}
@@ -70,18 +129,18 @@ export default function HeroSection() {
                     onChange={(e) => setPropertyType(e.target.value)}
                     className="bg-transparent outline-none w-full text-gray-700"
                   >
-                    <option value="all">Property Type</option>
-                    <option value="house">House</option>
-                    <option value="apartment">Apartment</option>
-                    <option value="land">Land</option>
-                    <option value="commercial">Commercial</option>
+                    {propertyTypes.map((type) => (
+                      <option key={type.value} value={type.value}>
+                        {type.label}
+                      </option>
+                    ))}
                   </select>
                 </div>
 
                 {/* Search Button */}
                 <Button
                   type="submit"
-                  className="bg-orange-600 hover:bg-orange-700 text-white px-6 py-6 rounded-lg font-semibold flex items-center gap-2 whitespace-nowrap"
+                  className="bg-orange-600 hover:bg-orange-700 text-white px-6 py-3 rounded-lg font-semibold flex items-center gap-2 whitespace-nowrap"
                 >
                   <Search className="h-5 w-5" />
                   <span className="hidden md:inline">Search</span>
@@ -89,17 +148,17 @@ export default function HeroSection() {
               </div>
             </form>
 
-            {/* Action Buttons */}
+            {/* Action Buttons - Changed to orange/brown */}
             <div className="flex flex-wrap gap-3 md:gap-4">
               <Button
-                className="bg-green-600 hover:bg-green-700 text-white px-6 md:px-8 py-6 text-base font-semibold rounded-lg shadow-md"
+                className="bg-orange-600 hover:bg-orange-700 text-white px-6 md:px-8 py-3 text-base font-semibold rounded-lg shadow-md"
                 asChild
               >
                 <Link href="/properties/rent">Browse Rentals</Link>
               </Button>
               <Button
                 variant="outline"
-                className="border-2 border-gray-300 hover:bg-gray-100 px-6 md:px-8 py-6 text-base font-semibold rounded-lg"
+                className="border-2 border-orange-600 text-orange-600 hover:bg-orange-50 px-6 md:px-8 py-3 text-base font-semibold rounded-lg"
                 asChild
               >
                 <Link href="/properties">View All Properties</Link>
@@ -108,22 +167,22 @@ export default function HeroSection() {
 
             {/* Small Links */}
             <div className="flex flex-wrap gap-4 text-sm text-gray-600">
-              <Link href="/jobs-in-kenya" className="hover:text-green-600 transition-colors flex items-center gap-1">
+              <Link href="/jobs-in-kenya" className="hover:text-orange-600 transition-colors flex items-center gap-1">
                 <span>Browse Jobs</span>
               </Link>
               <span className="text-gray-300">•</span>
-              <Link href="/business-directory" className="hover:text-green-600 transition-colors flex items-center gap-1">
+              <Link href="/business-directory" className="hover:text-orange-600 transition-colors flex items-center gap-1">
                 <span>Business Directory</span>
               </Link>
               <span className="text-gray-300">•</span>
-              <Link href="/add-listing" className="hover:text-green-600 transition-colors flex items-center gap-1">
+              <Link href="/add-listing" className="hover:text-orange-600 transition-colors flex items-center gap-1">
                 <span>List Property</span>
               </Link>
             </div>
           </div>
 
-          {/* RIGHT COLUMN - Image with Gradient & Floating Cards */}
-          <div className="relative lg:h-[600px] h-[500px] hidden lg:block">
+          {/* RIGHT COLUMN - Image with Gradient & Floating Cards - Reduced height */}
+          <div className="relative lg:h-[450px] h-[400px] hidden lg:block">
 
             {/* Rotated Gradient Background */}
             <div
@@ -137,9 +196,9 @@ export default function HeroSection() {
             </div>
 
             {/* Main Property Image */}
-            <div className="relative z-10 w-[85%] h-[70%] mx-auto mt-12 rounded-2xl overflow-hidden shadow-2xl">
+            <div className="relative z-10 w-[85%] h-[75%] mx-auto mt-8 rounded-2xl overflow-hidden shadow-2xl">
               <Image
-                src="/newkenyan-houses-for-sale-in-kenya.webp"
+                src="/images/newkenyan-houses-for-sale-in-kenya.webp"
                 alt="Houses for sale in Kenya"
                 fill
                 className="object-cover"
@@ -149,40 +208,40 @@ export default function HeroSection() {
             </div>
 
             {/* Floating Card - Top Right (Total Properties) */}
-            <div className="absolute top-8 right-0 bg-white rounded-xl shadow-xl p-4 z-20 border border-gray-100 hover:shadow-2xl transition-shadow">
-              <div className="flex items-center gap-3">
-                <div className="bg-purple-100 rounded-lg p-3">
-                  <Home className="h-6 w-6 text-purple-600" />
+            <div className="absolute top-6 right-0 bg-white rounded-xl shadow-xl p-3 z-20 border border-gray-100 hover:shadow-2xl transition-shadow">
+              <div className="flex items-center gap-2">
+                <div className="bg-purple-100 rounded-lg p-2">
+                  <Home className="h-5 w-5 text-purple-600" />
                 </div>
                 <div>
-                  <div className="text-2xl font-bold text-gray-900">1,200+</div>
-                  <div className="text-sm text-gray-600">Properties</div>
+                  <div className="text-xl font-bold text-gray-900">1,200+</div>
+                  <div className="text-xs text-gray-600">Properties</div>
                 </div>
               </div>
             </div>
 
             {/* Floating Card - Mid Right (Happy Customers) */}
-            <div className="absolute top-[45%] right-[-20px] bg-white rounded-xl shadow-xl p-4 z-20 border border-gray-100 hover:shadow-2xl transition-shadow">
-              <div className="flex items-center gap-3">
-                <div className="bg-orange-100 rounded-lg p-3">
-                  <Users className="h-6 w-6 text-orange-600" />
+            <div className="absolute top-[45%] right-[-20px] bg-white rounded-xl shadow-xl p-3 z-20 border border-gray-100 hover:shadow-2xl transition-shadow">
+              <div className="flex items-center gap-2">
+                <div className="bg-orange-100 rounded-lg p-2">
+                  <Users className="h-5 w-5 text-orange-600" />
                 </div>
                 <div>
-                  <div className="text-2xl font-bold text-gray-900">5,000+</div>
-                  <div className="text-sm text-gray-600">Happy Clients</div>
+                  <div className="text-xl font-bold text-gray-900">5,000+</div>
+                  <div className="text-xs text-gray-600">Happy Clients</div>
                 </div>
               </div>
             </div>
 
             {/* Floating Card - Bottom Left (Success Rate) */}
-            <div className="absolute bottom-16 left-0 bg-white rounded-xl shadow-xl p-4 z-20 border border-gray-100 hover:shadow-2xl transition-shadow">
-              <div className="flex items-center gap-3">
-                <div className="bg-green-100 rounded-lg p-3">
-                  <TrendingUp className="h-6 w-6 text-green-600" />
+            <div className="absolute bottom-12 left-0 bg-white rounded-xl shadow-xl p-3 z-20 border border-gray-100 hover:shadow-2xl transition-shadow">
+              <div className="flex items-center gap-2">
+                <div className="bg-green-100 rounded-lg p-2">
+                  <TrendingUp className="h-5 w-5 text-green-600" />
                 </div>
                 <div>
-                  <div className="text-2xl font-bold text-gray-900">98%</div>
-                  <div className="text-sm text-gray-600">Success Rate</div>
+                  <div className="text-xl font-bold text-gray-900">98%</div>
+                  <div className="text-xs text-gray-600">Success Rate</div>
                 </div>
               </div>
             </div>
