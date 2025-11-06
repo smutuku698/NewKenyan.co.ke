@@ -387,7 +387,7 @@ export default function HomePage() {
                   <div className="flex items-center justify-center w-10 h-10 bg-orange-100 rounded-lg">
                     <Home className="h-5 w-5 text-orange-600" />
                   </div>
-                  <h2 className="section-title">Properties for Sale & Rent in Kenya</h2>
+                  <h2 className="section-title">Houses for Rent in Nairobi & Apartments for Sale in Kenya</h2>
                 </div>
                 <div className="flex items-center gap-3">
                   {/* Filter Button */}
@@ -652,50 +652,127 @@ export default function HomePage() {
         </section>
 
 
-        {/* Popular Cities */}
+        {/* Comprehensive Location Directory - All Counties & Property Types */}
         <LazySection>
         <section className="py-16 bg-white">
           <div className="container mx-auto px-3">
             <div className="text-center mb-12">
               <h2 className="section-title mb-4">Explore Properties & Businesses by City</h2>
               <p className="text-gray-600 max-w-2xl mx-auto">
-                Find houses for rent, businesses, and job opportunities in Kenya's major cities
+                Comprehensive directory of properties across all 47 counties in Kenya. Find houses for sale, apartments for rent, and businesses in every location.
               </p>
             </div>
-            
-            <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-4 mb-12">
-              {[
-                { name: 'Nairobi', slug: 'nairobi' },
-                { name: 'Mombasa', slug: 'mombasa' },
-                { name: 'Kisumu', slug: 'kisumu' },
-                { name: 'Nakuru', slug: 'nakuru' },
-                { name: 'Eldoret', slug: 'eldoret' },
-                { name: 'Thika', slug: 'thika' },
-                { name: 'Machakos', slug: 'machakos' },
-                { name: 'Meru', slug: 'meru' },
-                { name: 'Nyeri', slug: 'nyeri' },
-                { name: 'Kitale', slug: 'kitale' },
-                { name: 'Kakamega', slug: 'kakamega' },
-                { name: 'Malindi', slug: 'malindi' }
-              ].map((city) => (
-                <div key={city.slug} className="bg-gray-50 rounded-lg p-4 text-center hover:bg-green-50 transition-colors">
-                  <h3 className="font-semibold text-gray-900 mb-2">{city.name}</h3>
-                  <div className="space-y-1">
-                    <Link 
-                      href={`/properties/city/${city.slug}`}
-                      className="block text-sm text-green-600 hover:underline"
-                    >
-                      Properties
-                    </Link>
-                    <Link 
-                      href={`/business-directory/city/${city.slug}`}
-                      className="block text-sm text-green-600 hover:underline"
-                    >
-                      Businesses
-                    </Link>
+
+            {/* Major Counties - Featured */}
+            <div className="mb-12">
+              <h3 className="text-xl font-bold text-gray-900 mb-6">Major Markets</h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
+                {KENYA_COUNTIES.filter(county =>
+                  ['nairobi-county', 'mombasa-county', 'kiambu-county', 'nakuru-county', 'kisumu-county'].includes(county.slug)
+                ).map((county) => (
+                  <div key={county.slug} className="bg-gradient-to-br from-green-50 to-green-100 rounded-lg p-5 border-2 border-green-200 hover:shadow-lg transition-all">
+                    <h3 className="font-bold text-lg text-gray-900 mb-3">{county.name}</h3>
+                    <div className="space-y-2">
+                      <div>
+                        <p className="text-xs font-semibold text-gray-700 mb-1">For Sale:</p>
+                        <div className="flex flex-wrap gap-1">
+                          <Link href={`/houses-for-sale/${county.slug}`} className="text-xs bg-white px-2 py-1 rounded hover:bg-green-600 hover:text-white transition-colors">Houses</Link>
+                          <Link href={`/apartments-for-sale/${county.slug}`} className="text-xs bg-white px-2 py-1 rounded hover:bg-green-600 hover:text-white transition-colors">Apartments</Link>
+                          <Link href={`/land-for-sale/${county.slug}`} className="text-xs bg-white px-2 py-1 rounded hover:bg-green-600 hover:text-white transition-colors">Land</Link>
+                        </div>
+                      </div>
+                      <div>
+                        <p className="text-xs font-semibold text-gray-700 mb-1">For Rent:</p>
+                        <div className="flex flex-wrap gap-1">
+                          <Link href={`/houses-for-rent/${county.slug}`} className="text-xs bg-white px-2 py-1 rounded hover:bg-green-600 hover:text-white transition-colors">Houses</Link>
+                          <Link href={`/apartments-for-rent/${county.slug}`} className="text-xs bg-white px-2 py-1 rounded hover:bg-green-600 hover:text-white transition-colors">Apartments</Link>
+                          <Link href={`/bedsitters-for-rent/${county.slug}`} className="text-xs bg-white px-2 py-1 rounded hover:bg-green-600 hover:text-white transition-colors">Bedsitters</Link>
+                        </div>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
+            </div>
+
+            {/* All 47 Counties - Comprehensive Grid */}
+            <div className="mb-8">
+              <h3 className="text-xl font-bold text-gray-900 mb-6">All Counties in Kenya</h3>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+                {KENYA_COUNTIES.sort((a, b) => a.name.localeCompare(b.name)).map((county) => (
+                  <div key={county.slug} className="bg-gray-50 rounded-lg p-4 hover:bg-green-50 transition-colors border border-gray-200 hover:border-green-300">
+                    <h3 className="font-semibold text-base text-gray-900 mb-3">{county.name}</h3>
+                    <div className="space-y-2">
+                      <div className="grid grid-cols-2 gap-1">
+                        <Link href={`/houses-for-sale/${county.slug}`} className="text-xs text-green-600 hover:underline">Houses Sale</Link>
+                        <Link href={`/houses-for-rent/${county.slug}`} className="text-xs text-green-600 hover:underline">Houses Rent</Link>
+                        <Link href={`/apartments-for-sale/${county.slug}`} className="text-xs text-green-600 hover:underline">Apartments Sale</Link>
+                        <Link href={`/apartments-for-rent/${county.slug}`} className="text-xs text-green-600 hover:underline">Apartments Rent</Link>
+                        <Link href={`/land-for-sale/${county.slug}`} className="text-xs text-green-600 hover:underline">Land</Link>
+                        <Link href={`/bedsitters-for-rent/${county.slug}`} className="text-xs text-green-600 hover:underline">Bedsitters</Link>
+                      </div>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Property Types Overview */}
+            <div className="bg-gradient-to-br from-blue-50 to-purple-50 rounded-lg p-8 border-2 border-blue-200">
+              <h3 className="text-xl font-bold text-gray-900 mb-4 text-center">Browse by Property Type</h3>
+              <p className="text-sm text-gray-600 text-center mb-6">
+                Explore all property types available across Kenya
+              </p>
+              <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-3">
+                <Link href="/houses-for-sale/nairobi-county" className="bg-white p-3 rounded-lg text-center hover:shadow-md transition-all">
+                  <div className="text-2xl mb-1">🏠</div>
+                  <div className="text-xs font-semibold text-gray-800">Houses for Sale</div>
+                </Link>
+                <Link href="/houses-for-rent/nairobi-county" className="bg-white p-3 rounded-lg text-center hover:shadow-md transition-all">
+                  <div className="text-2xl mb-1">🏠</div>
+                  <div className="text-xs font-semibold text-gray-800">Houses for Rent</div>
+                </Link>
+                <Link href="/apartments-for-sale/nairobi-county" className="bg-white p-3 rounded-lg text-center hover:shadow-md transition-all">
+                  <div className="text-2xl mb-1">🏢</div>
+                  <div className="text-xs font-semibold text-gray-800">Apartments Sale</div>
+                </Link>
+                <Link href="/apartments-for-rent/nairobi-county" className="bg-white p-3 rounded-lg text-center hover:shadow-md transition-all">
+                  <div className="text-2xl mb-1">🏢</div>
+                  <div className="text-xs font-semibold text-gray-800">Apartments Rent</div>
+                </Link>
+                <Link href="/land-for-sale/nairobi-county" className="bg-white p-3 rounded-lg text-center hover:shadow-md transition-all">
+                  <div className="text-2xl mb-1">🌍</div>
+                  <div className="text-xs font-semibold text-gray-800">Land for Sale</div>
+                </Link>
+                <Link href="/bedsitters-for-rent/nairobi-county" className="bg-white p-3 rounded-lg text-center hover:shadow-md transition-all">
+                  <div className="text-2xl mb-1">🚪</div>
+                  <div className="text-xs font-semibold text-gray-800">Bedsitters</div>
+                </Link>
+                <Link href="/bungalows-for-sale/nairobi-county" className="bg-white p-3 rounded-lg text-center hover:shadow-md transition-all">
+                  <div className="text-2xl mb-1">🏡</div>
+                  <div className="text-xs font-semibold text-gray-800">Bungalows Sale</div>
+                </Link>
+                <Link href="/maisonettes-for-sale/nairobi-county" className="bg-white p-3 rounded-lg text-center hover:shadow-md transition-all">
+                  <div className="text-2xl mb-1">🏘️</div>
+                  <div className="text-xs font-semibold text-gray-800">Maisonettes</div>
+                </Link>
+                <Link href="/townhouses-for-sale/nairobi-county" className="bg-white p-3 rounded-lg text-center hover:shadow-md transition-all">
+                  <div className="text-2xl mb-1">🏘️</div>
+                  <div className="text-xs font-semibold text-gray-800">Townhouses</div>
+                </Link>
+                <Link href="/villas-for-sale/nairobi-county" className="bg-white p-3 rounded-lg text-center hover:shadow-md transition-all">
+                  <div className="text-2xl mb-1">🏰</div>
+                  <div className="text-xs font-semibold text-gray-800">Villas</div>
+                </Link>
+                <Link href="/office-space-for-rent/nairobi-county" className="bg-white p-3 rounded-lg text-center hover:shadow-md transition-all">
+                  <div className="text-2xl mb-1">🏢</div>
+                  <div className="text-xs font-semibold text-gray-800">Office Space</div>
+                </Link>
+                <Link href="/commercial-properties-for-sale/nairobi-county" className="bg-white p-3 rounded-lg text-center hover:shadow-md transition-all">
+                  <div className="text-2xl mb-1">🏬</div>
+                  <div className="text-xs font-semibold text-gray-800">Commercial</div>
+                </Link>
+              </div>
             </div>
           </div>
         </section>

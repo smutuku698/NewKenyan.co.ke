@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Search, MapPin, Home, TrendingUp, Users, Award } from 'lucide-react';
+import { Search, MapPin, Home, TrendingUp, Users, Award, Calculator } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 // Location suggestions for autocomplete
@@ -78,13 +78,13 @@ export default function HeroSection() {
 
             {/* Main Heading - Reduced size */}
             <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight text-gray-900">
-              Find Your Dream
-              <span className="block text-orange-600">Home in Kenya</span>
+              Find Houses for Rent in Nairobi
+              <span className="block text-orange-600">& Properties for Sale in Kenya</span>
             </h1>
 
             {/* Subtext - Reduced */}
             <p className="text-base md:text-lg text-gray-600 leading-relaxed max-w-xl">
-              Discover thousands of properties, jobs, and businesses across Kenya.
+              Browse 6,500+ apartments for rent, houses for sale, bedsitters, land, jobs, and businesses across Kenya. Affordable listings from KES 5,000/month.
             </p>
 
             {/* Search Bar with Autocomplete */}
@@ -163,6 +163,22 @@ export default function HeroSection() {
               >
                 <Link href="/properties">View All Properties</Link>
               </Button>
+            </div>
+
+            {/* Construction Cost Calculator Button */}
+            <div className="mt-2">
+              <Button
+                className="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-purple-700 hover:to-blue-700 text-white px-6 md:px-8 py-3 text-base font-semibold rounded-lg shadow-lg flex items-center gap-2"
+                asChild
+              >
+                <Link href="https://newkenyan.com/construction-cost-calculator-kenya/" target="_blank" rel="noopener noreferrer">
+                  <Calculator className="h-5 w-5" />
+                  Construction Cost Calculator
+                </Link>
+              </Button>
+              <p className="text-sm text-gray-600 mt-2 ml-1">
+                See the cost of any house you have in mind right now!!
+              </p>
             </div>
 
             {/* Small Links */}

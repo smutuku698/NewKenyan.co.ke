@@ -31,15 +31,15 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   metadataBase: new URL('https://newkenyan.com'),
-  title: "NewKenyan.com - Find Jobs, Businesses & Properties in Kenya",
-  description: "Discover job opportunities, explore businesses, and find properties across Kenya on NewKenyan.com. Your gateway to Kenya's digital economy with verified listings and trusted connections.",
-  keywords: "Kenya jobs, jobs in Kenya, Kenya business directory, properties for sale Kenya, houses for rent Nairobi, apartments Kenya, office space rent Kenya, business opportunities Kenya, employment Kenya, real estate Kenya",
+  title: "Houses for Rent in Nairobi & Jobs in Kenya | NewKenyan.com",
+  description: "Find houses for rent in Nairobi, apartments for sale, land, jobs & businesses across Kenya. Over 6,500+ verified property listings. Browse bedsitters from KES 5,000/month.",
+  keywords: "houses for rent in nairobi, apartments for rent in nairobi, houses for sale in kenya, bedsitters in nairobi, 2 bedroom houses for rent, jobs in kenya, land for sale kenya, office space for rent nairobi, apartments for sale kenya, commercial properties kenya",
   authors: [{ name: "Legit Hustles" }],
   creator: "NewKenyan.com",
   publisher: "Legit Hustles",
   openGraph: {
-    title: "NewKenyan.com - Find Jobs, Businesses & Properties in Kenya",
-    description: "Discover job opportunities, explore businesses, and find properties across Kenya on NewKenyan.com.",
+    title: "Houses for Rent in Nairobi & Jobs in Kenya | NewKenyan.com",
+    description: "Find houses for rent in Nairobi, apartments for sale, land, jobs & businesses across Kenya. Over 6,500+ verified property listings.",
     url: "https://newkenyan.com",
     siteName: "NewKenyan.com",
     type: "website",
@@ -55,8 +55,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "NewKenyan.com - Find Jobs, Businesses & Properties in Kenya",
-    description: "Discover job opportunities, explore businesses, and find properties across Kenya.",
+    title: "Houses for Rent in Nairobi & Jobs in Kenya | NewKenyan.com",
+    description: "Find houses for rent in Nairobi, apartments for sale, land & jobs across Kenya. 6,500+ verified listings.",
     images: ["https://newkenyan.com/og-image.jpg"],
     site: "@newkenyan",
     creator: "@newkenyan",

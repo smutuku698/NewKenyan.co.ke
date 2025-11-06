@@ -43,7 +43,7 @@ const PropertyCard = ({
 
   const slug = generatePropertySlug(title, type, city, bedrooms);
 
-  // Calculate hours since posted
+  // Calculate hours since posted - Extended to 30 days for better visibility
   const getHoursSincePosted = () => {
     if (!createdAt) return null;
     const now = new Date();
@@ -53,7 +53,7 @@ const PropertyCard = ({
     if (hours < 1) return 'JUST NOW';
     if (hours < 24) return `${hours} HOUR${hours === 1 ? '' : 'S'}`;
     const days = Math.floor(hours / 24);
-    if (days < 7) return `${days} DAY${days === 1 ? '' : 'S'}`;
+    if (days < 30) return `${days} DAY${days === 1 ? '' : 'S'}`;
     return null;
   };
 
@@ -79,14 +79,20 @@ const PropertyCard = ({
             </div>
           )}
 
-          {/* NEW Badge - Top Left - Sleek and narrow like Movoto */}
-          {isNew && (
+          {/* NEW Badge or FEATURED Badge - Top Left - Sleek and narrow like Movoto */}
+          {isNew ? (
             <div className="absolute top-2.5 left-2.5 flex items-center gap-1.5">
               <span className="bg-green-700 text-white text-[10px] font-bold px-2 py-0.5 rounded">
                 NEW
               </span>
               <span className="bg-white text-gray-900 text-[10px] font-semibold px-2 py-0.5 rounded">
                 {hoursSincePosted}
+              </span>
+            </div>
+          ) : isFeatured && (
+            <div className="absolute top-2.5 left-2.5">
+              <span className="bg-gradient-to-r from-yellow-500 to-orange-500 text-white text-[10px] font-bold px-2.5 py-0.5 rounded shadow-md">
+                ⭐ FEATURED
               </span>
             </div>
           )}
