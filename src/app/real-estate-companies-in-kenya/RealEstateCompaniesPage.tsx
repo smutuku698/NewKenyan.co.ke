@@ -19,7 +19,9 @@ import {
   Hammer,
   LineChart,
   PieChart,
-  Building
+  Building,
+  BookOpen,
+  ChevronDown
 } from 'lucide-react';
 import realEstateData from '@/data/realEstateCompanies.json';
 
