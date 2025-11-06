@@ -144,12 +144,41 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     const locationPropertyPages: MetadataRoute.Sitemap = []
 
     if (locations && locations.length > 0) {
-      // Property type combinations
+      // All property type combinations with routes
       const propertyRoutes = [
         { path: 'houses-for-sale', priority: 0.85 },
         { path: 'houses-for-rent', priority: 0.85 },
         { path: 'apartments-for-sale', priority: 0.85 },
-        { path: 'apartments-for-rent', priority: 0.85 }
+        { path: 'apartments-for-rent', priority: 0.85 },
+        { path: '2-bedroom-houses-for-rent', priority: 0.84 },
+        { path: '2-bedroom-houses-for-sale', priority: 0.84 },
+        { path: '3-bedroom-houses-for-rent', priority: 0.84 },
+        { path: '3-bedroom-houses-for-sale', priority: 0.84 },
+        { path: '4-bedroom-houses-for-rent', priority: 0.83 },
+        { path: '4-bedroom-houses-for-sale', priority: 0.83 },
+        { path: '5-bedroom-houses-for-rent', priority: 0.83 },
+        { path: '5-bedroom-houses-for-sale', priority: 0.83 },
+        { path: 'bedsitters-for-rent', priority: 0.82 },
+        { path: 'bungalows-for-rent', priority: 0.82 },
+        { path: 'bungalows-for-sale', priority: 0.82 },
+        { path: 'commercial-properties-for-rent', priority: 0.81 },
+        { path: 'commercial-properties-for-sale', priority: 0.81 },
+        { path: 'container-houses-for-sale', priority: 0.80 },
+        { path: 'land-for-sale', priority: 0.85 },
+        { path: 'maisonettes-for-rent', priority: 0.82 },
+        { path: 'maisonettes-for-sale', priority: 0.82 },
+        { path: 'office-space-for-rent', priority: 0.83 },
+        { path: 'serviced-apartments-for-rent', priority: 0.82 },
+        { path: 'shops-for-rent', priority: 0.81 },
+        { path: 'shops-for-sale', priority: 0.81 },
+        { path: 'studio-apartments-for-rent', priority: 0.82 },
+        { path: 'studio-apartments-for-sale', priority: 0.82 },
+        { path: 'townhouses-for-rent', priority: 0.82 },
+        { path: 'townhouses-for-sale', priority: 0.82 },
+        { path: 'villas-for-rent', priority: 0.82 },
+        { path: 'villas-for-sale', priority: 0.82 },
+        { path: 'warehouses-for-rent', priority: 0.81 },
+        { path: 'warehouses-for-sale', priority: 0.81 }
       ]
 
       locations.forEach((location) => {
