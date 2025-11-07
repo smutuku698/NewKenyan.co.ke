@@ -914,6 +914,110 @@ export default function BedsitterNairobiClient() {
         </div>
       </section>
 
+      {/* Internal Linking Section - Browse by Location */}
+      <section className="py-12 bg-white border-t">
+        <div className="container mx-auto px-4">
+          <div className="max-w-6xl mx-auto">
+            <h2 className="text-3xl font-bold mb-4 text-center">Browse Bedsitters by Location</h2>
+            <p className="text-center text-gray-600 mb-8">Explore affordable bedsitters and studio apartments across Kenya</p>
+
+            {/* By County */}
+            <div className="mb-8">
+              <h3 className="text-xl font-semibold mb-4">Bedsitters by County</h3>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+                <Link href="/bedsitters-for-rent/nairobi-county" className="px-4 py-2 bg-gray-100 hover:bg-green-50 hover:text-green-600 rounded-lg text-center transition-colors border border-gray-200 hover:border-green-500">
+                  Nairobi
+                </Link>
+                <Link href="/bedsitters-for-rent/kiambu-county" className="px-4 py-2 bg-gray-100 hover:bg-green-50 hover:text-green-600 rounded-lg text-center transition-colors border border-gray-200 hover:border-green-500">
+                  Kiambu
+                </Link>
+                <Link href="/bedsitters-for-rent/machakos-county" className="px-4 py-2 bg-gray-100 hover:bg-green-50 hover:text-green-600 rounded-lg text-center transition-colors border border-gray-200 hover:border-green-500">
+                  Machakos
+                </Link>
+                <Link href="/bedsitters-for-rent/kajiado-county" className="px-4 py-2 bg-gray-100 hover:bg-green-50 hover:text-green-600 rounded-lg text-center transition-colors border border-gray-200 hover:border-green-500">
+                  Kajiado
+                </Link>
+                <Link href="/bedsitters-for-rent/mombasa-county" className="px-4 py-2 bg-gray-100 hover:bg-green-50 hover:text-green-600 rounded-lg text-center transition-colors border border-gray-200 hover:border-green-500">
+                  Mombasa
+                </Link>
+                <Link href="/bedsitters-for-rent/nakuru-county" className="px-4 py-2 bg-gray-100 hover:bg-green-50 hover:text-green-600 rounded-lg text-center transition-colors border border-gray-200 hover:border-green-500">
+                  Nakuru
+                </Link>
+              </div>
+            </div>
+
+            {/* Popular Nairobi Areas for Bedsitters */}
+            <div className="mb-8">
+              <h3 className="text-xl font-semibold mb-4">Popular Nairobi Areas for Bedsitters</h3>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+                <Link href="/bedsitter-kasarani" className="px-4 py-2 bg-green-50 hover:bg-green-100 text-green-700 hover:text-green-800 rounded-lg text-center transition-colors border border-green-200 hover:border-green-500 font-medium">
+                  Kasarani
+                </Link>
+                <Link href="/bedsitters-for-rent/kahawa" className="px-4 py-2 bg-green-50 hover:bg-green-100 text-green-700 hover:text-green-800 rounded-lg text-center transition-colors border border-green-200 hover:border-green-500 font-medium">
+                  Kahawa
+                </Link>
+                <Link href="/bedsitters-for-rent/zimmerman" className="px-4 py-2 bg-green-50 hover:bg-green-100 text-green-700 hover:text-green-800 rounded-lg text-center transition-colors border border-green-200 hover:border-green-500 font-medium">
+                  Zimmerman
+                </Link>
+                <Link href="/bedsitters-for-rent/roysambu" className="px-4 py-2 bg-green-50 hover:bg-green-100 text-green-700 hover:text-green-800 rounded-lg text-center transition-colors border border-green-200 hover:border-green-500 font-medium">
+                  Roysambu
+                </Link>
+                <Link href="/bedsitters-for-rent/githurai" className="px-4 py-2 bg-green-50 hover:bg-green-100 text-green-700 hover:text-green-800 rounded-lg text-center transition-colors border border-green-200 hover:border-green-500 font-medium">
+                  Githurai
+                </Link>
+              </div>
+            </div>
+
+            {/* Budget-Friendly Areas */}
+            <div className="mb-8">
+              <h3 className="text-xl font-semibold mb-4">Budget-Friendly Areas (Under KES 8K)</h3>
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3">
+                <Link href="/bedsitters-for-rent/ruiru" className="px-4 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 hover:text-blue-800 rounded-lg text-center transition-colors border border-blue-200 hover:border-blue-500">
+                  Ruiru
+                </Link>
+                <Link href="/bedsitters-for-rent/juja" className="px-4 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 hover:text-blue-800 rounded-lg text-center transition-colors border border-blue-200 hover:border-blue-500">
+                  Juja
+                </Link>
+                <Link href="/bedsitters-for-rent/ngong" className="px-4 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 hover:text-blue-800 rounded-lg text-center transition-colors border border-blue-200 hover:border-blue-500">
+                  Ngong
+                </Link>
+                <Link href="/bedsitters-for-rent/rongai" className="px-4 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 hover:text-blue-800 rounded-lg text-center transition-colors border border-blue-200 hover:border-blue-500">
+                  Rongai
+                </Link>
+                <Link href="/bedsitters-for-rent/syokimau" className="px-4 py-2 bg-blue-50 hover:bg-blue-100 text-blue-700 hover:text-blue-800 rounded-lg text-center transition-colors border border-blue-200 hover:border-blue-500">
+                  Syokimau
+                </Link>
+              </div>
+            </div>
+
+            {/* Related Property Searches */}
+            <div>
+              <h3 className="text-xl font-semibold mb-4">Related Property Searches</h3>
+              <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+                <Link href="/cheap-apartments-nairobi" className="px-4 py-2 bg-gray-50 hover:bg-gray-100 rounded-lg text-center transition-colors border border-gray-300 hover:border-gray-500">
+                  Cheap Apartments Nairobi
+                </Link>
+                <Link href="/apartments-for-rent-nairobi" className="px-4 py-2 bg-gray-50 hover:bg-gray-100 rounded-lg text-center transition-colors border border-gray-300 hover:border-gray-500">
+                  1 Bedroom Apartments
+                </Link>
+                <Link href="/2-bedroom-apartment-nairobi" className="px-4 py-2 bg-gray-50 hover:bg-gray-100 rounded-lg text-center transition-colors border border-gray-300 hover:border-gray-500">
+                  2 Bedroom Apartments
+                </Link>
+                <Link href="/apartments-westlands" className="px-4 py-2 bg-gray-50 hover:bg-gray-100 rounded-lg text-center transition-colors border border-gray-300 hover:border-gray-500">
+                  Westlands Apartments
+                </Link>
+                <Link href="/apartments-kilimani" className="px-4 py-2 bg-gray-50 hover:bg-gray-100 rounded-lg text-center transition-colors border border-gray-300 hover:border-gray-500">
+                  Kilimani Apartments
+                </Link>
+                <Link href="/3-bedroom-house-for-rent" className="px-4 py-2 bg-gray-50 hover:bg-gray-100 rounded-lg text-center transition-colors border border-gray-300 hover:border-gray-500">
+                  3 Bedroom Houses
+                </Link>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* FAQ Section with Schema */}
       <section id="faqs" className="py-12 bg-gray-50">
         <div className="container mx-auto px-3">

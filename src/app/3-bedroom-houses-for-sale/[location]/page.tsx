@@ -98,14 +98,14 @@ async function getProperties(location: Location): Promise<PropertyListing[]> {
 
   // Filter based on location type
   if (location.type === 'county') {
-    query = query.eq('county', location.name);
+    query = query.ilike('county', `%${location.name}%`);
   } else if (location.type === 'neighborhood') {
     query = query
-      .eq('county', location.county)
+      .ilike('county', `%${location.county}%`)
       .or(`city.ilike.%${location.name}%,address.ilike.%${location.name}%`);
   } else if (location.type === 'estate') {
     query = query
-      .eq('county', location.county)
+      .ilike('county', `%${location.county}%`)
       .ilike('address', `%${location.name}%`);
   }
 
@@ -171,9 +171,9 @@ async function getRelatedLocations(location: Location) {
     .eq('is_active', true);
 
   if (location.type === 'county') {
-    query = query.eq('county', location.name).neq('slug', location.slug);
+    query = query.ilike('county', `%${location.name}%`).neq('slug', location.slug);
   } else {
-    query = query.eq('county', location.county).neq('slug', location.slug);
+    query = query.ilike('county', `%${location.county}%`).neq('slug', location.slug);
   }
 
   query = query.order('name').limit(50);

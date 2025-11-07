@@ -62,10 +62,10 @@ export function PopularSearchesSection() {
               <TrendingUp className="h-6 w-6 text-white" />
             </div>
           </div>
-          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-3">
+          <h2 className="text-3xl md:text-3xl font-bold text-gray-900 mb-3">
             Most Searched Properties in Nairobi
           </h2>
-          <p className="text-gray-600 max-w-2xl mx-auto">
+          <p className="text-base md:text-base text-gray-600 max-w-2xl mx-auto">
             Quick access to the most popular property searches. Find apartments for rent in Nairobi, bedsitters, and houses based on what others are searching for.
           </p>
         </div>
@@ -159,7 +159,7 @@ export function BrowseByBudgetSection() {
               <DollarSign className="h-6 w-6 text-white" />
             </div>
           </div>
-          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-3">
+          <h2 className="text-3xl md:text-3xl font-bold text-gray-900 mb-3">
             Browse Properties by Your Budget
           </h2>
           <p className="text-gray-600 max-w-2xl mx-auto">
@@ -327,7 +327,7 @@ export function FeaturedNeighborhoodsSection() {
               <MapPin className="h-6 w-6 text-white" />
             </div>
           </div>
-          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-3">
+          <h2 className="text-3xl md:text-3xl font-bold text-gray-900 mb-3">
             Featured Neighborhoods in Nairobi
           </h2>
           <p className="text-gray-600 max-w-2xl mx-auto">
@@ -443,7 +443,7 @@ export function QuickAccessLinksSection() {
     <section className="py-12 bg-gray-50">
       <div className="container mx-auto px-3">
         <div className="text-center mb-10">
-          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-3">
+          <h2 className="text-3xl md:text-3xl font-bold text-gray-900 mb-3">
             Quick Access to Popular Property Types
           </h2>
           <p className="text-gray-600 max-w-2xl mx-auto">

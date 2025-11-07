@@ -76,14 +76,14 @@ export default function HeroSection() {
               <span className="text-orange-800 font-medium">8 Years of Trusted Service</span>
             </div>
 
-            {/* Main Heading - Reduced size */}
-            <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold leading-tight text-gray-900">
+            {/* Main Heading - Improved mobile size */}
+            <h1 className="text-4xl md:text-4xl lg:text-5xl font-bold leading-tight text-gray-900">
               Find Houses for Rent in Nairobi
               <span className="block text-orange-600">& Properties for Sale in Kenya</span>
             </h1>
 
-            {/* Subtext - Reduced */}
-            <p className="text-base md:text-lg text-gray-600 leading-relaxed max-w-xl">
+            {/* Subtext - Improved mobile size */}
+            <p className="text-lg md:text-lg text-gray-600 leading-relaxed max-w-xl">
               Browse 6,500+ apartments for rent, houses for sale, bedsitters, land, jobs, and businesses across Kenya. Affordable listings from KES 5,000/month.
             </p>
 
@@ -181,17 +181,20 @@ export default function HeroSection() {
               </p>
             </div>
 
-            {/* Small Links */}
-            <div className="flex flex-wrap gap-4 text-sm text-gray-600">
-              <Link href="/jobs-in-kenya" className="hover:text-orange-600 transition-colors flex items-center gap-1">
+            {/* Small Links - Improved mobile layout */}
+            <div className="flex flex-wrap items-center justify-start gap-3 md:gap-4 text-base md:text-sm text-gray-600">
+              <Link href="/jobs-in-kenya" className="hover:text-orange-600 transition-colors flex items-center gap-1 font-medium">
                 <span>Browse Jobs</span>
               </Link>
-              <span className="text-gray-300">•</span>
-              <Link href="/business-directory" className="hover:text-orange-600 transition-colors flex items-center gap-1">
-                <span>Business Directory</span>
+              <span className="text-gray-300 hidden md:inline">•</span>
+              <Link href="/real-estate-companies-in-kenya" className="hover:text-orange-600 transition-colors flex items-center gap-1 font-medium text-center md:text-left">
+                <span className="whitespace-nowrap md:whitespace-normal">
+                  R/Estate Agencies<span className="hidden md:inline"> in KE</span>
+                  <span className="block md:hidden text-sm">in Kenya</span>
+                </span>
               </Link>
-              <span className="text-gray-300">•</span>
-              <Link href="/add-listing" className="hover:text-orange-600 transition-colors flex items-center gap-1">
+              <span className="text-gray-300 hidden md:inline">•</span>
+              <Link href="/add-listing" className="hover:text-orange-600 transition-colors flex items-center gap-1 font-medium">
                 <span>List Property</span>
               </Link>
             </div>

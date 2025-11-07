@@ -45,10 +45,10 @@ interface PageProps {
 }
 
 // Property type configuration
-const PROPERTY_TYPE = 'bungalows';
+const PROPERTY_TYPE = 'container-houses';
 const TRANSACTION_TYPE = 'sale';
-const DB_QUERY = '%bungalow%';
-const PROPERTY_LABEL = 'Bungalows';
+const DB_QUERY = '%container%house%|%shipping container%|%prefab%|%modular house%';
+const PROPERTY_LABEL = 'Container Houses';
 
 // ISR Configuration: Revalidate every 24 hours
 export const revalidate = 86400;
@@ -269,7 +269,7 @@ export default async function PropertyPage({ params }: PageProps) {
               county: location.county,
               city: location.city || undefined
             }}
-            propertyType="bungalow"
+            propertyType="container-house"
             transactionType={TRANSACTION_TYPE}
             enableFilters={true}
           />

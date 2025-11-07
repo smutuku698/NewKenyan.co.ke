@@ -25,6 +25,7 @@ import {
   generateAboutContent,
   formatPrice
 } from '@/lib/property-page-generator';
+import { getFullCanonicalUrl } from '@/lib/canonical-mapping';
 
 interface PropertyListing {
   id: string;
@@ -90,14 +91,14 @@ async function getApartmentsForRent(location: Location): Promise<PropertyListing
     .ilike('property_type', '%apartment%');
 
   if (location.type === 'county') {
-    query = query.eq('county', location.name);
+    query = query.ilike('county', `%${location.name}%`);
   } else if (location.type === 'neighborhood') {
     query = query
-      .eq('county', location.county)
+      .ilike('county', `%${location.county}%`)
       .or(`city.ilike.%${location.name}%,address.ilike.%${location.name}%`);
   } else if (location.type === 'estate') {
     query = query
-      .eq('county', location.county)
+      .ilike('county', `%${location.county}%`)
       .ilike('address', `%${location.name}%`);
   }
 
@@ -174,7 +175,21 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const properties = await getApartmentsForRent(location);
   const stats = calculateStats(properties);
 
-  return generatePropertyMetadata(location, 'apartments', 'rent', stats);
+  const metadata = generatePropertyMetadata(location, 'apartments', 'rent', stats);
+
+  // Add canonical URL if this page has a standalone equivalent
+  const canonicalUrl = getFullCanonicalUrl(location.slug, 'apartment', 'rent');
+  if (canonicalUrl) {
+    return {
+      ...metadata,
+      alternates: {
+        ...metadata.alternates,
+        canonical: canonicalUrl
+      }
+    };
+  }
+
+  return metadata;
 }
 
 // Get related locations

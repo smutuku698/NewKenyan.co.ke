@@ -18,6 +18,7 @@ import {
   generateAboutContent,
   formatPrice
 } from '@/lib/property-page-generator';
+import { getFullCanonicalUrl } from '@/lib/canonical-mapping';
 
 interface PropertyListing {
   id: string;
@@ -92,14 +93,14 @@ async function getProperties(location: Location): Promise<PropertyListing[]> {
 
   // Filter based on location type
   if (location.type === 'county') {
-    query = query.eq('county', location.name);
+    query = query.ilike('county', `%${location.name}%`);
   } else if (location.type === 'neighborhood') {
     query = query
-      .eq('county', location.county)
+      .ilike('county', `%${location.county}%`)
       .or(`city.ilike.%${location.name}%,address.ilike.%${location.name}%`);
   } else if (location.type === 'estate') {
     query = query
-      .eq('county', location.county)
+      .ilike('county', `%${location.county}%`)
       .ilike('address', `%${location.name}%`);
   }
 
@@ -172,9 +173,9 @@ async function getRelatedLocations(location: Location) {
     .eq('is_active', true);
 
   if (location.type === 'county') {
-    query = query.eq('county', location.name).neq('slug', location.slug);
+    query = query.ilike('county', `%${location.name}%`).neq('slug', location.slug);
   } else {
-    query = query.eq('county', location.county).neq('slug', location.slug);
+    query = query.ilike('county', `%${location.county}%`).neq('slug', location.slug);
   }
 
   query = query.order('name').limit(50);
@@ -198,7 +199,21 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   const properties = await getProperties(location);
   const stats = calculateStats(properties);
 
-  return generatePropertyMetadata(location, PROPERTY_TYPE, TRANSACTION_TYPE, stats);
+  const metadata = generatePropertyMetadata(location, PROPERTY_TYPE, TRANSACTION_TYPE, stats);
+
+  // Add canonical URL if this page has a standalone equivalent
+  const canonicalUrl = getFullCanonicalUrl(location.slug, 'bedsitter', 'rent');
+  if (canonicalUrl) {
+    return {
+      ...metadata,
+      alternates: {
+        ...metadata.alternates,
+        canonical: canonicalUrl
+      }
+    };
+  }
+
+  return metadata;
 }
 
 export default async function PropertyPage({ params }: PageProps) {

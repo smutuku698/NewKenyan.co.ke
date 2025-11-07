@@ -1,0 +1,79 @@
+{
+  "timestamp": "2025-11-07T04:49:03.604Z",
+  "totalTransformations": 635,
+  "successCount": 635,
+  "errorCount": 0,
+  "propertyTypeDistribution": {
+    "Apartment": 204,
+    "House": 150,
+    "Bedsitter": 45,
+    "Maisonette": 80,
+    "Bungalow": 39,
+    "Townhouse": 50,
+    "Villa": 40,
+    "Penthouse": 2,
+    "Studio": 25,
+    "Land": 0,
+    "Commercial": 0,
+    "Office": 0
+  },
+  "locationFocus": {
+    "nairobi": {
+      "neighborhoods": [
+        "Westlands",
+        "Kilimani",
+        "Kileleshwa",
+        "Karen",
+        "Lavington",
+        "Parklands",
+        "Riverside",
+        "Kasarani",
+        "Ruaka",
+        "Kitisuru",
+        "Runda",
+        "Muthaiga",
+        "Spring Valley",
+        "Loresho",
+        "General Mathenge",
+        "Pangani",
+        "South C",
+        "South B",
+        "Langata",
+        "Syokimau",
+        "Rongai",
+        "Ngong",
+        "Kikuyu",
+        "Thika Road",
+        "Kamiti Road"
+      ],
+      "propertyCount": 818
+    },
+    "mombasa": {
+      "neighborhoods": [
+        "Nyali",
+        "Bamburi",
+        "Mtwapa",
+        "Diani",
+        "Shanzu",
+        "Malindi",
+        "Mkomani",
+        "Kizingo",
+        "Tudor",
+        "Likoni"
+      ],
+      "propertyCount": 143
+    },
+    "expansionCities": [
+      "Nakuru",
+      "Kisumu",
+      "Eldoret"
+    ]
+  },
+  "recommendations": [
+    "All homepage filter links should now return results",
+    "Focus future uploads on Nairobi and Mombasa neighborhoods",
+    "Expansion cities (Nakuru, Kisumu, Eldoret) ready for more listings",
+    "Maintain 60% rental / 40% sale distribution",
+    "Distribute property types according to bedroom count and price"
+  ]
+}

@@ -50,7 +50,7 @@ const Header = () => {
               <Link
                 key={item.path}
                 href={item.path}
-                className={`px-4 py-2 text-sm font-medium transition-colors duration-200 rounded-md ${
+                className={`px-4 py-2 text-base font-bold font-heading transition-colors duration-200 rounded-md ${
                   currentPath === item.path || currentPath.startsWith(item.path.split('?')[0])
                     ? 'text-gray-900 bg-gray-100'
                     : 'text-gray-700 hover:text-gray-900 hover:bg-gray-50'
@@ -128,7 +128,7 @@ const Header = () => {
                 <Link
                   key={item.path}
                   href={item.path}
-                  className={`block px-4 py-3 text-sm font-medium rounded-md ${
+                  className={`block px-4 py-3 text-lg font-bold font-heading rounded-md ${
                     currentPath === item.path || currentPath.startsWith(item.path.split('?')[0])
                       ? 'text-gray-900 bg-gray-100'
                       : 'text-gray-700 hover:text-gray-900 hover:bg-gray-50'
