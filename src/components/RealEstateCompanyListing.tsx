@@ -177,17 +177,17 @@ export default function RealEstateCompanyListing({ companies }: Props) {
         </div>
       </div>
 
-      {/* Search and Filter Bar */}
-      <div className="bg-white rounded-xl shadow-md p-4 space-y-4">
+      {/* Search and Filter Bar - IMPROVED VISIBILITY */}
+      <div className="bg-gradient-to-br from-white to-gray-50 rounded-xl shadow-lg border-2 border-gray-200 p-6 space-y-4">
         {/* Search Bar */}
         <div className="relative">
-          <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
+          <Search className="absolute left-4 top-1/2 transform -translate-y-1/2 h-6 w-6 text-green-600" />
           <input
             type="text"
             placeholder="Search companies by name, services, or location..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-12 pr-4 py-3 border-2 border-gray-200 rounded-lg focus:border-blue-500 focus:outline-none transition-colors"
+            className="w-full pl-14 pr-4 py-4 text-lg border-3 border-green-500 bg-white rounded-xl focus:border-green-600 focus:ring-4 focus:ring-green-100 focus:outline-none transition-all shadow-sm placeholder:text-gray-400 font-medium"
           />
         </div>
 

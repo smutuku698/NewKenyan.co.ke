@@ -82,9 +82,9 @@ export default function RealEstateCompanyCard({ company, index }: Props) {
 
   return (
     <div
-      className={`bg-white rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden border-2 ${
+      className={`bg-gradient-to-br from-white via-gray-50 to-white rounded-xl shadow-lg hover:shadow-2xl transition-all duration-300 overflow-hidden border-2 ${
         company.featured
-          ? 'border-yellow-400 ring-2 ring-yellow-200'
+          ? 'border-orange-400 ring-2 ring-orange-200 bg-gradient-to-br from-orange-50 via-amber-50 to-white'
           : company.verified
           ? 'border-blue-200'
           : 'border-gray-200'

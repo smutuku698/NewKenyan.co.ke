@@ -105,25 +105,25 @@ export default function RealEstateCompaniesPage() {
               <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 leading-tight">
                 Best Real Estate Companies in Kenya: Top Realtors & Property Investment Agents
               </h1>
-              <p className="text-xl md:text-2xl text-blue-100 mb-8 leading-relaxed">
+              <p className="text-xl md:text-2xl text-green-100 mb-8 leading-relaxed">
                 Find trusted real estate agents, realtors, and property investment companies in Kenya. Compare commercial real estate firms, property developers, and expert consultants in Nairobi and beyond
               </p>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                 <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20">
                   <div className="text-3xl font-bold">KES 773B</div>
-                  <div className="text-sm text-blue-100">Market Value 2025</div>
+                  <div className="text-sm text-green-100">Market Value 2025</div>
                 </div>
                 <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20">
                   <div className="text-3xl font-bold">5.12%</div>
-                  <div className="text-sm text-blue-100">Annual Growth Rate</div>
+                  <div className="text-sm text-green-100">Annual Growth Rate</div>
                 </div>
                 <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20">
                   <div className="text-3xl font-bold">4.4%</div>
-                  <div className="text-sm text-blue-100">Urbanization Rate</div>
+                  <div className="text-sm text-green-100">Urbanization Rate</div>
                 </div>
                 <div className="bg-white/10 backdrop-blur-sm rounded-lg p-4 border border-white/20">
                   <div className="text-3xl font-bold">200K</div>
-                  <div className="text-sm text-blue-100">Housing Deficit</div>
+                  <div className="text-sm text-green-100">Housing Deficit</div>
                 </div>
               </div>
             </div>
@@ -164,7 +164,91 @@ export default function RealEstateCompaniesPage() {
         </section>
 
         <div className="container mx-auto px-4 py-12">
+
+
           {/* Market Overview Section */}
+          <section id="companies" className="mb-16 scroll-mt-24">
+            <div className="mb-8">
+              <div className="bg-gradient-to-r from-green-700 via-green-600 to-teal-600 text-white rounded-2xl shadow-xl p-8 md:p-12 mb-8">
+                <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-4">
+                  <div className="flex items-center gap-3">
+                    <div className="p-3 bg-white/20 backdrop-blur-sm rounded-lg">
+                      <Building2 className="h-8 w-8 text-white" />
+                    </div>
+                    <h2 className="text-3xl md:text-4xl font-bold">Trusted Real Estate Companies in Kenya</h2>
+                  </div>
+                  <Link
+                    href="/real-estate-companies/add"
+                    className="inline-flex items-center gap-2 bg-white text-blue-600 px-6 py-3 rounded-lg hover:bg-green-50 transition-colors font-semibold shadow-lg whitespace-nowrap"
+                  >
+                    <Building2 className="h-5 w-5" />
+                    Add Your Company
+                  </Link>
+                </div>
+                <p className="text-xl text-green-100 leading-relaxed mb-6">
+                  Browse our curated directory of {companies.length}+ verified real estate companies across Kenya. Each listing includes contact details, Google Maps location, client reviews, and comprehensive service information to help you make informed decisions.
+                </p>
+                <div className="grid md:grid-cols-2 gap-4">
+                  <div className="flex items-start gap-3">
+                    <CheckCircle2 className="h-6 w-6 text-green-300 flex-shrink-0 mt-1" />
+                    <div>
+                      <div className="font-semibold mb-1">Verified Contact Information</div>
+                      <div className="text-sm text-green-100">Direct phone numbers, WhatsApp links, and website URLs for instant communication</div>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <CheckCircle2 className="h-6 w-6 text-green-300 flex-shrink-0 mt-1" />
+                    <div>
+                      <div className="font-semibold mb-1">Google Maps Integration</div>
+                      <div className="text-sm text-green-100">Interactive maps showing exact company locations with directions</div>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <CheckCircle2 className="h-6 w-6 text-green-300 flex-shrink-0 mt-1" />
+                    <div>
+                      <div className="font-semibold mb-1">Real Client Reviews</div>
+                      <div className="text-sm text-green-100">Authentic Google reviews and ratings from actual clients</div>
+                    </div>
+                  </div>
+                  <div className="flex items-start gap-3">
+                    <CheckCircle2 className="h-6 w-6 text-green-300 flex-shrink-0 mt-1" />
+                    <div>
+                      <div className="font-semibold mb-1">Detailed Service Listings</div>
+                      <div className="text-sm text-green-100">Comprehensive information about each company's specializations and offerings</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Company Listings */}
+              <RealEstateCompanyListing companies={companies} />
+
+              {/* Bottom CTA */}
+              <div className="bg-gradient-to-r from-gray-50 to-slate-50 rounded-xl p-8 mt-8 text-center">
+                <h3 className="text-2xl font-bold text-gray-900 mb-3">Can't Find What You're Looking For?</h3>
+                <p className="text-gray-600 mb-6 max-w-2xl mx-auto">
+                  Browse thousands of property listings or list your own business in our directory
+                </p>
+                <div className="flex flex-col sm:flex-row gap-4 justify-center">
+                  <Link
+                    href="/properties"
+                    className="inline-flex items-center justify-center gap-2 bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition-colors font-semibold"
+                  >
+                    <Home className="h-5 w-5" />
+                    Browse Properties
+                  </Link>
+                  <Link
+                    href="/add-listing"
+                    className="inline-flex items-center justify-center gap-2 bg-green-600 text-white px-8 py-3 rounded-lg hover:bg-green-700 transition-colors font-semibold"
+                  >
+                    <Building2 className="h-5 w-5" />
+                    List Your Company
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </section>
+
           <section id="overview" className="mb-16 scroll-mt-24">
             <div className="bg-white rounded-2xl shadow-lg p-8 md:p-12">
               <div className="flex items-center gap-3 mb-6">
@@ -240,7 +324,7 @@ export default function RealEstateCompaniesPage() {
 
                 <div className="bg-yellow-50 border-l-4 border-yellow-500 p-6 rounded-r-lg mb-6">
                   <h4 className="font-bold text-gray-900 mb-2 flex items-center gap-2">
-                    <AlertCircle className="h-5 w-5 text-yellow-600" />
+                    <AlertCircle className="h-5 w-5 text-orange-600" />
                     Housing Demand vs. Supply Gap
                   </h4>
                   <p className="text-gray-700">
@@ -525,7 +609,7 @@ export default function RealEstateCompaniesPage() {
 
                 <div className="bg-yellow-50 border-l-4 border-yellow-500 p-6 rounded-r-lg">
                   <h4 className="font-bold text-gray-900 mb-2 flex items-center gap-2">
-                    <AlertCircle className="h-5 w-5 text-yellow-600" />
+                    <AlertCircle className="h-5 w-5 text-orange-600" />
                     Investment Risks to Consider
                   </h4>
                   <p className="text-gray-700 text-sm mb-3">
@@ -986,7 +1070,7 @@ export default function RealEstateCompaniesPage() {
             <div className="bg-white rounded-2xl shadow-lg p-8 md:p-12">
               <div className="flex items-center gap-3 mb-6">
                 <div className="p-3 bg-yellow-100 rounded-lg">
-                  <Hammer className="h-6 w-6 text-yellow-600" />
+                  <Hammer className="h-6 w-6 text-orange-600" />
                 </div>
                 <h2 className="text-3xl md:text-4xl font-bold text-gray-900">Construction Materials & Building Trends</h2>
               </div>
@@ -1194,88 +1278,6 @@ export default function RealEstateCompaniesPage() {
           </section>
 
           {/* Real Estate Companies Section */}
-          <section id="companies" className="mb-16 scroll-mt-24">
-            <div className="mb-8">
-              <div className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white rounded-2xl shadow-xl p-8 md:p-12 mb-8">
-                <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4 mb-4">
-                  <div className="flex items-center gap-3">
-                    <div className="p-3 bg-white/20 backdrop-blur-sm rounded-lg">
-                      <Building2 className="h-8 w-8 text-white" />
-                    </div>
-                    <h2 className="text-3xl md:text-4xl font-bold">Trusted Real Estate Companies in Kenya</h2>
-                  </div>
-                  <Link
-                    href="/real-estate-companies/add"
-                    className="inline-flex items-center gap-2 bg-white text-blue-600 px-6 py-3 rounded-lg hover:bg-blue-50 transition-colors font-semibold shadow-lg whitespace-nowrap"
-                  >
-                    <Building2 className="h-5 w-5" />
-                    Add Your Company
-                  </Link>
-                </div>
-                <p className="text-xl text-blue-100 leading-relaxed mb-6">
-                  Browse our curated directory of {companies.length}+ verified real estate companies across Kenya. Each listing includes contact details, Google Maps location, client reviews, and comprehensive service information to help you make informed decisions.
-                </p>
-                <div className="grid md:grid-cols-2 gap-4">
-                  <div className="flex items-start gap-3">
-                    <CheckCircle2 className="h-6 w-6 text-green-300 flex-shrink-0 mt-1" />
-                    <div>
-                      <div className="font-semibold mb-1">Verified Contact Information</div>
-                      <div className="text-sm text-blue-100">Direct phone numbers, WhatsApp links, and website URLs for instant communication</div>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <CheckCircle2 className="h-6 w-6 text-green-300 flex-shrink-0 mt-1" />
-                    <div>
-                      <div className="font-semibold mb-1">Google Maps Integration</div>
-                      <div className="text-sm text-blue-100">Interactive maps showing exact company locations with directions</div>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <CheckCircle2 className="h-6 w-6 text-green-300 flex-shrink-0 mt-1" />
-                    <div>
-                      <div className="font-semibold mb-1">Real Client Reviews</div>
-                      <div className="text-sm text-blue-100">Authentic Google reviews and ratings from actual clients</div>
-                    </div>
-                  </div>
-                  <div className="flex items-start gap-3">
-                    <CheckCircle2 className="h-6 w-6 text-green-300 flex-shrink-0 mt-1" />
-                    <div>
-                      <div className="font-semibold mb-1">Detailed Service Listings</div>
-                      <div className="text-sm text-blue-100">Comprehensive information about each company's specializations and offerings</div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* Company Listings */}
-              <RealEstateCompanyListing companies={companies} />
-
-              {/* Bottom CTA */}
-              <div className="bg-gradient-to-r from-gray-50 to-slate-50 rounded-xl p-8 mt-8 text-center">
-                <h3 className="text-2xl font-bold text-gray-900 mb-3">Can't Find What You're Looking For?</h3>
-                <p className="text-gray-600 mb-6 max-w-2xl mx-auto">
-                  Browse thousands of property listings or list your own business in our directory
-                </p>
-                <div className="flex flex-col sm:flex-row gap-4 justify-center">
-                  <Link
-                    href="/properties"
-                    className="inline-flex items-center justify-center gap-2 bg-blue-600 text-white px-8 py-3 rounded-lg hover:bg-blue-700 transition-colors font-semibold"
-                  >
-                    <Home className="h-5 w-5" />
-                    Browse Properties
-                  </Link>
-                  <Link
-                    href="/add-listing"
-                    className="inline-flex items-center justify-center gap-2 bg-green-600 text-white px-8 py-3 rounded-lg hover:bg-green-700 transition-colors font-semibold"
-                  >
-                    <Building2 className="h-5 w-5" />
-                    List Your Company
-                  </Link>
-                </div>
-              </div>
-            </div>
-          </section>
-
           {/* Related Resources Section */}
           <section className="mb-16">
             <div className="bg-gradient-to-r from-gray-50 to-slate-50 rounded-2xl shadow-lg p-8 md:p-12">
@@ -1416,15 +1418,15 @@ export default function RealEstateCompaniesPage() {
 
           {/* Final CTA */}
           <section>
-            <div className="bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 text-white rounded-2xl shadow-2xl p-8 md:p-12 text-center">
+            <div className="bg-gradient-to-r from-green-700 via-green-600 to-teal-600 text-white rounded-2xl shadow-2xl p-8 md:p-12 text-center">
               <h2 className="text-3xl md:text-4xl font-bold mb-4">Ready to Start Your Real Estate Journey?</h2>
-              <p className="text-xl text-blue-100 mb-8 max-w-3xl mx-auto">
+              <p className="text-xl text-green-100 mb-8 max-w-3xl mx-auto">
                 Whether you're buying your first home, investing in property, or looking for the perfect commercial space, NewKenyan.co.ke connects you with trusted real estate professionals across Kenya.
               </p>
               <div className="flex flex-col sm:flex-row gap-4 justify-center">
                 <Link
                   href="/properties"
-                  className="inline-flex items-center justify-center gap-2 bg-white text-blue-900 px-8 py-4 rounded-xl font-bold text-lg hover:bg-blue-50 transition-colors shadow-lg"
+                  className="inline-flex items-center justify-center gap-2 bg-white text-blue-900 px-8 py-4 rounded-xl font-bold text-lg hover:bg-green-50 transition-colors shadow-lg"
                 >
                   <Home className="h-6 w-6" />
                   Explore Properties
