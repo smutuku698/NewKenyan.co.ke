@@ -136,22 +136,22 @@ const RealEstateServicesPage = () => {
                   View Our Services
                   <ArrowRight className="ml-2 h-4 w-4" />
                 </Button>
-                <Button 
-                  size="lg" 
-                  variant="outline" 
-                  className="border-white text-white hover:bg-white hover:text-green-600 font-semibold"
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="bg-white text-green-600 border-white hover:bg-green-50 font-semibold"
                   onClick={() => window.open('mailto:info@newkenyan.com?subject=Real Estate Service Consultation&body=Hi, I would like to discuss real estate services for my property.', '_blank')}
                 >
                   <Mail className="mr-2 h-4 w-4" />
                   Get Free Consultation
                 </Button>
-                <Button 
-                  size="lg" 
+                <Button
+                  size="lg"
                   className="bg-green-700 text-white hover:bg-green-800 font-semibold"
-                  onClick={() => window.open('https://wa.me/254736407642?text=' + encodeURIComponent('Hi, I would like to discuss real estate services for my property.'), '_blank')}
+                  onClick={() => window.location.href = '/real-estate-companies-in-kenya/'}
                 >
-                  <MessageCircle className="mr-2 h-4 w-4" />
-                  WhatsApp Consultation
+                  <Home className="mr-2 h-4 w-4" />
+                  Other Real Estate Companies in Kenya
                 </Button>
               </div>
             </div>
@@ -357,10 +357,10 @@ const RealEstateServicesPage = () => {
                   <MessageCircle className="mr-2 h-5 w-5" />
                   WhatsApp: +254 736 407 642
                 </Button>
-                <Button 
-                  size="lg" 
-                  variant="outline" 
-                  className="border-white text-white hover:bg-white hover:text-green-600 font-semibold"
+                <Button
+                  size="lg"
+                  variant="outline"
+                  className="bg-white text-green-600 border-white hover:bg-green-50 font-semibold"
                   onClick={() => window.open('tel:+254736407642', '_self')}
                 >
                   <Phone className="mr-2 h-5 w-5" />

@@ -38,7 +38,7 @@ const Header = () => {
               <span className="text-base lg:text-lg font-heading font-bold text-gray-900">
                 NewKenyan.com
               </span>
-              <span className="text-[9px] text-gray-600 font-body font-medium tracking-wide hidden sm:block">
+              <span className="text-[9px] text-gray-600 font-body font-bold tracking-wide hidden sm:block">
                 NEWKENYAN PROPERTIES
               </span>
             </div>
@@ -84,22 +84,13 @@ const Header = () => {
             <SignedOut>
               <SignInButton>
                 <Button
-                  variant="ghost"
-                  size="sm"
-                  className="text-gray-700 hover:text-gray-900 hover:bg-gray-100 font-medium"
-                >
-                  Sign In
-                </Button>
-              </SignInButton>
-              <Link href="/properties/add">
-                <Button
                   variant="outline"
                   size="sm"
                   className="border-gray-300 text-gray-900 hover:bg-gray-50 font-medium rounded-full px-5"
                 >
-                  Join
+                  Sign In
                 </Button>
-              </Link>
+              </SignInButton>
             </SignedOut>
           </div>
 
@@ -165,20 +156,11 @@ const Header = () => {
                   <SignInButton>
                     <Button
                       variant="outline"
-                      className="w-full justify-center font-medium border-gray-300"
+                      className="w-full justify-center font-medium border-gray-300 rounded-full"
                     >
                       Sign In
                     </Button>
                   </SignInButton>
-                  <Link href="/properties/add">
-                    <Button
-                      variant="outline"
-                      className="w-full justify-center font-medium border-gray-300 rounded-full"
-                      onClick={() => setIsMobileMenuOpen(false)}
-                    >
-                      Join
-                    </Button>
-                  </Link>
                 </SignedOut>
               </div>
             </div>
