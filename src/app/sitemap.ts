@@ -4,6 +4,46 @@ import { createClient } from '@supabase/supabase-js'
 import { generatePropertySlug, generateBusinessSlug } from '@/utils/seo'
 import jobsData from '@/data/jobs.json'
 import { generateJobSlug } from '@/lib/utils'
+import fs from 'fs'
+import path from 'path'
+
+// Auto-discover all app routes from file system
+function getAppRoutes(): string[] {
+  const appDir = path.join(process.cwd(), 'src', 'app')
+  const routes: string[] = []
+
+  function scanDirectory(dir: string, currentPath: string = '') {
+    const entries = fs.readdirSync(dir, { withFileTypes: true })
+
+    for (const entry of entries) {
+      // Skip special Next.js folders and files
+      if (entry.name.startsWith('_') || entry.name.startsWith('.') ||
+          entry.name === 'api' || entry.name === 'components' ||
+          entry.name.includes('[') || entry.name.includes(']')) {
+        continue
+      }
+
+      const fullPath = path.join(dir, entry.name)
+      const routePath = currentPath ? `${currentPath}/${entry.name}` : entry.name
+
+      if (entry.isDirectory()) {
+        // Check if directory has a page.tsx or page.ts file
+        const hasPage = fs.existsSync(path.join(fullPath, 'page.tsx')) ||
+                        fs.existsSync(path.join(fullPath, 'page.ts'))
+
+        if (hasPage) {
+          routes.push(`/${routePath}`)
+        }
+
+        // Recursively scan subdirectories
+        scanDirectory(fullPath, routePath)
+      }
+    }
+  }
+
+  scanDirectory(appDir)
+  return routes
+}
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = 'https://newkenyan.com'
@@ -14,203 +54,38 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   )
 
-  // Static pages - comprehensive list of all static routes
-  const staticPages = [
-    // Home
-    {
-      url: baseUrl,
-      lastModified: new Date(),
-      changeFrequency: 'daily' as const,
-      priority: 1,
-    },
-    // Main sections
-    {
-      url: `${baseUrl}/properties`,
-      lastModified: new Date(),
-      changeFrequency: 'daily' as const,
-      priority: 0.9,
-    },
-    {
-      url: `${baseUrl}/real-estate-companies-in-kenya`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly' as const,
-      priority: 0.9,
-    },
-    {
-      url: `${baseUrl}/business-directory`,
-      lastModified: new Date(),
-      changeFrequency: 'daily' as const,
-      priority: 0.9,
-    },
-    {
-      url: `${baseUrl}/jobs-in-kenya`,
-      lastModified: new Date(),
-      changeFrequency: 'daily' as const,
-      priority: 0.8,
-    },
-    {
-      url: `${baseUrl}/blog`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly' as const,
-      priority: 0.7,
-    },
-    // Tools & Calculators
-    {
-      url: `${baseUrl}/construction-cost-calculator-kenya`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly' as const,
-      priority: 0.75,
-    },
-    {
-      url: `${baseUrl}/mortgage-calculator-kenya`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly' as const,
-      priority: 0.75,
-    },
-    {
-      url: `${baseUrl}/net-pay-calculator`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly' as const,
-      priority: 0.75,
-    },
-    // Services
-    {
-      url: `${baseUrl}/real-estate-services`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly' as const,
-      priority: 0.7,
-    },
-    {
-      url: `${baseUrl}/website-services`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly' as const,
-      priority: 0.7,
-    },
-    // Static property pages
-    {
-      url: `${baseUrl}/houses-for-rent-nairobi`,
-      lastModified: new Date(),
-      changeFrequency: 'daily' as const,
-      priority: 0.9,
-    },
-    {
-      url: `${baseUrl}/land-for-sale-kenya`,
-      lastModified: new Date(),
-      changeFrequency: 'daily' as const,
-      priority: 0.9,
-    },
-    {
-      url: `${baseUrl}/2-bedroom-apartment-nairobi`,
-      lastModified: new Date(),
-      changeFrequency: 'daily' as const,
-      priority: 0.88,
-    },
-    {
-      url: `${baseUrl}/3-bedroom-house-for-rent`,
-      lastModified: new Date(),
-      changeFrequency: 'daily' as const,
-      priority: 0.88,
-    },
-    {
-      url: `${baseUrl}/apartments-for-rent-nairobi`,
-      lastModified: new Date(),
-      changeFrequency: 'daily' as const,
-      priority: 0.9,
-    },
-    {
-      url: `${baseUrl}/apartments-kilimani`,
-      lastModified: new Date(),
-      changeFrequency: 'daily' as const,
-      priority: 0.88,
-    },
-    {
-      url: `${baseUrl}/apartments-westlands`,
-      lastModified: new Date(),
-      changeFrequency: 'daily' as const,
-      priority: 0.88,
-    },
-    {
-      url: `${baseUrl}/bedsitter-kasarani`,
-      lastModified: new Date(),
-      changeFrequency: 'daily' as const,
-      priority: 0.87,
-    },
-    {
-      url: `${baseUrl}/bedsitter-nairobi`,
-      lastModified: new Date(),
-      changeFrequency: 'daily' as const,
-      priority: 0.88,
-    },
-    {
-      url: `${baseUrl}/cheap-apartments-nairobi`,
-      lastModified: new Date(),
-      changeFrequency: 'daily' as const,
-      priority: 0.88,
-    },
-    // Additional static property pages
-    {
-      url: `${baseUrl}/properties/add`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly' as const,
-      priority: 0.6,
-    },
-    {
-      url: `${baseUrl}/properties/rent`,
-      lastModified: new Date(),
-      changeFrequency: 'daily' as const,
-      priority: 0.85,
-    },
-    {
-      url: `${baseUrl}/real-estate-companies/add`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly' as const,
-      priority: 0.6,
-    },
-    {
-      url: `${baseUrl}/jobs-in-kenya/post`,
-      lastModified: new Date(),
-      changeFrequency: 'weekly' as const,
-      priority: 0.65,
-    },
-    // Informational pages
-    {
-      url: `${baseUrl}/about`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly' as const,
-      priority: 0.5,
-    },
-    {
-      url: `${baseUrl}/contact`,
-      lastModified: new Date(),
-      changeFrequency: 'monthly' as const,
-      priority: 0.5,
-    },
-    {
-      url: `${baseUrl}/privacy-policy`,
-      lastModified: new Date(),
-      changeFrequency: 'yearly' as const,
-      priority: 0.3,
-    },
-    {
-      url: `${baseUrl}/terms-of-service`,
-      lastModified: new Date(),
-      changeFrequency: 'yearly' as const,
-      priority: 0.3,
-    },
-    // City pillar pages
-    {
-      url: `${baseUrl}/nairobi`,
-      lastModified: new Date(),
-      changeFrequency: 'daily' as const,
-      priority: 0.95,
-    },
-    {
-      url: `${baseUrl}/mombasa`,
-      lastModified: new Date(),
-      changeFrequency: 'daily' as const,
-      priority: 0.95,
-    },
-  ]
+  // Auto-discover all static routes
+  const discoveredRoutes = getAppRoutes()
+
+  // Determine priority based on route type
+  const getPriority = (route: string): number => {
+    if (route === '/') return 1
+    if (route.includes('properties') || route.includes('business')) return 0.9
+    if (route.includes('nairobi') || route.includes('mombasa')) return 0.88
+    if (route.includes('apartment') || route.includes('house')) return 0.85
+    if (route.includes('bedroom')) return 0.84
+    if (route.includes('bedsitter') || route.includes('cheap')) return 0.83
+    if (route.includes('jobs')) return 0.8
+    if (route.includes('calculator') || route.includes('services')) return 0.75
+    if (route.includes('blog')) return 0.7
+    if (route.includes('about') || route.includes('contact')) return 0.5
+    if (route.includes('privacy') || route.includes('terms')) return 0.3
+    return 0.7 // default
+  }
+
+  // Auto-generate static pages from discovered routes
+  const autoStaticPages: MetadataRoute.Sitemap = discoveredRoutes.map(route => ({
+    url: route === '/' ? baseUrl : `${baseUrl}${route}`,
+    lastModified: new Date(),
+    changeFrequency: route.includes('properties') || route.includes('apartment') || route.includes('house')
+      ? 'daily' as const
+      : route.includes('jobs') || route.includes('business')
+      ? 'weekly' as const
+      : 'monthly' as const,
+    priority: getPriority(route),
+  }))
+
+  // No need for manual static pages list anymore - all auto-discovered!
 
   try {
     // Get all approved properties
@@ -349,7 +224,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     })
 
     return [
-      ...staticPages,
+      ...autoStaticPages,
       ...locationPropertyPages,
       ...propertyPages,
       ...businessPages,
@@ -360,7 +235,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
   } catch (error) {
     console.error('Error generating sitemap:', error)
-    // Return just static pages if dynamic content fails
-    return staticPages
+    // Return just auto-discovered pages if dynamic content fails
+    return autoStaticPages
   }
 }

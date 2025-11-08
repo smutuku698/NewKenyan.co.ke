@@ -50,7 +50,8 @@
       "Bash(client-page.tsx.tmp)",
       "Bash(nul)",
       "Bash(bash scripts/update-all-location-queries.sh:*)",
-      "Bash(npm run verify-sitemap:*)"
+      "Bash(npm run verify-sitemap:*)",
+      "Bash(npx next build)"
     ],
     "deny": [],
     "ask": []

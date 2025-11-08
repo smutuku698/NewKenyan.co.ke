@@ -58,8 +58,8 @@ export default function TwoBedroomApartmentNairobiClient() {
         .eq('is_approved', true)
         .eq('property_type', 'Apartment')
         .eq('bedrooms', 2)
-        .eq('price_type', 'rent')
-        .ilike('city', '%nairobi%')
+        .eq('price_type', 'For Rent')
+        .ilike('county', '%Nairobi%')
         .order('is_featured', { ascending: false })
         .order('created_at', { ascending: false });
 
@@ -86,8 +86,8 @@ export default function TwoBedroomApartmentNairobiClient() {
           .from('property_listings')
           .select('*')
           .eq('is_approved', true)
-          .eq('price_type', 'rent')
-          .ilike('city', '%nairobi%')
+          .eq('price_type', 'For Rent')
+          .ilike('county', '%Nairobi%')
           .order('is_featured', { ascending: false })
           .order('created_at', { ascending: false })
           .limit(12);

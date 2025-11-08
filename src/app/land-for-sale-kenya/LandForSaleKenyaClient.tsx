@@ -57,7 +57,7 @@ export default function LandForSaleKenyaClient() {
         .from('property_listings')
         .select('*')
         .eq('is_approved', true)
-        .eq('price_type', 'sale')
+        .eq('price_type', 'For Sale')
         .eq('property_type', 'Land')
         .order('is_featured', { ascending: false })
         .order('created_at', { ascending: false});
@@ -85,7 +85,7 @@ export default function LandForSaleKenyaClient() {
           .from('property_listings')
           .select('*')
           .eq('is_approved', true)
-          .eq('price_type', 'sale')
+          .eq('price_type', 'For Sale')
           .eq('property_type', 'Land')
           .order('is_featured', { ascending: false })
           .order('created_at', { ascending: false })
