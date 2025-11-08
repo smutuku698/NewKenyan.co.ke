@@ -79,7 +79,26 @@ export default function BedsitterNairobiClient() {
       const { data, error } = await query;
 
       if (error) throw error;
-      setProperties(data || []);
+
+      // Fallback: If no bedsitters found, show any rental properties in Nairobi
+      if (!data || data.length === 0) {
+        const fallbackQuery = supabase
+          .from('property_listings')
+          .select('*')
+          .eq('is_approved', true)
+          .eq('price_type', 'rent')
+          .ilike('city', '%nairobi%')
+          .order('is_featured', { ascending: false })
+          .order('created_at', { ascending: false })
+          .limit(12);
+
+        const { data: fallbackData, error: fallbackError } = await fallbackQuery;
+        if (!fallbackError) {
+          setProperties(fallbackData || []);
+        }
+      } else {
+        setProperties(data || []);
+      }
     } catch (error) {
       console.error('Error fetching properties:', error);
     } finally {
@@ -271,10 +290,10 @@ export default function BedsitterNairobiClient() {
             <div className="bg-white rounded-xl shadow-lg p-6">
               <h2 className="text-lg font-bold text-gray-900 mb-4">Quick Navigation</h2>
               <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+                <a href="#listings" className="text-sm text-green-600 hover:underline">Latest Listings</a>
                 <a href="#price-ranges" className="text-sm text-green-600 hover:underline">Price Ranges</a>
                 <a href="#neighborhoods" className="text-sm text-green-600 hover:underline">Best Areas</a>
                 <a href="#guide" className="text-sm text-green-600 hover:underline">Renter's Guide</a>
-                <a href="#listings" className="text-sm text-green-600 hover:underline">Latest Listings</a>
                 <a href="#market-trends" className="text-sm text-green-600 hover:underline">Market Trends</a>
                 <a href="#tips" className="text-sm text-green-600 hover:underline">Student Tips</a>
                 <a href="#faqs" className="text-sm text-green-600 hover:underline">FAQs</a>
@@ -282,6 +301,73 @@ export default function BedsitterNairobiClient() {
               </div>
             </div>
           </div>
+        </div>
+      </section>
+
+      {/* Property Listings - MOVED TO TOP */}
+      <section id="listings" className="py-12 bg-white border-b-2 border-gray-100">
+        <div className="container mx-auto px-3">
+          <div className="mb-6">
+            <h2 className="text-3xl font-bold text-gray-900 mb-2">
+              Latest Bedsitters for Rent in Nairobi
+            </h2>
+            <p className="text-gray-600">
+              Browse verified bedsitter listings. Showing {properties.length > 4 ? '4 of ' + properties.length : properties.length} properties
+            </p>
+          </div>
+
+          {loading ? (
+            <GridLoadingSkeleton type="property" count={4} />
+          ) : properties.length > 0 ? (
+            <>
+              <div className="grid gap-4 sm:gap-6 md:grid-cols-2 lg:grid-cols-4 mb-8">
+                {properties.slice(0, 4).map((property) => (
+                  <PropertyCard
+                    key={property.id}
+                    id={property.id}
+                    title={property.property_title}
+                    type={property.property_type}
+                    price={property.price}
+                    bedrooms={property.bedrooms || undefined}
+                    bathrooms={property.bathrooms || undefined}
+                    squareFeet={property.square_feet || undefined}
+                    location={property.city + (property.county ? ', ' + property.county : '')}
+                    city={property.city}
+                    images={property.images}
+                    amenities={property.amenities}
+                    contactPhone={property.contact_phone}
+                    whatsappNumber={property.whatsapp_number || undefined}
+                    createdAt={property.created_at}
+                    isFeatured={property.is_featured}
+                  />
+                ))}
+              </div>
+              {properties.length > 4 && (
+                <div className="text-center">
+                  <Button className="bg-green-600 hover:bg-green-700 text-white px-8 py-3" asChild>
+                    <Link href="/bedsitters-for-rent/nairobi-county">
+                      View All {properties.length} Bedsitters in Nairobi →
+                    </Link>
+                  </Button>
+                </div>
+              )}
+            </>
+          ) : (
+            <div className="text-center py-12 bg-gray-50 rounded-lg">
+              <Home className="h-16 w-16 text-gray-300 mx-auto mb-4" />
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                {selectedNeighborhood !== 'all' || selectedPriceRange !== 'all'
+                  ? 'No bedsitters match your filters'
+                  : 'Finding bedsitters for you...'}
+              </h3>
+              <p className="text-gray-600 mb-6">
+                Browse all available properties in Nairobi
+              </p>
+              <Button className="bg-green-600 hover:bg-green-700 text-white" asChild>
+                <Link href="/bedsitters-for-rent/nairobi-county">Browse All Nairobi Properties</Link>
+              </Button>
+            </div>
+          )}
         </div>
       </section>
 
@@ -312,7 +398,7 @@ export default function BedsitterNairobiClient() {
             </div>
 
             <p className="text-gray-700 leading-relaxed mb-6">
-              At <Link href="/" className="text-green-600 hover:underline font-semibold">NewKenyan.com</Link>, we've specialized in the Kenyan property market for over <strong>8 years</strong>, earning <strong>13+ industry awards</strong> including Best Real Estate Marketing Platform (2023) and Property Marketplace of the Year (2023). Our partnership with the <strong>Kenya Property Developers Association (KPDA)</strong> ensures all bedsitter listings meet quality and safety standards. We've successfully helped over <strong>50,000+ tenants</strong> find affordable accommodation across Nairobi.
+              At <Link href="/" className="text-green-600 hover:underline font-semibold">NewKenyan.com</Link>, we've specialized in the Kenyan property market for over <strong>8 years</strong>, earning <strong>13+ industry awards</strong> including Best Real Estate Marketing Platform (2023) and Property Marketplace of the Year (2023). We partner with <Link href="/real-estate-companies-in-kenya" className="text-green-600 hover:underline font-semibold">many real estate agencies in Kenya</Link> to ensure all bedsitter listings meet quality and safety standards. We've successfully helped over <strong>50,000+ tenants</strong> find affordable accommodation across Nairobi.
             </p>
           </div>
         </div>
@@ -689,91 +775,6 @@ export default function BedsitterNairobiClient() {
         </div>
       </section>
 
-      {/* Property Listings */}
-      <section id="listings" className="py-12 bg-white">
-        <div className="container mx-auto px-3">
-          <div className="mb-8">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">
-              Latest Bedsitters for Rent in Nairobi
-            </h2>
-            <div className="flex flex-wrap gap-4 items-center">
-              <select
-                value={selectedNeighborhood}
-                onChange={(e) => setSelectedNeighborhood(e.target.value)}
-                className="border-2 border-gray-300 rounded-lg px-4 py-2 focus:border-green-500 focus:outline-none"
-              >
-                <option value="all">All Neighborhoods</option>
-                <option value="Kasarani">Kasarani</option>
-                <option value="Ruaka">Ruaka</option>
-                <option value="Kahawa">Kahawa West</option>
-                <option value="Rongai">Rongai</option>
-                <option value="Kitengela">Kitengela</option>
-                <option value="Pipeline">Pipeline</option>
-                <option value="Githurai">Githurai</option>
-                <option value="Syokimau">Syokimau</option>
-              </select>
-
-              <select
-                value={selectedPriceRange}
-                onChange={(e) => setSelectedPriceRange(e.target.value)}
-                className="border-2 border-gray-300 rounded-lg px-4 py-2 focus:border-green-500 focus:outline-none"
-              >
-                <option value="all">All Prices</option>
-                <option value="5000-8000">KES 5K - 8K</option>
-                <option value="8000-10000">KES 8K - 10K</option>
-                <option value="10000-12000">KES 10K - 12K</option>
-                <option value="12000-15000">KES 12K - 15K</option>
-                <option value="15000-999999999">KES 15K+</option>
-              </select>
-
-              <div className="ml-auto">
-                <p className="text-gray-600">
-                  Showing <strong>{properties.length}</strong> bedsitters
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {loading ? (
-            <GridLoadingSkeleton type="property" count={12} />
-          ) : properties.length > 0 ? (
-            <div className="grid gap-4 sm:gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-              {properties.map((property) => (
-                <PropertyCard
-                  key={property.id}
-                  id={property.id}
-                  title={property.property_title}
-                  type={property.property_type}
-                  price={property.price}
-                  bedrooms={property.bedrooms || undefined}
-                  bathrooms={property.bathrooms || undefined}
-                  squareFeet={property.square_feet || undefined}
-                  location={property.city + (property.county ? ', ' + property.county : '')}
-                  city={property.city}
-                  images={property.images}
-                  amenities={property.amenities}
-                  contactPhone={property.contact_phone}
-                  whatsappNumber={property.whatsapp_number || undefined}
-                  createdAt={property.created_at}
-                  isFeatured={property.is_featured}
-                />
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-12">
-              <Home className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">No bedsitters found</h3>
-              <p className="text-gray-600 mb-6">
-                Try adjusting your filters or browse all properties
-              </p>
-              <Button asChild>
-                <Link href="/bedsitters-for-rent/nairobi-county">Browse All Bedsitters</Link>
-              </Button>
-            </div>
-          )}
-        </div>
-      </section>
-
       {/* Market Trends & Expert Tips */}
       <section id="market-trends" className="py-12 bg-gray-50">
         <div className="container mx-auto px-3">
@@ -1083,9 +1084,9 @@ export default function BedsitterNairobiClient() {
               </div>
               <div className="bg-white/10 backdrop-blur rounded-lg p-6">
                 <Shield className="h-12 w-12 mx-auto mb-4" />
-                <h3 className="font-bold text-xl mb-2">KPDA Partner</h3>
+                <h3 className="font-bold text-xl mb-2">Verified Listings</h3>
                 <p className="text-sm text-green-50">
-                  Official partner of Kenya Property Developers Association
+                  Partnering with trusted real estate agencies across Kenya
                 </p>
               </div>
             </div>

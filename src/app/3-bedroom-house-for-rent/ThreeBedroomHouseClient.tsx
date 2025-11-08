@@ -78,7 +78,26 @@ export default function ThreeBedroomHouseClient() {
       const { data, error } = await query;
 
       if (error) throw error;
-      setProperties(data || []);
+
+      // Fallback: If no properties found, show any rental houses in Kenya
+      if (!data || data.length === 0) {
+        const fallbackQuery = supabase
+          .from('property_listings')
+          .select('*')
+          .eq('is_approved', true)
+          .eq('price_type', 'rent')
+          .in('property_type', ['House', 'Bungalow', 'Townhouse', 'Maisonette', 'Villa'])
+          .order('is_featured', { ascending: false })
+          .order('created_at', { ascending: false })
+          .limit(12);
+
+        const { data: fallbackData, error: fallbackError } = await fallbackQuery;
+        if (!fallbackError) {
+          setProperties(fallbackData || []);
+        }
+      } else {
+        setProperties(data || []);
+      }
     } catch (error) {
       console.error('Error fetching properties:', error);
     } finally {
@@ -310,6 +329,71 @@ export default function ThreeBedroomHouseClient() {
         </div>
       </section>
 
+      {/* Property Listings - MOVED TO TOP */}
+      <section id="listings" className="py-12 bg-white border-b-2 border-gray-100">
+        <div className="container mx-auto px-3">
+          <div className="mb-6">
+            <h2 className="text-3xl font-bold text-gray-900 mb-2">
+              Latest 3 Bedroom Houses for Rent in Kenya
+            </h2>
+            <p className="text-gray-600">
+              Browse verified listings. Showing {properties.length > 4 ? '4 of ' + properties.length : properties.length} properties
+            </p>
+          </div>
+
+          {loading ? (
+            <GridLoadingSkeleton type="property" count={4} />
+          ) : properties.length > 0 ? (
+            <>
+              <div className="grid gap-4 sm:gap-6 md:grid-cols-2 lg:grid-cols-4 mb-8">
+                {properties.slice(0, 4).map((property) => (
+                  <PropertyCard
+                    key={property.id}
+                    id={property.id}
+                    title={property.property_title}
+                    type={property.property_type}
+                    price={property.price}
+                    bedrooms={property.bedrooms || undefined}
+                    bathrooms={property.bathrooms || undefined}
+                    squareFeet={property.square_feet || undefined}
+                    location={property.city + (property.county ? ', ' + property.county : '')}
+                    city={property.city}
+                    images={property.images}
+                    amenities={property.amenities}
+                    contactPhone={property.contact_phone}
+                    whatsappNumber={property.whatsapp_number || undefined}
+                    createdAt={property.created_at}
+                    isFeatured={property.is_featured}
+                  />
+                ))}
+              </div>
+              {properties.length > 4 && (
+                <div className="text-center">
+                  <Button className="bg-green-600 hover:bg-green-700 text-white px-8 py-3" asChild>
+                    <Link href="/houses-for-rent?bedrooms=3">
+                      View All {properties.length} 3 Bedroom Houses →
+                    </Link>
+                  </Button>
+                </div>
+              )}
+            </>
+          ) : (
+            <div className="text-center py-12 bg-gray-50 rounded-lg">
+              <Home className="h-16 w-16 text-gray-300 mx-auto mb-4" />
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                No properties found
+              </h3>
+              <p className="text-gray-600 mb-6">
+                Browse all available properties
+              </p>
+              <Button className="bg-green-600 hover:bg-green-700 text-white" asChild>
+                <Link href="/houses-for-rent?bedrooms=3">Browse All Houses</Link>
+              </Button>
+            </div>
+          )}
+        </div>
+      </section>
+
       {/* Introduction Section */}
       <section className="py-12 bg-white">
         <div className="container mx-auto px-4">
@@ -320,7 +404,7 @@ export default function ThreeBedroomHouseClient() {
                 Looking for a <strong>3 bedroom house for rent in Kenya</strong>? You've come to the right place. NewKenyan.com offers <strong>800+ verified 3 bedroom house listings</strong> across Kenya's most sought-after neighborhoods, from luxury estates in Karen and Runda to affordable family suburbs in Ngong and Ruiru.
               </p>
               <p>
-                The Kenya rental market in 2025 shows strong demand for <strong>3 bedroom houses</strong>, particularly among growing families, expatriates, and professionals seeking more space and privacy than apartments offer. With our 8+ years of real estate experience and partnerships with the Kenya Property Developers Association (KPDA), we've helped thousands of families find their ideal homes.
+                The Kenya rental market in 2025 shows strong demand for <strong>3 bedroom houses</strong>, particularly among growing families, expatriates, and professionals seeking more space and privacy than apartments offer. With our 8+ years of real estate experience and partnerships with <Link href="/real-estate-companies-in-kenya" className="text-green-600 hover:underline font-semibold">many real estate agencies in Kenya</Link>, we've helped thousands of families find their ideal homes.
               </p>
               <p>
                 <strong>Current Market Trends 2025:</strong> Rental prices for 3 bedroom houses have stabilized after 2024 fluctuations, with budget suburbs like <Link href="/houses-for-rent/nairobi-county?city=Ngong&bedrooms=3" className="text-green-600 hover:underline">Ngong</Link> and <Link href="/houses-for-rent/nairobi-county?city=Syokimau&bedrooms=3" className="text-green-600 hover:underline">Syokimau</Link> offering excellent value (KES 35,000-60,000/month). Premium neighborhoods like <Link href="/houses-for-rent/nairobi-county?city=Karen&bedrooms=3" className="text-green-600 hover:underline">Karen</Link>, <Link href="/houses-for-rent/nairobi-county?city=Runda&bedrooms=3" className="text-green-600 hover:underline">Runda</Link>, and <Link href="/houses-for-rent/nairobi-county?city=Kitisuru&bedrooms=3" className="text-green-600 hover:underline">Kitisuru</Link> remain in high demand among diplomats and executives (KES 120,000-300,000/month).
@@ -622,7 +706,7 @@ export default function ThreeBedroomHouseClient() {
                     </li>
                     <li className="flex items-start gap-2">
                       <CheckCircle className="h-5 w-5 text-green-600 mt-0.5 flex-shrink-0" />
-                      <span><strong>Dispute Resolution:</strong> Rent Tribunal handles landlord-tenant disputes. Contact KPDA or consult lawyer for serious issues.</span>
+                      <span><strong>Dispute Resolution:</strong> Rent Tribunal handles landlord-tenant disputes. Consult a lawyer or seek professional mediation for serious issues.</span>
                     </li>
                   </ul>
                 </div>
@@ -788,77 +872,6 @@ export default function ThreeBedroomHouseClient() {
         </div>
       </section>
 
-      {/* Property Listings Grid */}
-      <section id="listings" className="py-12 bg-white">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold mb-8 text-center">Browse 3 Bedroom Houses for Rent</h2>
-
-          {/* Filters */}
-          <div className="max-w-4xl mx-auto mb-8">
-            <div className="grid md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium mb-2">Filter by Location</label>
-                <select
-                  value={selectedLocation}
-                  onChange={(e) => setSelectedLocation(e.target.value)}
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
-                >
-                  {topLocations.map((loc) => (
-                    <option key={loc.value} value={loc.value}>
-                      {loc.label} {loc.count && `(${loc.count})`}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-2">Filter by Price Range</label>
-                <select
-                  value={selectedPriceRange}
-                  onChange={(e) => setSelectedPriceRange(e.target.value)}
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
-                >
-                  {priceRanges.map((range) => (
-                    <option key={range.value} value={range.value}>
-                      {range.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-          </div>
-
-          {/* Listings */}
-          {loading ? (
-            <GridLoadingSkeleton count={6} />
-          ) : properties.length > 0 ? (
-            <>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {properties.map((property) => (
-                  <PropertyCard key={property.id} property={property} />
-                ))}
-              </div>
-
-              <div className="text-center mt-8">
-                <Link href="/houses-for-rent?bedrooms=3">
-                  <Button size="lg">
-                    View All 3 Bedroom Houses
-                  </Button>
-                </Link>
-              </div>
-            </>
-          ) : (
-            <div className="text-center py-12">
-              <Building2 className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-gray-700 mb-2">No properties found</h3>
-              <p className="text-gray-600 mb-4">Try adjusting your filters or browse all listings</p>
-              <Link href="/houses-for-rent?bedrooms=3">
-                <Button>Browse All Listings</Button>
-              </Link>
-            </div>
-          )}
-        </div>
-      </section>
 
       {/* Expert Tips Section */}
       <section className="py-12 bg-gray-50">
@@ -1119,8 +1132,8 @@ export default function ThreeBedroomHouseClient() {
 
               <div>
                 <Users className="h-12 w-12 text-green-600 mx-auto mb-3" />
-                <h3 className="font-bold text-lg mb-2">KPDA Partner</h3>
-                <p className="text-sm text-gray-600">Official Kenya Property Developers Association member</p>
+                <h3 className="font-bold text-lg mb-2">Agency Partnerships</h3>
+                <p className="text-sm text-gray-600">Partnering with trusted real estate agencies across Kenya</p>
               </div>
 
               <div>

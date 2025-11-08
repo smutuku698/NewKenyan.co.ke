@@ -79,7 +79,38 @@ export default function TwoBedroomApartmentNairobiClient() {
       const { data, error } = await query;
 
       if (error) throw error;
-      setProperties(data || []);
+
+      // If no exact matches found, try fallback query without property type and bedroom filters
+      if (!data || data.length === 0) {
+        let fallbackQuery = supabase
+          .from('property_listings')
+          .select('*')
+          .eq('is_approved', true)
+          .eq('price_type', 'rent')
+          .ilike('city', '%nairobi%')
+          .order('is_featured', { ascending: false })
+          .order('created_at', { ascending: false })
+          .limit(12);
+
+        if (selectedNeighborhood !== 'all') {
+          fallbackQuery = fallbackQuery.ilike('city', `%${selectedNeighborhood}%`);
+        }
+
+        if (selectedPriceRange !== 'all') {
+          const [min, max] = selectedPriceRange.split('-').map(Number);
+          if (max) {
+            fallbackQuery = fallbackQuery.gte('price', min).lte('price', max);
+          } else {
+            fallbackQuery = fallbackQuery.gte('price', min);
+          }
+        }
+
+        const { data: fallbackData, error: fallbackError } = await fallbackQuery;
+        if (fallbackError) throw fallbackError;
+        setProperties(fallbackData || []);
+      } else {
+        setProperties(data);
+      }
     } catch (error) {
       console.error('Error fetching properties:', error);
     } finally {
@@ -293,6 +324,71 @@ export default function TwoBedroomApartmentNairobiClient() {
         </div>
       </section>
 
+      {/* Property Listings - MOVED TO TOP */}
+      <section id="listings" className="py-12 bg-white border-b-2 border-gray-100">
+        <div className="container mx-auto px-3">
+          <div className="mb-6">
+            <h2 className="text-3xl font-bold text-gray-900 mb-2">
+              Latest 2 Bedroom Apartments in Nairobi
+            </h2>
+            <p className="text-gray-600">
+              Browse verified listings. Showing {properties.length > 4 ? '4 of ' + properties.length : properties.length} properties
+            </p>
+          </div>
+
+          {loading ? (
+            <GridLoadingSkeleton type="property" count={4} />
+          ) : properties.length > 0 ? (
+            <>
+              <div className="grid gap-4 sm:gap-6 md:grid-cols-2 lg:grid-cols-4 mb-8">
+                {properties.slice(0, 4).map((property) => (
+                  <PropertyCard
+                    key={property.id}
+                    id={property.id}
+                    title={property.property_title}
+                    type={property.property_type}
+                    price={property.price}
+                    bedrooms={property.bedrooms || undefined}
+                    bathrooms={property.bathrooms || undefined}
+                    squareFeet={property.square_feet || undefined}
+                    location={property.city + (property.county ? ', ' + property.county : '')}
+                    city={property.city}
+                    images={property.images}
+                    amenities={property.amenities}
+                    contactPhone={property.contact_phone}
+                    whatsappNumber={property.whatsapp_number || undefined}
+                    createdAt={property.created_at}
+                    isFeatured={property.is_featured}
+                  />
+                ))}
+              </div>
+              {properties.length > 4 && (
+                <div className="text-center">
+                  <Button className="bg-green-600 hover:bg-green-700 text-white px-8 py-3" asChild>
+                    <Link href="/apartments-for-rent/nairobi-county?bedrooms=2">
+                      View All {properties.length} 2 Bedroom Apartments →
+                    </Link>
+                  </Button>
+                </div>
+              )}
+            </>
+          ) : (
+            <div className="text-center py-12 bg-gray-50 rounded-lg">
+              <Home className="h-16 w-16 text-gray-300 mx-auto mb-4" />
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                No properties found
+              </h3>
+              <p className="text-gray-600 mb-6">
+                Browse all available properties
+              </p>
+              <Button className="bg-green-600 hover:bg-green-700 text-white" asChild>
+                <Link href="/apartments-for-rent/nairobi-county?bedrooms=2">Browse All 2BR Apartments</Link>
+              </Button>
+            </div>
+          )}
+        </div>
+      </section>
+
       {/* Market Overview - EEAT Content */}
       <section className="py-12 bg-white">
         <div className="container mx-auto px-3">
@@ -325,7 +421,7 @@ export default function TwoBedroomApartmentNairobiClient() {
             </p>
 
             <p className="text-gray-700 leading-relaxed mb-6">
-              At <Link href="/" className="text-green-600 hover:underline font-semibold">NewKenyan.com</Link>, we've been Kenya's trusted property marketplace for over <strong>8 years</strong>, having successfully connected over <strong>50,000+ tenants</strong> with their ideal homes. Our platform has won <strong>13+ industry awards</strong>, including Best Real Estate Marketing Platform (2023), Property Marketplace of the Year (2023), and Digital Innovation Excellence Award. As an official partner of the <strong>Kenya Property Developers Association (KPDA)</strong>, all our 2-bedroom apartment listings undergo verification to ensure authenticity, accurate pricing, and legitimate landlord contacts - eliminating the risk of scams that plague other platforms.
+              At <Link href="/" className="text-green-600 hover:underline font-semibold">NewKenyan.com</Link>, we've been Kenya's trusted property marketplace for over <strong>8 years</strong>, having successfully connected over <strong>50,000+ tenants</strong> with their ideal homes. Our platform has won <strong>13+ industry awards</strong>, including Best Real Estate Marketing Platform (2023), Property Marketplace of the Year (2023), and Digital Innovation Excellence Award. We partner with <Link href="/real-estate-companies-in-kenya" className="text-green-600 hover:underline font-semibold">many real estate agencies in Kenya</Link> to ensure all our 2-bedroom apartment listings undergo verification for authenticity, accurate pricing, and legitimate landlord contacts - eliminating the risk of scams that plague other platforms.
             </p>
 
             <div className="bg-green-50 border-l-4 border-green-600 p-6 my-6">
@@ -1193,94 +1289,6 @@ export default function TwoBedroomApartmentNairobiClient() {
         </div>
       </section>
 
-      {/* Property Listings */}
-      <section id="listings" className="py-12 bg-white">
-        <div className="container mx-auto px-3">
-          <div className="mb-8">
-            <h2 className="text-3xl font-bold text-gray-900 mb-4">
-              Latest 2-Bedroom Apartments for Rent in Nairobi
-            </h2>
-            <p className="text-gray-600 mb-6">
-              Browse our curated selection of verified 2BR apartments. All listings feature direct landlord contacts, authentic photos, and accurate pricing.
-            </p>
-            <div className="flex flex-wrap gap-4 items-center">
-              <select
-                value={selectedNeighborhood}
-                onChange={(e) => setSelectedNeighborhood(e.target.value)}
-                className="border-2 border-gray-300 rounded-lg px-4 py-2 focus:border-green-500 focus:outline-none"
-              >
-                <option value="all">All Neighborhoods</option>
-                <option value="Westlands">Westlands</option>
-                <option value="Kilimani">Kilimani</option>
-                <option value="Kileleshwa">Kileleshwa</option>
-                <option value="Karen">Karen</option>
-                <option value="Lavington">Lavington</option>
-                <option value="Parklands">Parklands</option>
-                <option value="South C">South C</option>
-                <option value="Langata">Lang'ata</option>
-                <option value="Ruaka">Ruaka</option>
-                <option value="Runda">Runda</option>
-              </select>
-
-              <select
-                value={selectedPriceRange}
-                onChange={(e) => setSelectedPriceRange(e.target.value)}
-                className="border-2 border-gray-300 rounded-lg px-4 py-2 focus:border-green-500 focus:outline-none"
-              >
-                <option value="all">All Prices</option>
-                <option value="25000-35000">KES 25K - 35K</option>
-                <option value="35000-50000">KES 35K - 50K</option>
-                <option value="50000-70000">KES 50K - 70K</option>
-                <option value="70000-999999999">KES 70K+</option>
-              </select>
-
-              <div className="ml-auto">
-                <p className="text-gray-600">
-                  Showing <strong>{properties.length}</strong> 2-bedroom apartments
-                </p>
-              </div>
-            </div>
-          </div>
-
-          {loading ? (
-            <GridLoadingSkeleton type="property" count={12} />
-          ) : properties.length > 0 ? (
-            <div className="grid gap-4 sm:gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-              {properties.map((property) => (
-                <PropertyCard
-                  key={property.id}
-                  id={property.id}
-                  title={property.property_title}
-                  type={property.property_type}
-                  price={property.price}
-                  bedrooms={property.bedrooms || undefined}
-                  bathrooms={property.bathrooms || undefined}
-                  squareFeet={property.square_feet || undefined}
-                  location={property.city + (property.county ? ', ' + property.county : '')}
-                  city={property.city}
-                  images={property.images}
-                  amenities={property.amenities}
-                  contactPhone={property.contact_phone}
-                  whatsappNumber={property.whatsapp_number || undefined}
-                  createdAt={property.created_at}
-                  isFeatured={property.is_featured}
-                />
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-12">
-              <Building2 className="h-16 w-16 text-gray-300 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">No 2-bedroom apartments found</h3>
-              <p className="text-gray-600 mb-6">
-                Try adjusting your filters or browse all 2BR apartments
-              </p>
-              <Button asChild>
-                <Link href="/apartments-for-rent/nairobi-county?bedrooms=2">View All 2BR Apartments</Link>
-              </Button>
-            </div>
-          )}
-        </div>
-      </section>
 
       {/* Related Property Links - Silo Structure */}
       <section className="py-12 bg-gray-50">
@@ -1571,9 +1579,9 @@ export default function TwoBedroomApartmentNairobiClient() {
               </div>
               <div className="bg-white/10 backdrop-blur rounded-lg p-6">
                 <Shield className="h-12 w-12 mx-auto mb-4" />
-                <h3 className="font-bold text-xl mb-2">KPDA Partnership</h3>
+                <h3 className="font-bold text-xl mb-2">Verified Listings</h3>
                 <p className="text-sm text-green-50">
-                  Official partner of Kenya Property Developers Association ensuring all listings meet quality standards. Every 2BR apartment verified for authenticity
+                  Partnering with trusted real estate agencies across Kenya ensuring all listings meet quality standards. Every 2BR apartment verified for authenticity
                 </p>
               </div>
             </div>

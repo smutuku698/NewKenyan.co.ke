@@ -78,7 +78,26 @@ export default function LandForSaleKenyaClient() {
       const { data, error } = await query;
 
       if (error) throw error;
-      setProperties(data || []);
+
+      // Fallback: If no properties found, show any land for sale in Kenya
+      if (!data || data.length === 0) {
+        const fallbackQuery = supabase
+          .from('property_listings')
+          .select('*')
+          .eq('is_approved', true)
+          .eq('price_type', 'sale')
+          .eq('property_type', 'Land')
+          .order('is_featured', { ascending: false })
+          .order('created_at', { ascending: false })
+          .limit(12);
+
+        const { data: fallbackData, error: fallbackError } = await fallbackQuery;
+        if (!fallbackError) {
+          setProperties(fallbackData || []);
+        }
+      } else {
+        setProperties(data || []);
+      }
     } catch (error) {
       console.error('Error fetching properties:', error);
     } finally {
@@ -282,6 +301,71 @@ export default function LandForSaleKenyaClient() {
         </div>
       </section>
 
+      {/* Property Listings - MOVED TO TOP */}
+      <section id="listings" className="py-12 bg-white border-b-2 border-gray-100">
+        <div className="container mx-auto px-3">
+          <div className="mb-6">
+            <h2 className="text-3xl font-bold text-gray-900 mb-2">
+              Latest Land for Sale in Kenya
+            </h2>
+            <p className="text-gray-600">
+              Browse verified listings. Showing {properties.length > 4 ? '4 of ' + properties.length : properties.length} properties
+            </p>
+          </div>
+
+          {loading ? (
+            <GridLoadingSkeleton type="property" count={4} />
+          ) : properties.length > 0 ? (
+            <>
+              <div className="grid gap-4 sm:gap-6 md:grid-cols-2 lg:grid-cols-4 mb-8">
+                {properties.slice(0, 4).map((property) => (
+                  <PropertyCard
+                    key={property.id}
+                    id={property.id}
+                    title={property.property_title}
+                    type={property.property_type}
+                    price={property.price}
+                    bedrooms={property.bedrooms || undefined}
+                    bathrooms={property.bathrooms || undefined}
+                    squareFeet={property.square_feet || undefined}
+                    location={property.city + (property.county ? ', ' + property.county : '')}
+                    city={property.city}
+                    images={property.images}
+                    amenities={property.amenities}
+                    contactPhone={property.contact_phone}
+                    whatsappNumber={property.whatsapp_number || undefined}
+                    createdAt={property.created_at}
+                    isFeatured={property.is_featured}
+                  />
+                ))}
+              </div>
+              {properties.length > 4 && (
+                <div className="text-center">
+                  <Button className="bg-green-600 hover:bg-green-700 text-white px-8 py-3" asChild>
+                    <Link href="/land-for-sale">
+                      View All {properties.length} Land Listings →
+                    </Link>
+                  </Button>
+                </div>
+              )}
+            </>
+          ) : (
+            <div className="text-center py-12 bg-gray-50 rounded-lg">
+              <Home className="h-16 w-16 text-gray-300 mx-auto mb-4" />
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                No properties found
+              </h3>
+              <p className="text-gray-600 mb-6">
+                Browse all available properties
+              </p>
+              <Button className="bg-green-600 hover:bg-green-700 text-white" asChild>
+                <Link href="/land-for-sale">Browse All Land</Link>
+              </Button>
+            </div>
+          )}
+        </div>
+      </section>
+
       {/* Introduction Section */}
       <section className="py-12 bg-white">
         <div className="container mx-auto px-4">
@@ -289,7 +373,7 @@ export default function LandForSaleKenyaClient() {
             <h2 className="text-3xl font-bold mb-6">Buy Land in Kenya - 2025 Complete Investor Guide</h2>
             <div className="prose prose-lg max-w-none text-gray-700 space-y-4">
               <p>
-                Looking to <strong>buy land in Kenya</strong>? NewKenyan.com offers <strong>2000+ verified land listings</strong> across Kenya's prime investment zones - from affordable plots starting at KES 500,000 to premium acres in high-growth areas. With 8+ years of real estate expertise and KPDA partnerships, we help buyers make informed land investments with confidence.
+                Looking to <strong>buy land in Kenya</strong>? NewKenyan.com offers <strong>2000+ verified land listings</strong> across Kenya's prime investment zones - from affordable plots starting at KES 500,000 to premium acres in high-growth areas. With 8+ years of real estate expertise and partnerships with <Link href="/real-estate-companies-in-kenya" className="text-green-600 hover:underline font-semibold">many real estate agencies in Kenya</Link>, we help buyers make informed land investments with confidence.
               </p>
               <p>
                 <strong>Why Invest in Kenyan Land in 2025?</strong> Land remains Kenya's most reliable investment with average annual appreciation of 10-25% depending on location. Unlike volatile stocks or depreciating vehicles, land consistently grows in value, especially in infrastructure development corridors. Vision 2030 projects (Konza City, Lamu Port, SGR, expressways) are driving unprecedented land appreciation in <Link href="/land-for-sale/kiambu-county" className="text-green-600 hover:underline">Kiambu</Link>, <Link href="/land-for-sale/machakos-county" className="text-green-600 hover:underline">Machakos</Link>, and <Link href="/land-for-sale/kajiado-county" className="text-green-600 hover:underline">Kajiado</Link> counties.
@@ -863,8 +947,8 @@ export default function LandForSaleKenyaClient() {
 
               <div>
                 <Users className="h-12 w-12 text-green-600 mx-auto mb-3" />
-                <h3 className="font-bold text-lg mb-2">KPDA Partner</h3>
-                <p className="text-sm text-gray-600">Official member</p>
+                <h3 className="font-bold text-lg mb-2">Agency Partnerships</h3>
+                <p className="text-sm text-gray-600">Partnering with trusted agencies</p>
               </div>
 
               <div>

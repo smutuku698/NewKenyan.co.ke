@@ -80,7 +80,26 @@ export default function BedsitterKasaraniClient() {
       const { data, error } = await query;
 
       if (error) throw error;
-      setProperties(data || []);
+
+      // Fallback: If no properties found, show any bedsitters in Nairobi
+      if (!data || data.length === 0) {
+        const fallbackQuery = supabase
+          .from('property_listings')
+          .select('*')
+          .eq('is_approved', true)
+          .eq('price_type', 'rent')
+          .ilike('city', '%nairobi%')
+          .order('is_featured', { ascending: false })
+          .order('created_at', { ascending: false })
+          .limit(12);
+
+        const { data: fallbackData, error: fallbackError } = await fallbackQuery;
+        if (!fallbackError) {
+          setProperties(fallbackData || []);
+        }
+      } else {
+        setProperties(data || []);
+      }
     } catch (error) {
       console.error('Error fetching properties:', error);
     } finally {
@@ -287,6 +306,71 @@ export default function BedsitterKasaraniClient() {
             <span className="text-gray-300">|</span>
             <a href="#faqs" className="text-sm font-medium hover:text-green-600 whitespace-nowrap">FAQs</a>
           </div>
+        </div>
+      </section>
+
+      {/* Property Listings - MOVED TO TOP */}
+      <section id="listings" className="py-12 bg-white border-b-2 border-gray-100">
+        <div className="container mx-auto px-3">
+          <div className="mb-6">
+            <h2 className="text-3xl font-bold text-gray-900 mb-2">
+              Latest Bedsitters in Kasarani
+            </h2>
+            <p className="text-gray-600">
+              Browse verified listings. Showing {properties.length > 4 ? '4 of ' + properties.length : properties.length} properties
+            </p>
+          </div>
+
+          {loading ? (
+            <GridLoadingSkeleton type="property" count={4} />
+          ) : properties.length > 0 ? (
+            <>
+              <div className="grid gap-4 sm:gap-6 md:grid-cols-2 lg:grid-cols-4 mb-8">
+                {properties.slice(0, 4).map((property) => (
+                  <PropertyCard
+                    key={property.id}
+                    id={property.id}
+                    title={property.property_title}
+                    type={property.property_type}
+                    price={property.price}
+                    bedrooms={property.bedrooms || undefined}
+                    bathrooms={property.bathrooms || undefined}
+                    squareFeet={property.square_feet || undefined}
+                    location={property.city + (property.county ? ', ' + property.county : '')}
+                    city={property.city}
+                    images={property.images}
+                    amenities={property.amenities}
+                    contactPhone={property.contact_phone}
+                    whatsappNumber={property.whatsapp_number || undefined}
+                    createdAt={property.created_at}
+                    isFeatured={property.is_featured}
+                  />
+                ))}
+              </div>
+              {properties.length > 4 && (
+                <div className="text-center">
+                  <Button className="bg-green-600 hover:bg-green-700 text-white px-8 py-3" asChild>
+                    <Link href="/bedsitters-for-rent/nairobi-county?city=Kasarani">
+                      View All {properties.length} Bedsitters in Kasarani →
+                    </Link>
+                  </Button>
+                </div>
+              )}
+            </>
+          ) : (
+            <div className="text-center py-12 bg-gray-50 rounded-lg">
+              <Home className="h-16 w-16 text-gray-300 mx-auto mb-4" />
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                No properties found
+              </h3>
+              <p className="text-gray-600 mb-6">
+                Browse all available properties
+              </p>
+              <Button className="bg-green-600 hover:bg-green-700 text-white" asChild>
+                <Link href="/bedsitters-for-rent/nairobi-county?city=Kasarani">Browse All Bedsitters</Link>
+              </Button>
+            </div>
+          )}
         </div>
       </section>
 
@@ -585,77 +669,6 @@ export default function BedsitterKasaraniClient() {
         </div>
       </section>
 
-      {/* Property Listings Grid */}
-      <section id="listings" className="py-12 bg-white">
-        <div className="container mx-auto px-4">
-          <h2 className="text-3xl font-bold mb-8 text-center">Browse Kasarani Bedsitters</h2>
-
-          {/* Filters */}
-          <div className="max-w-4xl mx-auto mb-8">
-            <div className="grid md:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-sm font-medium mb-2">Filter by Area</label>
-                <select
-                  value={selectedArea}
-                  onChange={(e) => setSelectedArea(e.target.value)}
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
-                >
-                  {kasaraniAreas.map((area) => (
-                    <option key={area.value} value={area.value}>
-                      {area.label} {area.count && `(${area.count})`}
-                    </option>
-                  ))}
-                </select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium mb-2">Filter by Price Range</label>
-                <select
-                  value={selectedPriceRange}
-                  onChange={(e) => setSelectedPriceRange(e.target.value)}
-                  className="w-full p-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500"
-                >
-                  {priceRanges.map((range) => (
-                    <option key={range.value} value={range.value}>
-                      {range.label}
-                    </option>
-                  ))}
-                </select>
-              </div>
-            </div>
-          </div>
-
-          {/* Listings */}
-          {loading ? (
-            <GridLoadingSkeleton count={6} />
-          ) : properties.length > 0 ? (
-            <>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {properties.map((property) => (
-                  <PropertyCard key={property.id} property={property} />
-                ))}
-              </div>
-
-              <div className="text-center mt-8">
-                <Link href="/bedsitters-for-rent/nairobi-county?city=Kasarani">
-                  <Button size="lg">
-                    View All Kasarani Bedsitters
-                  </Button>
-                </Link>
-              </div>
-            </>
-          ) : (
-            <div className="text-center py-12">
-              <Building2 className="h-16 w-16 text-gray-400 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-gray-700 mb-2">No properties found</h3>
-              <p className="text-gray-600 mb-4">Try adjusting your filters</p>
-              <Link href="/bedsitters-for-rent/nairobi-county?city=Kasarani">
-                <Button>Browse All Listings</Button>
-              </Link>
-            </div>
-          )}
-        </div>
-      </section>
 
       {/* Internal Linking Section - Browse by Location */}
       <section className="py-12 bg-white border-t">
@@ -810,8 +823,8 @@ export default function BedsitterKasaraniClient() {
 
               <div>
                 <Users className="h-12 w-12 text-green-600 mx-auto mb-3" />
-                <h3 className="font-bold text-lg mb-2">KPDA Partner</h3>
-                <p className="text-sm text-gray-600">Official member</p>
+                <h3 className="font-bold text-lg mb-2">Agency Partnerships</h3>
+                <p className="text-sm text-gray-600">Partnering with trusted agencies</p>
               </div>
 
               <div>
