@@ -49,7 +49,8 @@
       "Bash(git reset:*)",
       "Bash(client-page.tsx.tmp)",
       "Bash(nul)",
-      "Bash(bash scripts/update-all-location-queries.sh:*)"
+      "Bash(bash scripts/update-all-location-queries.sh:*)",
+      "Bash(npm run verify-sitemap:*)"
     ],
     "deny": [],
     "ask": []

@@ -34,7 +34,16 @@ export default async function middleware(request: NextRequest) {
   )
 
   await supabase.auth.getUser()
-  const { pathname } = request.nextUrl;
+  const { pathname, searchParams } = request.nextUrl;
+
+  // Handle Supabase auth callback redirects
+  // If there's a 'code' query parameter (from email confirmation), redirect to auth callback
+  const code = searchParams.get('code')
+  if (code && pathname === '/') {
+    const callbackUrl = new URL('/auth/callback', request.url)
+    callbackUrl.searchParams.set('code', code)
+    return NextResponse.redirect(callbackUrl)
+  }
 
   // Redirect old domain content with smart categorization for SEO juice
 

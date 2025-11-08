@@ -10,7 +10,9 @@
     "populate-properties": "node scripts/populate-properties.js",
     "process-blog-seo": "node scripts/process-blog-seo.js",
     "process-blog-file": "node scripts/process-blog-seo.js",
-    "prepare-push": "node scripts/prepare-for-push.js"
+    "prepare-push": "node scripts/prepare-for-push.js",
+    "verify-sitemap": "node scripts/generate-sitemap-config.js",
+    "prebuild": "node scripts/generate-sitemap-config.js"
   },
   "dependencies": {
     "@clerk/nextjs": "^6.30.2",

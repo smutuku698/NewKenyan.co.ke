@@ -7,21 +7,23 @@ import { generateJobSlug } from '@/lib/utils'
 
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = 'https://newkenyan.com'
-  
+
   // Create Supabase client
   const supabase = createClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
     process.env.SUPABASE_SERVICE_ROLE_KEY!
   )
 
-  // Static pages
+  // Static pages - comprehensive list of all static routes
   const staticPages = [
+    // Home
     {
       url: baseUrl,
       lastModified: new Date(),
       changeFrequency: 'daily' as const,
       priority: 1,
     },
+    // Main sections
     {
       url: `${baseUrl}/properties`,
       lastModified: new Date(),
@@ -52,6 +54,125 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       changeFrequency: 'weekly' as const,
       priority: 0.7,
     },
+    // Tools & Calculators
+    {
+      url: `${baseUrl}/construction-cost-calculator-kenya`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly' as const,
+      priority: 0.75,
+    },
+    {
+      url: `${baseUrl}/mortgage-calculator-kenya`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly' as const,
+      priority: 0.75,
+    },
+    {
+      url: `${baseUrl}/net-pay-calculator`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly' as const,
+      priority: 0.75,
+    },
+    // Services
+    {
+      url: `${baseUrl}/real-estate-services`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly' as const,
+      priority: 0.7,
+    },
+    {
+      url: `${baseUrl}/website-services`,
+      lastModified: new Date(),
+      changeFrequency: 'monthly' as const,
+      priority: 0.7,
+    },
+    // Static property pages
+    {
+      url: `${baseUrl}/houses-for-rent-nairobi`,
+      lastModified: new Date(),
+      changeFrequency: 'daily' as const,
+      priority: 0.9,
+    },
+    {
+      url: `${baseUrl}/land-for-sale-kenya`,
+      lastModified: new Date(),
+      changeFrequency: 'daily' as const,
+      priority: 0.9,
+    },
+    {
+      url: `${baseUrl}/2-bedroom-apartment-nairobi`,
+      lastModified: new Date(),
+      changeFrequency: 'daily' as const,
+      priority: 0.88,
+    },
+    {
+      url: `${baseUrl}/3-bedroom-house-for-rent`,
+      lastModified: new Date(),
+      changeFrequency: 'daily' as const,
+      priority: 0.88,
+    },
+    {
+      url: `${baseUrl}/apartments-for-rent-nairobi`,
+      lastModified: new Date(),
+      changeFrequency: 'daily' as const,
+      priority: 0.9,
+    },
+    {
+      url: `${baseUrl}/apartments-kilimani`,
+      lastModified: new Date(),
+      changeFrequency: 'daily' as const,
+      priority: 0.88,
+    },
+    {
+      url: `${baseUrl}/apartments-westlands`,
+      lastModified: new Date(),
+      changeFrequency: 'daily' as const,
+      priority: 0.88,
+    },
+    {
+      url: `${baseUrl}/bedsitter-kasarani`,
+      lastModified: new Date(),
+      changeFrequency: 'daily' as const,
+      priority: 0.87,
+    },
+    {
+      url: `${baseUrl}/bedsitter-nairobi`,
+      lastModified: new Date(),
+      changeFrequency: 'daily' as const,
+      priority: 0.88,
+    },
+    {
+      url: `${baseUrl}/cheap-apartments-nairobi`,
+      lastModified: new Date(),
+      changeFrequency: 'daily' as const,
+      priority: 0.88,
+    },
+    // Additional static property pages
+    {
+      url: `${baseUrl}/properties/add`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly' as const,
+      priority: 0.6,
+    },
+    {
+      url: `${baseUrl}/properties/rent`,
+      lastModified: new Date(),
+      changeFrequency: 'daily' as const,
+      priority: 0.85,
+    },
+    {
+      url: `${baseUrl}/real-estate-companies/add`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly' as const,
+      priority: 0.6,
+    },
+    {
+      url: `${baseUrl}/jobs-in-kenya/post`,
+      lastModified: new Date(),
+      changeFrequency: 'weekly' as const,
+      priority: 0.65,
+    },
+    // Informational pages
     {
       url: `${baseUrl}/about`,
       lastModified: new Date(),
