@@ -54,8 +54,7 @@ async function generateHTMLSitemap() {
     .select('slug, name, type, county')
     .eq('is_active', true)
     .order('type')
-    .order('name')
-    .limit(200); // Top 200 locations
+    .order('name');
 
   const propertyTypes = [
     { path: 'houses-for-sale', title: 'Houses for Sale' },
@@ -92,7 +91,7 @@ async function generateHTMLSitemap() {
 
     if (neighborhoods.length > 0) {
       const neighborhoodLinks = [];
-      neighborhoods.slice(0, 10).forEach(neighborhood => {
+      neighborhoods.forEach(neighborhood => {
         propertyTypes.slice(0, 2).forEach(type => {
           neighborhoodLinks.push({
             url: `/${type.path}/${neighborhood.slug}`,
@@ -109,6 +108,64 @@ async function generateHTMLSitemap() {
       }
     }
   });
+
+  // Helper function to create slug from title
+  const createSlug = (text, id) => {
+    const slug = text
+      .toLowerCase()
+      .replace(/[^a-z0-9]+/g, '-')
+      .replace(/^-+|-+$/g, '');
+    return `${slug}-${id}`;
+  };
+
+  // 3. Individual Properties
+  console.log('3️⃣ Fetching individual properties...');
+  const { data: properties } = await supabase
+    .from('property_listings')
+    .select('id, property_title')
+    .eq('is_approved', true)
+    .order('created_at', { ascending: false })
+    .limit(2000);
+
+  if (properties && properties.length > 0) {
+    console.log(`   Found ${properties.length} properties`);
+    // Split into chunks for better organization
+    const chunkSize = 100;
+    for (let i = 0; i < properties.length; i += chunkSize) {
+      const chunk = properties.slice(i, i + chunkSize);
+      const propertyLinks = chunk.map(p => ({
+        url: `/properties/${createSlug(p.property_title, p.id)}`,
+        title: p.property_title,
+      }));
+
+      sections.push({
+        title: i === 0 ? 'Recent Properties' : `Properties ${i + 1}-${i + chunk.length}`,
+        links: propertyLinks,
+      });
+    }
+  }
+
+  // 4. Business Directory
+  console.log('4️⃣ Fetching businesses...');
+  const { data: businesses } = await supabase
+    .from('business_listings')
+    .select('id, business_name')
+    .eq('is_approved', true)
+    .order('created_at', { ascending: false })
+    .limit(1000);
+
+  if (businesses && businesses.length > 0) {
+    console.log(`   Found ${businesses.length} businesses`);
+    const businessLinks = businesses.map(b => ({
+      url: `/business/${createSlug(b.business_name, b.id)}`,
+      title: b.business_name,
+    }));
+
+    sections.push({
+      title: 'Business Directory',
+      links: businessLinks,
+    });
+  }
 
   // Generate HTML
   console.log('\n📝 Generating HTML...');
