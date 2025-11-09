@@ -135,6 +135,7 @@ async function submitToIndexNow(urls) {
   };
 
   try {
+    const startTime = Date.now();
     const response = await fetch(INDEXNOW_ENDPOINT, {
       method: 'POST',
       headers: {
@@ -142,16 +143,24 @@ async function submitToIndexNow(urls) {
       },
       body: JSON.stringify(payload),
     });
+    const duration = ((Date.now() - startTime) / 1000).toFixed(2);
+
+    console.log(`   ⏱️  Request completed in ${duration}s`);
+    console.log(`   📡 Response status: ${response.status} ${response.statusText}`);
 
     if (response.ok) {
+      console.log(`   ✓ IndexNow accepted the submission`);
       return { success: true, urls: urlsToSubmit };
     } else {
       const text = await response.text();
-      console.error(`❌ IndexNow returned status ${response.status}: ${text}`);
+      console.error(`   ❌ IndexNow returned status ${response.status}: ${text || 'No error message'}`);
       return { success: false, urls: urlsToSubmit };
     }
   } catch (error) {
-    console.error('❌ Error submitting to IndexNow:', error.message);
+    console.error(`   ❌ Network error: ${error.message}`);
+    if (error.cause) {
+      console.error(`   ℹ️  Cause: ${error.cause}`);
+    }
     return { success: false, urls: urlsToSubmit };
   }
 }
@@ -160,18 +169,36 @@ async function submitAllPages() {
   console.log('\n' + '═'.repeat(70));
   console.log('🚀 SUBMITTING PAGES TO INDEXNOW');
   console.log('═'.repeat(70));
+  console.log(`⏰ Started at: ${new Date().toLocaleString()}`);
+
+  // Check environment variables
+  console.log('\n🔍 Checking configuration...');
+  console.log(`   ✓ Supabase URL: ${process.env.NEXT_PUBLIC_SUPABASE_URL ? '✓ Set' : '❌ Missing'}`);
+  console.log(`   ✓ Service Role Key: ${process.env.SUPABASE_SERVICE_ROLE_KEY ? '✓ Set' : '❌ Missing'}`);
+  console.log(`   ✓ IndexNow API Key: ${INDEXNOW_API_KEY ? '✓ Set' : '❌ Missing'}`);
+  console.log(`   ✓ Site URL: ${SITE_URL}`);
+
+  if (!process.env.NEXT_PUBLIC_SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    console.error('\n❌ ERROR: Missing required environment variables!');
+    console.error('   Please check your .env.local file');
+    process.exit(1);
+  }
 
   // Load submission history
+  console.log('\n📁 Loading submission history...');
   let submissionsData = loadSubmissions();
-  console.log(`\n📁 Loaded ${submissionsData.submissions.length} URLs from history`);
+  console.log(`   ✓ Loaded ${submissionsData.submissions.length} URLs from history`);
   if (submissionsData.lastSubmission) {
-    console.log(`   Last submission: ${new Date(submissionsData.lastSubmission).toLocaleString()}`);
+    console.log(`   ✓ Last submission: ${new Date(submissionsData.lastSubmission).toLocaleString()}`);
+  } else {
+    console.log(`   ℹ️  No previous submissions found`);
   }
 
   const allUrls = [];
 
   // 1. Homepage and main pages
   console.log('\n1️⃣ Adding main pages...');
+  console.log('   ⏳ Building list of main pages...');
   const mainPages = [
     `${SITE_URL}`,
     `${SITE_URL}/properties`,
@@ -199,63 +226,102 @@ async function submitAllPages() {
 
   // 2. Location pages
   console.log('\n2️⃣ Fetching location pages...');
-  const { data: locations } = await supabase
-    .from('locations')
-    .select('slug')
-    .eq('is_active', true)
-    .limit(500); // Top 500 locations
+  console.log('   ⏳ Querying Supabase for active locations...');
+  try {
+    const { data: locations, error } = await supabase
+      .from('locations')
+      .select('slug')
+      .eq('is_active', true)
+      .limit(500); // Top 500 locations
 
-  const propertyTypes = [
-    'houses-for-sale',
-    'houses-for-rent',
-    'apartments-for-sale',
-    'apartments-for-rent',
-    'land-for-sale',
-  ];
+    if (error) {
+      console.error('   ❌ Error fetching locations:', error.message);
+      console.log('   ⚠️  Continuing without location pages...');
+    } else {
+      console.log(`   ✓ Retrieved ${locations?.length || 0} locations from database`);
 
-  locations?.forEach(location => {
-    propertyTypes.forEach(type => {
-      allUrls.push(`${SITE_URL}/${type}/${location.slug}`);
-    });
-  });
-  console.log(`   Added ${locations?.length * propertyTypes.length || 0} location pages`);
+      const propertyTypes = [
+        'houses-for-sale',
+        'houses-for-rent',
+        'apartments-for-sale',
+        'apartments-for-rent',
+        'land-for-sale',
+      ];
+
+      console.log(`   ⏳ Generating URLs for ${propertyTypes.length} property types...`);
+      locations?.forEach(location => {
+        propertyTypes.forEach(type => {
+          allUrls.push(`${SITE_URL}/${type}/${location.slug}`);
+        });
+      });
+      console.log(`   ✓ Added ${locations?.length * propertyTypes.length || 0} location pages`);
+    }
+  } catch (err) {
+    console.error('   ❌ Exception fetching locations:', err.message);
+    console.log('   ⚠️  Continuing without location pages...');
+  }
 
   // 3. Recent properties (last 100)
   console.log('\n3️⃣ Fetching recent property listings...');
-  const { data: properties } = await supabase
-    .from('property_listings')
-    .select('id')
-    .eq('is_approved', true)
-    .order('created_at', { ascending: false })
-    .limit(100);
+  console.log('   ⏳ Querying Supabase for approved properties...');
+  try {
+    const { data: properties, error } = await supabase
+      .from('property_listings')
+      .select('id')
+      .eq('is_approved', true)
+      .order('created_at', { ascending: false })
+      .limit(100);
 
-  properties?.forEach(prop => {
-    allUrls.push(`${SITE_URL}/properties/${prop.id}`);
-  });
-  console.log(`   Added ${properties?.length || 0} property pages`);
+    if (error) {
+      console.error('   ❌ Error fetching properties:', error.message);
+      console.log('   ⚠️  Continuing without property pages...');
+    } else {
+      console.log(`   ✓ Retrieved ${properties?.length || 0} property listings`);
+      properties?.forEach(prop => {
+        allUrls.push(`${SITE_URL}/properties/${prop.id}`);
+      });
+      console.log(`   ✓ Added ${properties?.length || 0} property pages`);
+    }
+  } catch (err) {
+    console.error('   ❌ Exception fetching properties:', err.message);
+    console.log('   ⚠️  Continuing without property pages...');
+  }
 
   // 4. Blog posts
   console.log('\n4️⃣ Fetching blog posts...');
-  const { data: blogPosts } = await supabase
-    .from('blog_posts')
-    .select('slug')
-    .eq('published', true)
-    .limit(100);
+  console.log('   ⏳ Querying Supabase for published blog posts...');
+  try {
+    const { data: blogPosts, error } = await supabase
+      .from('blog_posts')
+      .select('slug')
+      .eq('published', true)
+      .limit(100);
 
-  blogPosts?.forEach(post => {
-    allUrls.push(`${SITE_URL}/blog/${post.slug}`);
-  });
-  console.log(`   Added ${blogPosts?.length || 0} blog pages`);
+    if (error) {
+      console.error('   ❌ Error fetching blog posts:', error.message);
+      console.log('   ⚠️  Continuing without blog pages...');
+    } else {
+      console.log(`   ✓ Retrieved ${blogPosts?.length || 0} blog posts`);
+      blogPosts?.forEach(post => {
+        allUrls.push(`${SITE_URL}/blog/${post.slug}`);
+      });
+      console.log(`   ✓ Added ${blogPosts?.length || 0} blog pages`);
+    }
+  } catch (err) {
+    console.error('   ❌ Exception fetching blog posts:', err.message);
+    console.log('   ⚠️  Continuing without blog pages...');
+  }
 
   // Filter out recently submitted URLs
   console.log('\n5️⃣ Filtering out recently submitted URLs...');
-  console.log(`   Total URLs before filtering: ${allUrls.length}`);
+  console.log(`   📊 Total URLs collected: ${allUrls.length}`);
+  console.log(`   ⏳ Checking submission history (${RESUBMIT_AFTER_DAYS} day threshold)...`);
 
   const urlsToSubmit = filterUnsubmittedUrls(allUrls, submissionsData);
 
   const skippedCount = allUrls.length - urlsToSubmit.length;
   console.log(`   ✅ New/Updated URLs to submit: ${urlsToSubmit.length}`);
-  console.log(`   ⏭️  Skipped (submitted within ${RESUBMIT_AFTER_DAYS} days): ${skippedCount}`);
+  console.log(`   ⏭️  Skipped (recently submitted): ${skippedCount}`);
 
   // Summary
   console.log('\n' + '═'.repeat(70));
@@ -285,19 +351,25 @@ async function submitAllPages() {
     const batchNum = Math.floor(i / batchSize) + 1;
     const totalBatches = Math.ceil(urlsToSubmit.length / batchSize);
 
-    console.log(`📤 Submitting batch ${batchNum}/${totalBatches} (${batch.length} URLs)...`);
+    console.log(`📤 Batch ${batchNum}/${totalBatches}: Submitting ${batch.length} URLs...`);
+    console.log(`   ⏳ Sending POST request to ${INDEXNOW_ENDPOINT}...`);
 
     const result = await submitToIndexNow(batch);
 
     if (result.success) {
-      console.log(`   ✅ Batch ${batchNum} submitted successfully`);
+      console.log(`   ✅ Batch ${batchNum} submitted successfully!`);
+      console.log(`   💾 Saving submission records to history...`);
       successCount += batch.length;
 
       // Record successful submissions
       submissionsData = recordSubmissions(result.urls, true, submissionsData);
-      saveSubmissions(submissionsData);
+      const saved = saveSubmissions(submissionsData);
+      if (saved) {
+        console.log(`   ✓ History updated (${submissionsData.submissions.length} total tracked URLs)`);
+      }
     } else {
-      console.log(`   ❌ Batch ${batchNum} failed`);
+      console.log(`   ❌ Batch ${batchNum} failed!`);
+      console.log(`   💾 Recording failed attempt...`);
       failCount += batch.length;
 
       // Record failed submissions
@@ -307,6 +379,7 @@ async function submitAllPages() {
 
     // Wait 1 second between batches to avoid rate limiting
     if (i + batchSize < urlsToSubmit.length) {
+      console.log(`   ⏸️  Waiting 1 second before next batch...`);
       await new Promise(resolve => setTimeout(resolve, 1000));
     }
   }
@@ -314,6 +387,7 @@ async function submitAllPages() {
   console.log('\n' + '═'.repeat(70));
   console.log('✅ SUBMISSION COMPLETE');
   console.log('═'.repeat(70));
+  console.log(`⏰ Finished at: ${new Date().toLocaleString()}`);
   console.log(`✅ Successfully submitted: ${successCount} URLs`);
   console.log(`❌ Failed: ${failCount} URLs`);
   console.log('\n💡 What happens next:');

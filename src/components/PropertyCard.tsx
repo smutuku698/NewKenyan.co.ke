@@ -4,6 +4,7 @@ import Image from 'next/image';
 import Link from 'next/link';
 import { Heart } from 'lucide-react';
 import { generatePropertySlug } from '@/lib/utils';
+import { useState } from 'react';
 
 interface PropertyCardProps {
   id: string;
@@ -37,11 +38,23 @@ const PropertyCard = ({
   createdAt,
   isFeatured = false,
 }: PropertyCardProps) => {
+  const [imageError, setImageError] = useState(false);
+
   const formatPrice = (price: number) => {
     return `KES ${price.toLocaleString()}`;
   };
 
   const slug = generatePropertySlug(title, type, city, bedrooms);
+
+  // Get a valid image URL or use fallback
+  const getImageUrl = () => {
+    if (!images || images.length === 0 || imageError) {
+      return '/images/property-placeholder.svg';
+    }
+    return images[0];
+  };
+
+  const imageUrl = getImageUrl();
 
   // Calculate hours since posted - Extended to 30 days for better visibility
   const getHoursSincePosted = () => {
@@ -65,19 +78,15 @@ const PropertyCard = ({
       <div className="bg-white rounded-xl overflow-hidden shadow-md hover:shadow-xl transition-all duration-300 border border-gray-100">
         {/* Image Container - Landscape aspect ratio like Movoto */}
         <div className="relative w-full aspect-[16/10] bg-gray-200">
-          {images[0] ? (
-            <Image
-              src={images[0]}
-              alt={title}
-              fill
-              className="object-cover group-hover:scale-105 transition-transform duration-300"
-              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-            />
-          ) : (
-            <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-              <span className="text-gray-400 text-sm">No Image</span>
-            </div>
-          )}
+          <Image
+            src={imageUrl}
+            alt={title}
+            fill
+            className="object-cover group-hover:scale-105 transition-transform duration-300"
+            sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            onError={() => setImageError(true)}
+            unoptimized={imageUrl.startsWith('http')}
+          />
 
           {/* NEW Badge or FEATURED Badge - Top Left - Sleek and narrow like Movoto */}
           {isNew ? (

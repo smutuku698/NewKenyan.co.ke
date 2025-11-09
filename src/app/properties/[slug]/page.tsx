@@ -16,6 +16,9 @@ import PropertyDetailClient from './PropertyDetailClient';
 // Revalidate pages every 24 hours (86400 seconds) for ISR
 export const revalidate = 86400;
 
+// Enable dynamic rendering for paths not generated at build time
+export const dynamicParams = true;
+
 interface PropertyListing {
   id: string;
   created_at: string;
@@ -54,21 +57,20 @@ interface PropertyListing {
 
 async function getPropertyBySlug(slug: string): Promise<PropertyListing | null> {
   try {
-    // First try to get by slug, if that fails try by ID for backward compatibility
+    // Get ALL properties to search through (no limit)
     const { data, error } = await supabase
       .from('property_listings')
       .select('*')
-      .eq('is_approved', true)
-      .limit(1000); // Ensure we get enough properties to find matches
+      .eq('is_approved', true);
 
     if (error || !data) return null;
 
     // Find property by matching slug or ID
     const property = data.find(p => {
       const expectedSlug = generatePropertySlug(
-        p.property_title, 
-        p.property_type, 
-        p.city, 
+        p.property_title,
+        p.property_type,
+        p.city,
         p.bedrooms
       );
       // Try exact slug match first, then ID fallback
@@ -78,11 +80,7 @@ async function getPropertyBySlug(slug: string): Promise<PropertyListing | null> 
     // If no property found, log for debugging (only in development)
     if (!property && process.env.NODE_ENV === 'development') {
       console.log('Property not found for slug:', slug);
-      console.log('Available properties:', data.map(p => ({
-        id: p.id,
-        title: p.property_title,
-        expectedSlug: generatePropertySlug(p.property_title, p.property_type, p.city, p.bedrooms)
-      })).slice(0, 3));
+      console.log('Searched through', data.length, 'properties');
     }
 
     return property || null;
@@ -103,10 +101,12 @@ export async function generateStaticParams() {
     const { data: properties } = await supabase
       .from('property_listings')
       .select('id, property_title, property_type, city, bedrooms')
-      .eq('is_approved', true)
-      .limit(1000); // Generate pages for up to 1000 properties
+      .eq('is_approved', true);
+      // No limit - generate pages for ALL properties
 
     if (!properties) return [];
+
+    console.log(`Generating static params for ${properties.length} properties`);
 
     return properties.map((property) => ({
       slug: generatePropertySlug(
