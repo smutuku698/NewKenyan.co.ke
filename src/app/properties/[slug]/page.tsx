@@ -6,6 +6,7 @@ import {
   generatePropertyMetaTags,
   generatePropertyHeadings
 } from '@/lib/utils';
+import { generateOpenGraphMetadata, generateTwitterMetadata } from '@/lib/dynamic-og-image';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import Breadcrumb from '@/components/Breadcrumb';
@@ -147,32 +148,27 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     property.bedrooms
   );
 
+  // Generate dynamic OG images (uses property images or falls back to default)
+  const openGraphData = generateOpenGraphMetadata({
+    title: metaTags.title,
+    description: metaTags.description,
+    url: `https://newkenyan.com/properties/${canonicalSlug}`,
+    images: property.images,
+    type: 'website'
+  });
+
+  const twitterData = generateTwitterMetadata({
+    title: metaTags.title,
+    description: metaTags.description,
+    images: property.images
+  });
+
   return {
     title: metaTags.title,
     description: metaTags.description,
     keywords: metaTags.keywords,
-    openGraph: {
-      title: metaTags.title,
-      description: metaTags.description,
-      url: `https://newkenyan.com/properties/${canonicalSlug}`,
-      siteName: 'NewKenyan.com',
-      images: property.images.length > 0 ? [
-        {
-          url: property.images[0],
-          width: 1200,
-          height: 630,
-          alt: `${property.property_title} in ${property.city}`,
-        },
-      ] : [],
-      locale: 'en_KE',
-      type: 'website',
-    },
-    twitter: {
-      card: 'summary_large_image',
-      title: metaTags.title,
-      description: metaTags.description,
-      images: property.images.length > 0 ? [property.images[0]] : [],
-    },
+    openGraph: openGraphData,
+    twitter: twitterData,
     alternates: {
       canonical: `https://newkenyan.com/properties/${canonicalSlug}`,
     },

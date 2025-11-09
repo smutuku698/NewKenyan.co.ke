@@ -1,8 +1,12 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import { MapPin } from 'lucide-react';
-import { extractGoogleMapsCoordinates, getCityCoordinates, getNairobiNeighborhoodCoords } from '@/lib/maps-utils';
+import { MapPin, ExternalLink } from 'lucide-react';
+import {
+  extractGoogleMapsCoordinates,
+  getCityCoordinates,
+  getNairobiNeighborhoodCoords
+} from '@/lib/maps-utils';
 
 // Dynamically import map component to avoid SSR issues with Leaflet
 const MapComponent = dynamic(() => import('./LeafletMap'), {
@@ -14,26 +18,25 @@ const MapComponent = dynamic(() => import('./LeafletMap'), {
   )
 });
 
-interface PropertyMapProps {
+interface BusinessMapProps {
   googleMapsLink?: string | null;
+  pinLocationUrl?: string | null;
   latitude?: number | null;
   longitude?: number | null;
   address: string;
   city: string;
-  county?: string | null;
-  propertyTitle: string;
+  businessName: string;
 }
 
-
-export default function PropertyMap({
+export default function BusinessMap({
   googleMapsLink,
+  pinLocationUrl,
   latitude,
   longitude,
   address,
   city,
-  county,
-  propertyTitle
-}: PropertyMapProps) {
+  businessName
+}: BusinessMapProps) {
   // Extract coordinates intelligently from multiple sources
   let coords: [number, number] | null = null;
   let isExact = false;
@@ -43,7 +46,15 @@ export default function PropertyMap({
     coords = [latitude, longitude];
     isExact = true;
   }
-  // Priority 2: Extract from Google Maps link (supports ALL Google Maps URL formats)
+  // Priority 2: Extract from pin_location_url (usually Google Maps)
+  else if (pinLocationUrl) {
+    const extracted = extractGoogleMapsCoordinates(pinLocationUrl);
+    if (extracted) {
+      coords = [extracted.lat, extracted.lng];
+      isExact = true;
+    }
+  }
+  // Priority 3: Extract from googleMapsLink
   else if (googleMapsLink) {
     const extracted = extractGoogleMapsCoordinates(googleMapsLink);
     if (extracted) {
@@ -52,7 +63,7 @@ export default function PropertyMap({
     }
   }
 
-  // Priority 3: Try neighborhood match for Nairobi
+  // Priority 4: Try neighborhood match for Nairobi
   if (!coords) {
     const neighborhoodCoords = city.toLowerCase() === 'nairobi'
       ? getNairobiNeighborhoodCoords(address)
@@ -63,17 +74,18 @@ export default function PropertyMap({
     }
   }
 
-  // Priority 4: Fallback to city coordinates
+  // Priority 5: Fallback to city coordinates
   if (!coords) {
     const cityCoords = getCityCoordinates(city);
     coords = [cityCoords.lat, cityCoords.lng];
   }
 
   const openInGoogleMaps = () => {
-    if (googleMapsLink) {
-      window.open(googleMapsLink, '_blank');
+    const mapsUrl = pinLocationUrl || googleMapsLink;
+    if (mapsUrl) {
+      window.open(mapsUrl, '_blank');
     } else {
-      const searchQuery = `${address}, ${city}${county ? `, ${county}` : ''}, Kenya`;
+      const searchQuery = `${businessName}, ${address}, ${city}, Kenya`;
       window.open(`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(searchQuery)}`, '_blank');
     }
   };
@@ -83,35 +95,25 @@ export default function PropertyMap({
       <div className="flex items-center justify-between mb-4">
         <h2 className="text-xl font-semibold flex items-center">
           <MapPin className="h-5 w-5 mr-2 text-green-600" />
-          Property Location
+          Business Location
         </h2>
         <button
           onClick={openInGoogleMaps}
-          className="text-sm text-green-600 hover:text-green-700 font-medium flex items-center"
+          className="text-sm text-green-600 hover:text-green-700 font-medium flex items-center gap-1 transition-colors"
         >
           Open in Google Maps
-          <svg
-            className="h-4 w-4 ml-1"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-            />
-          </svg>
+          <ExternalLink className="h-4 w-4" />
         </button>
       </div>
 
       {/* Address Display */}
       <div className="mb-4 p-3 bg-gray-50 rounded-lg">
         <p className="text-sm text-gray-600">
-          <span className="font-semibold text-gray-900">{address}</span>
+          <span className="font-semibold text-gray-900">{businessName}</span>
           <br />
-          {city}{county ? `, ${county}` : ''}, Kenya
+          <span className="text-gray-700">{address}</span>
+          <br />
+          {city}, Kenya
         </p>
       </div>
 
@@ -120,17 +122,24 @@ export default function PropertyMap({
         coords={coords}
         address={address}
         city={city}
-        propertyTitle={propertyTitle}
+        propertyTitle={businessName}
         isExactLocation={isExact}
-        locationType="property"
+        locationType="business"
       />
 
       {/* Map Note */}
-      <p className="text-xs text-gray-500 mt-3 text-center">
-        {isExact
-          ? '📍 Showing exact property location from Google Maps'
-          : `📍 Showing approximate location in ${city}. Contact owner for exact address.`}
-      </p>
+      <div className="mt-3 text-center">
+        <p className="text-xs text-gray-500">
+          {isExact
+            ? '📍 Showing exact business location'
+            : `📍 Showing approximate location in ${city}. Contact business for exact directions.`}
+        </p>
+        {isExact && (
+          <p className="text-xs text-green-600 mt-1">
+            ✓ Location verified from Google Maps
+          </p>
+        )}
+      </div>
     </div>
   );
 }

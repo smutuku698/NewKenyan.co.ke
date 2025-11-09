@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import Image from 'next/image';
 import { MapPin, Mail, Phone, MessageSquare, Users, Building2, ArrowRight } from 'lucide-react';
 
 const Footer = () => {
@@ -57,9 +58,13 @@ const Footer = () => {
           {/* Logo and Description */}
           <div className="lg:col-span-2">
             <div className="flex items-center space-x-2 mb-4">
-              <div className="h-8 w-8 bg-gradient-to-r from-green-600 to-green-800 rounded-lg flex items-center justify-center">
-                <MapPin className="h-5 w-5 text-white" />
-              </div>
+              <Image
+                src="/android-chrome-512x512.png"
+                alt="NewKenyan.com Logo"
+                width={32}
+                height={32}
+                className="rounded-lg"
+              />
               <span className="text-xl font-bold">NewKenyan.com</span>
             </div>
             <p className="text-gray-400 mb-4 max-w-md">
@@ -202,6 +207,9 @@ const Footer = () => {
               </Link>
               <Link href="/terms-of-service" className="text-gray-400 hover:text-white transition-colors">
                 Terms
+              </Link>
+              <Link href="/sitemap-page.html" className="text-gray-400 hover:text-white transition-colors">
+                Sitemap
               </Link>
               <Link href="/contact" className="text-gray-400 hover:text-white transition-colors">
                 Support

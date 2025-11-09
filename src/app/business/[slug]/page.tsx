@@ -1,11 +1,12 @@
 import { Metadata } from 'next';
 import { notFound } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
-import { 
-  generateBusinessSlug, 
-  generateBusinessMetaTags, 
-  generateBusinessHeadings 
+import {
+  generateBusinessSlug,
+  generateBusinessMetaTags,
+  generateBusinessHeadings
 } from '@/lib/utils';
+import { generateOpenGraphMetadata, generateTwitterMetadata } from '@/lib/dynamic-og-image';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
 import Breadcrumb from '@/components/Breadcrumb';
@@ -87,32 +88,27 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     business.category
   );
 
+  // Generate dynamic OG images (uses business logo/image or falls back to default)
+  const openGraphData = generateOpenGraphMetadata({
+    title: metaTags.title,
+    description: metaTags.description,
+    url: `https://newkenyan.com/business/${canonicalSlug}`,
+    images: business.image_url ? [business.image_url] : null,
+    type: 'website'
+  });
+
+  const twitterData = generateTwitterMetadata({
+    title: metaTags.title,
+    description: metaTags.description,
+    images: business.image_url ? [business.image_url] : null
+  });
+
   return {
     title: metaTags.title,
     description: metaTags.description,
     keywords: metaTags.keywords,
-    openGraph: {
-      title: metaTags.title,
-      description: metaTags.description,
-      url: `https://newkenyan.com/business/${canonicalSlug}`,
-      siteName: 'NewKenyan.com',
-      images: business.image_url ? [
-        {
-          url: business.image_url,
-          width: 1200,
-          height: 630,
-          alt: `${business.business_name} - ${business.category} in ${business.city}`,
-        },
-      ] : [],
-      locale: 'en_KE',
-      type: 'website',
-    },
-    twitter: {
-      card: 'summary_large_image',
-      title: metaTags.title,
-      description: metaTags.description,
-      images: business.image_url ? [business.image_url] : [],
-    },
+    openGraph: openGraphData,
+    twitter: twitterData,
     alternates: {
       canonical: `https://newkenyan.com/business/${canonicalSlug}`,
     },

@@ -176,9 +176,14 @@ export default function AddPropertyForm() {
     setImagePreviews(prev => prev.filter((_, i) => i !== index));
   };
 
-  const uploadImages = async (files: File[]): Promise<string[]> => {
+  const uploadImages = async (files: File[], propertyTitle?: string): Promise<string[]> => {
     const formData = new FormData();
     files.forEach(file => formData.append('files', file));
+
+    // Add property title for intelligent image naming
+    if (propertyTitle) {
+      formData.append('propertyTitle', propertyTitle);
+    }
 
     const response = await fetch('/api/upload-images', {
       method: 'POST',
@@ -186,8 +191,16 @@ export default function AddPropertyForm() {
     });
 
     const result = await response.json();
-    
+
     if (result.success) {
+      // Log optimization stats
+      if (result.stats) {
+        console.log(`📊 Image Optimization Stats:
+          - Original size: ${(result.stats.originalSize / 1024 / 1024).toFixed(2)}MB
+          - Optimized size: ${(result.stats.optimizedSize / 1024 / 1024).toFixed(2)}MB
+          - Savings: ${result.stats.savings}
+          - Total images: ${result.stats.totalImages}`);
+      }
       return result.urls;
     } else {
       console.error('Image upload failed:', result.error);
@@ -245,8 +258,8 @@ export default function AddPropertyForm() {
     const { validatedData, imageFiles } = pendingPropertyData;
 
     try {
-      // Upload images
-      const imageUrls = await uploadImages(imageFiles);
+      // Upload images with property title for intelligent naming
+      const imageUrls = await uploadImages(imageFiles, validatedData.propertyTitle);
       if (imageUrls.length === 0) {
         setErrors({ images: 'Failed to upload images. Please try again.' });
         setIsSubmitting(false);

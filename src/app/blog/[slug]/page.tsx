@@ -7,14 +7,15 @@ import Footer from '@/components/Footer';
 import { Button } from '@/components/ui/button';
 import { sampleBlogPosts } from '@/data/sampleData';
 import { getBlogPost, getAllBlogPosts } from '@/lib/blog';
+import { generateOpenGraphMetadata, generateTwitterMetadata } from '@/lib/dynamic-og-image';
 import ShareButton from './ShareButtons';
 import RelatedPostCard from './RelatedPostCard';
 import BlogContentWithTOC from '@/components/BlogContentWithTOC';
 import SocialFollowLinks from '@/components/SocialFollowLinks';
-import { 
-  Calendar, 
-  Clock, 
-  User, 
+import {
+  Calendar,
+  Clock,
+  User,
   ArrowLeft,
   BookOpen
 } from 'lucide-react';
@@ -40,33 +41,34 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     };
   }
 
+  // Generate dynamic OG images (uses featured image or falls back to default)
+  const openGraphData = generateOpenGraphMetadata({
+    title: post.title,
+    description: post.excerpt,
+    url: `https://newkenyan.com/blog/${post.slug}`,
+    images: post.featuredImage ? [post.featuredImage] : null,
+    type: 'article'
+  });
+
+  const twitterData = generateTwitterMetadata({
+    title: post.title,
+    description: post.excerpt,
+    images: post.featuredImage ? [post.featuredImage] : null
+  });
+
   return {
     title: post.seoTitle || `${post.title} | NewKenyan.com Blog`,
     description: post.seoDescription || post.excerpt,
     keywords: post.keywords,
     authors: [{ name: post.author }],
     openGraph: {
-      title: post.title,
-      description: post.excerpt,
-      images: [
-        {
-          url: post.featuredImage,
-          width: 1200,
-          height: 630,
-          alt: post.title,
-        }
-      ],
+      ...openGraphData,
       type: 'article',
       publishedTime: post.publishedAt.toISOString(),
       authors: [post.author],
       section: post.category,
     },
-    twitter: {
-      card: 'summary_large_image',
-      title: post.title,
-      description: post.excerpt,
-      images: [post.featuredImage],
-    },
+    twitter: twitterData,
     alternates: {
       canonical: `https://newkenyan.com/blog/${post.slug}`,
     },
