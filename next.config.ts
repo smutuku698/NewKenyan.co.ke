@@ -95,7 +95,7 @@ const nextConfig: NextConfig = {
     ];
   },
   // Skip API routes during static generation to avoid build-time environment issues
-  trailingSlash: true,
+  trailingSlash: false, // Changed from true to fix 404 issues with property detail pages
   generateBuildId: async () => {
     return 'build-' + Date.now()
   }
