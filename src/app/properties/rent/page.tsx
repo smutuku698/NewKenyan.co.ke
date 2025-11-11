@@ -272,6 +272,7 @@ export default function RentPropertiesPage() {
                       title={property.property_title}
                       type={property.property_type}
                       price={property.price}
+                      priceType={property.price_type}
                       bedrooms={property.bedrooms}
                       bathrooms={property.bathrooms}
                       location={`${property.city}${property.county ? `, ${property.county}` : ''}`}
@@ -280,6 +281,8 @@ export default function RentPropertiesPage() {
                       amenities={property.amenities}
                       contactPhone={property.contact_phone}
                       whatsappNumber={property.whatsapp_number}
+                      createdAt={property.created_at}
+                      isFeatured={property.is_featured}
                     />
                   ))}
                 </div>

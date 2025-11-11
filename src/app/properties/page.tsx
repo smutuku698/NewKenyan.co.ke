@@ -214,8 +214,8 @@ export default function PropertiesPage() {
           {filteredProperties.length > 0 ? (
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {filteredProperties.map((property) => (
-                <PropertyCard 
-                  key={property.id} 
+                <PropertyCard
+                  key={property.id}
                   id={property.id}
                   title={property.property_title}
                   type={property.property_type}
@@ -228,6 +228,8 @@ export default function PropertiesPage() {
                   amenities={property.amenities || []}
                   contactPhone={property.contact_phone}
                   whatsappNumber={property.whatsapp_number}
+                  createdAt={property.created_at}
+                  isFeatured={property.is_featured}
                 />
               ))}
             </div>
