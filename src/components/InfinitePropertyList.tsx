@@ -134,6 +134,7 @@ export default function InfinitePropertyList({
                 title={property.property_title}
                 type={property.property_type}
                 price={property.price}
+                priceType={property.price_type}
                 bedrooms={property.bedrooms || undefined}
                 bathrooms={property.bathrooms || undefined}
                 squareFeet={property.square_feet || undefined}

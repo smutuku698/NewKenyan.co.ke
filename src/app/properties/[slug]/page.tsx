@@ -71,7 +71,8 @@ async function getPropertyBySlug(slug: string): Promise<PropertyListing | null> 
         p.property_title,
         p.property_type,
         p.city,
-        p.bedrooms
+        p.bedrooms,
+        p.price_type
       );
       // Try exact slug match first, then ID fallback
       return expectedSlug === slug || p.id === slug;
@@ -100,7 +101,7 @@ export async function generateStaticParams() {
   try {
     const { data: properties } = await supabase
       .from('property_listings')
-      .select('id, property_title, property_type, city, bedrooms')
+      .select('id, property_title, property_type, city, bedrooms, price_type')
       .eq('is_approved', true);
       // No limit - generate pages for ALL properties
 
@@ -113,7 +114,8 @@ export async function generateStaticParams() {
         property.property_title,
         property.property_type,
         property.city,
-        property.bedrooms
+        property.bedrooms,
+        property.price_type
       ),
     }));
   } catch (error) {
@@ -145,7 +147,8 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     property.property_title,
     property.property_type,
     property.city,
-    property.bedrooms
+    property.bedrooms,
+    property.price_type
   );
 
   // Generate dynamic OG images (uses property images or falls back to default)

@@ -35,10 +35,30 @@ export function generateSEOSlug(title: string, location?: string, maxLength = 60
   return slug;
 }
 
-export function generatePropertySlug(title: string, propertyType: string, city: string, bedrooms?: number): string {
+export function generatePropertySlug(
+  title: string,
+  propertyType: string,
+  city: string,
+  bedrooms?: number,
+  priceType?: string
+): string {
   // Use title if provided, otherwise create from property details
   const baseTitle = title || `${bedrooms ? `${bedrooms} bedroom ` : ''}${propertyType}`;
-  return generateSEOSlug(baseTitle, city);
+  let slug = generateSEOSlug(baseTitle, city);
+
+  // Add price type suffix (for-rent or for-sale)
+  if (priceType) {
+    const transactionType = priceType.toLowerCase() === 'rent' || priceType.toLowerCase() === 'for rent'
+      ? 'for-rent'
+      : 'for-sale';
+
+    // Only add if not already in slug
+    if (!slug.endsWith('-for-rent') && !slug.endsWith('-for-sale')) {
+      slug = `${slug}-${transactionType}`;
+    }
+  }
+
+  return slug;
 }
 
 export function generateBusinessSlug(businessName: string, city: string, category?: string): string {

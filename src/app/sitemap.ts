@@ -91,7 +91,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     // Get all approved properties
     const { data: properties } = await supabase
       .from('property_listings')
-      .select('id, property_title, property_type, city, bedrooms, updated_at')
+      .select('id, property_title, property_type, city, bedrooms, price_type, updated_at')
       .eq('is_approved', true)
       .order('updated_at', { ascending: false })
 
@@ -109,17 +109,18 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
       .eq('is_active', true)
       .order('type', { ascending: true })
 
-    // Property pages
+    // Property pages - Use proper slugs with price_type
     const propertyPages = properties?.map((property) => {
       const slug = generatePropertySlug(
         property.property_title,
         property.property_type,
         property.city,
-        property.bedrooms
+        property.bedrooms,
+        property.price_type
       )
 
       return {
-        url: `${baseUrl}/properties/${property.id}`,
+        url: `${baseUrl}/properties/${slug}`,
         lastModified: new Date(property.updated_at),
         changeFrequency: 'weekly' as const,
         priority: 0.8,

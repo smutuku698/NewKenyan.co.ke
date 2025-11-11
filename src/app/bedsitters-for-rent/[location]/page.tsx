@@ -95,24 +95,38 @@ async function getProperties(
     .eq('price_type', 'rent')
     .ilike('property_type', DB_QUERY);
 
-  // Filter based on location type
+  // Build location filters with proper AND logic
   if (location.type === 'county') {
-    query = query.ilike('county', `%${location.name}%`);
+    // Remove " County" suffix from location name for database matching
+    const countyName = location.name.replace(/ County$/i, '');
+    query = query.ilike('county', `%${countyName}%`);
+
+    // If city param is provided, add it as additional filter within the county
+    if (searchParams?.city && typeof searchParams.city === 'string') {
+      query = query.or(`city.ilike.%${searchParams.city}%,address.ilike.%${searchParams.city}%`);
+    }
   } else if (location.type === 'neighborhood') {
+    // Remove " County" suffix from county name for database matching
+    const countyName = location.county.replace(/ County$/i, '');
     query = query
-      .ilike('county', `%${location.county}%`)
+      .ilike('county', `%${countyName}%`)
       .or(`city.ilike.%${location.name}%,address.ilike.%${location.name}%`);
+
+    // If city param provided and different from location name, add additional filter
+    if (searchParams?.city && typeof searchParams.city === 'string' &&
+        searchParams.city.toLowerCase() !== location.name.toLowerCase()) {
+      query = query.or(`city.ilike.%${searchParams.city}%,address.ilike.%${searchParams.city}%`);
+    }
   } else if (location.type === 'estate') {
+    // Remove " County" suffix from county name for database matching
+    const countyName = location.county.replace(/ County$/i, '');
     query = query
-      .ilike('county', `%${location.county}%`)
+      .ilike('county', `%${countyName}%`)
       .ilike('address', `%${location.name}%`);
   }
 
-  // Apply query parameter filters
+  // Apply other query parameter filters
   if (searchParams) {
-    if (searchParams.city && typeof searchParams.city === 'string') {
-      query = query.or(`city.ilike.%${searchParams.city}%,address.ilike.%${searchParams.city}%`);
-    }
     if (searchParams.bedrooms && typeof searchParams.bedrooms === 'string') {
       const bedrooms = parseInt(searchParams.bedrooms);
       if (!isNaN(bedrooms)) {

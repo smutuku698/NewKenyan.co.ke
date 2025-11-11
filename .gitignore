@@ -52,3 +52,54 @@ properties-for-upload*.csv
 
 # Claude settings
 .claude/settings.local.json
+
+# Property data package (source files - already imported to database)
+# This folder contains 4,457 images and source JSON files (~550MB total)
+# Data is already in Supabase, so no need to commit these large files
+C:\Users\Atom\Documents\jobs-in-kenya-scrapper\property_data_package
+C:\Users\Atom\Documents\jobs-in-kenya-scrapper\property_data_package\*
+**/property_data_package/
+**/property_data_package/**
+
+# Import scripts (one-time use, already completed)
+import-full-property-data.ts
+quick-import-properties.ts
+upload-images-to-supabase.ts
+update-image-urls.ts
+update-remaining-images.ts
+verify-final-import.ts
+verify-all-pages.ts
+check-import-issue.ts
+deep-verify-database.ts
+final-verify.ts
+fix-database-import.ts
+verify-supabase-data.ts
+check-*.ts
+fix-*.ts
+verify-*.ts
+*-verify*.ts
+update-slugs*.ts
+audit-*.ts
+location-breakdown-report.ts
+
+# Import reports and temporary files
+empty-locations-report.json
+IMPORT_SUCCESS_SUMMARY.md
+PAGE_COVERAGE_REPORT.md
+QUICK_REFERENCE.md
+DATABASE_AUDIT_REPORT.md
+FINAL_FIX.md
+COMPLETE_PROJECT_SUMMARY.txt
+*.sql
+calculators.txt
+whyconstructioncostcalculatorRanks.txt
+*.sh
+compare-json-vs-db.ts
+complete-fix.ts
+database-verification-report.json
+delete-sample-data.ts
+find-exact-issue.ts
+check-*.ts
+true-count.ts
+*.json.backup
+*-report.json

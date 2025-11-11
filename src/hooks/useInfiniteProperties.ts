@@ -68,14 +68,20 @@ export function useInfiniteProperties({
       // Location filtering
       if (location) {
         if (location.type === 'county') {
-          query = query.eq('county', location.name);
+          // Remove " County" suffix from location name for database matching
+          const countyName = location.name.replace(/ County$/i, '');
+          query = query.ilike('county', `%${countyName}%`);
         } else if (location.type === 'neighborhood') {
+          // Remove " County" suffix from county name for database matching
+          const countyName = location.county.replace(/ County$/i, '');
           query = query
-            .eq('county', location.county)
+            .ilike('county', `%${countyName}%`)
             .or(`city.ilike.%${location.name}%,address.ilike.%${location.name}%`);
         } else if (location.type === 'estate') {
+          // Remove " County" suffix from county name for database matching
+          const countyName = location.county.replace(/ County$/i, '');
           query = query
-            .eq('county', location.county)
+            .ilike('county', `%${countyName}%`)
             .ilike('address', `%${location.name}%`);
         }
       }
@@ -89,9 +95,9 @@ export function useInfiniteProperties({
 
       // Transaction type filtering
       if (transactionType === 'sale') {
-        query = query.eq('price_type', 'For Sale');
+        query = query.eq('price_type', 'sale');
       } else if (transactionType === 'rent') {
-        query = query.eq('price_type', 'For Rent');
+        query = query.eq('price_type', 'rent');
       }
 
       // User filters

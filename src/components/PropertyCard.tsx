@@ -11,6 +11,7 @@ interface PropertyCardProps {
   title: string;
   type: string;
   price: number;
+  priceType?: string;
   bedrooms?: number;
   bathrooms?: number;
   location: string;
@@ -29,6 +30,7 @@ const PropertyCard = ({
   title,
   type,
   price,
+  priceType,
   bedrooms,
   bathrooms,
   location,
@@ -44,7 +46,7 @@ const PropertyCard = ({
     return `KES ${price.toLocaleString()}`;
   };
 
-  const slug = generatePropertySlug(title, type, city, bedrooms);
+  const slug = generatePropertySlug(title, type, city, bedrooms, priceType);
 
   // Get a valid image URL or use fallback
   const getImageUrl = () => {
