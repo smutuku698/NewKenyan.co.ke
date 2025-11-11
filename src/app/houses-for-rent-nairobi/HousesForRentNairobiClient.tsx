@@ -50,7 +50,7 @@ export default function HousesForRentNairobiClient() {
         .select('*')
         .eq('is_approved', true)
         .eq('property_type', 'House')
-        .eq('price_type', 'For Rent')
+        .eq('price_type', 'rent')
         .ilike('county', '%Nairobi%')
         .order('is_featured', { ascending: false })
         .order('created_at', { ascending: false });

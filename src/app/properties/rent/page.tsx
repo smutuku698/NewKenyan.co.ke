@@ -53,7 +53,7 @@ export default function RentPropertiesPage() {
         .from('property_listings')
         .select('*')
         .eq('is_approved', true)
-        .eq('price_type', 'For Rent')
+        .eq('price_type', 'rent')
         .order('is_featured', { ascending: false })
         .order('created_at', { ascending: false });
 

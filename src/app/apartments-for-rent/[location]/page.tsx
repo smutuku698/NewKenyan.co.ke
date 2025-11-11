@@ -50,6 +50,7 @@ interface PropertyListing {
 
 interface PageProps {
   params: { location: string };
+  searchParams: { [key: string]: string | string[] | undefined };
 }
 
 // ISR Configuration: Revalidate every 24 hours
@@ -82,12 +83,15 @@ async function getLocation(slug: string): Promise<Location | null> {
   return data as Location;
 }
 
-async function getApartmentsForRent(location: Location): Promise<PropertyListing[]> {
+async function getApartmentsForRent(
+  location: Location,
+  searchParams?: { [key: string]: string | string[] | undefined }
+): Promise<PropertyListing[]> {
   let query = supabase
     .from('property_listings')
     .select('*')
     .eq('is_approved', true)
-    .eq('price_type', 'For Rent')
+    .eq('price_type', 'rent')
     .ilike('property_type', '%apartment%');
 
   if (location.type === 'county') {
@@ -102,10 +106,50 @@ async function getApartmentsForRent(location: Location): Promise<PropertyListing
       .ilike('address', `%${location.name}%`);
   }
 
+  // Apply query parameter filters
+  if (searchParams) {
+    // Filter by city/neighborhood
+    if (searchParams.city && typeof searchParams.city === 'string') {
+      query = query.or(`city.ilike.%${searchParams.city}%,address.ilike.%${searchParams.city}%`);
+    }
+
+    // Filter by bedrooms
+    if (searchParams.bedrooms && typeof searchParams.bedrooms === 'string') {
+      const bedrooms = parseInt(searchParams.bedrooms);
+      if (!isNaN(bedrooms)) {
+        query = query.eq('bedrooms', bedrooms);
+      }
+    }
+
+    // Filter by min price
+    if (searchParams.min_price && typeof searchParams.min_price === 'string') {
+      const minPrice = parseInt(searchParams.min_price);
+      if (!isNaN(minPrice)) {
+        query = query.gte('price', minPrice);
+      }
+    }
+
+    // Filter by max price
+    if (searchParams.max_price && typeof searchParams.max_price === 'string') {
+      const maxPrice = parseInt(searchParams.max_price);
+      if (!isNaN(maxPrice)) {
+        query = query.lte('price', maxPrice);
+      }
+    }
+
+    // Filter by bathrooms
+    if (searchParams.bathrooms && typeof searchParams.bathrooms === 'string') {
+      const bathrooms = parseInt(searchParams.bathrooms);
+      if (!isNaN(bathrooms)) {
+        query = query.gte('bathrooms', bathrooms);
+      }
+    }
+  }
+
   query = query
     .order('is_featured', { ascending: false })
     .order('created_at', { ascending: false })
-    .limit(12);
+    .limit(100); // Increase limit to show more filtered results
 
   const { data, error } = await query;
 
@@ -162,7 +206,7 @@ function calculateStats(properties: PropertyListing[]): PropertyStats {
   };
 }
 
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+export async function generateMetadata({ params, searchParams }: PageProps): Promise<Metadata> {
   const location = await getLocation(params.location);
 
   if (!location) {
@@ -172,7 +216,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     };
   }
 
-  const properties = await getApartmentsForRent(location);
+  const properties = await getApartmentsForRent(location, searchParams);
   const stats = calculateStats(properties);
 
   const metadata = generatePropertyMetadata(location, 'apartments', 'rent', stats);
@@ -213,14 +257,14 @@ async function getRelatedLocations(location: Location) {
   return data;
 }
 
-export default async function ApartmentsForRentPage({ params }: PageProps) {
+export default async function ApartmentsForRentPage({ params, searchParams }: PageProps) {
   const location = await getLocation(params.location);
 
   if (!location) {
     notFound();
   }
 
-  const properties = await getApartmentsForRent(location);
+  const properties = await getApartmentsForRent(location, searchParams);
   const stats = calculateStats(properties);
   const relatedLocations = await getRelatedLocations(location);
 

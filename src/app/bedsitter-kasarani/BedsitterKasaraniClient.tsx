@@ -56,7 +56,7 @@ export default function BedsitterKasaraniClient() {
         .from('property_listings')
         .select('*')
         .eq('is_approved', true)
-        .eq('price_type', 'For Rent')
+        .eq('price_type', 'rent')
         .ilike('city', '%kasarani%')
         .order('is_featured', { ascending: false })
         .order('created_at', { ascending: false });
@@ -87,7 +87,7 @@ export default function BedsitterKasaraniClient() {
           .from('property_listings')
           .select('*')
           .eq('is_approved', true)
-          .eq('price_type', 'For Rent')
+          .eq('price_type', 'rent')
           .ilike('county', '%Nairobi%')
           .order('is_featured', { ascending: false })
           .order('created_at', { ascending: false })

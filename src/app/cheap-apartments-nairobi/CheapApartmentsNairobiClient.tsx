@@ -57,7 +57,7 @@ export default function CheapApartmentsNairobiClient() {
         .from('property_listings')
         .select('*')
         .eq('is_approved', true)
-        .eq('price_type', 'For Rent')
+        .eq('price_type', 'rent')
         .in('property_type', ['Apartment', 'Flat', 'Bedsitter', 'Studio'])
         .lte('price', 25000) // Only show apartments under KES 25,000
         .order('is_featured', { ascending: false })
@@ -90,7 +90,7 @@ export default function CheapApartmentsNairobiClient() {
           .from('property_listings')
           .select('*')
           .eq('is_approved', true)
-          .eq('price_type', 'For Rent')
+          .eq('price_type', 'rent')
           .ilike('county', '%Nairobi%')
           .lte('price', 30000)
           .order('is_featured', { ascending: false })

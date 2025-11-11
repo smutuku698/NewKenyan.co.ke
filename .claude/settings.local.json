@@ -51,7 +51,8 @@
       "Bash(nul)",
       "Bash(bash scripts/update-all-location-queries.sh:*)",
       "Bash(npm run verify-sitemap:*)",
-      "Bash(npx next build)"
+      "Bash(npx next build)",
+      "Bash(bash /tmp/update-page.sh:*)"
     ],
     "deny": [],
     "ask": []

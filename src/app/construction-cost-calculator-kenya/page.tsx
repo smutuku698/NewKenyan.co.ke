@@ -60,6 +60,93 @@ export default function ConstructionCalculatorPage() {
       {/* Calculator Component */}
       <ConstructionCalculator />
 
+      {/* Strategic Internal Links - Property Listings Silo */}
+      <div className="max-w-6xl mx-auto px-6 py-12 bg-gradient-to-br from-green-50 to-blue-50">
+        <div className="bg-white rounded-xl shadow-lg p-8 border border-green-200">
+          <h2 className="text-3xl font-bold text-gray-900 mb-6 text-center">
+            🏠 Compare Your Building Costs with Actual Properties in Kenya
+          </h2>
+          <p className="text-lg text-gray-700 mb-8 text-center max-w-3xl mx-auto">
+            After calculating your construction costs, browse real properties for sale and rent across Kenya.
+            Compare market prices with your estimated building costs to make informed decisions.
+          </p>
+
+          <div className="grid md:grid-cols-3 gap-6 mb-8">
+            {/* Houses for Sale */}
+            <div className="bg-gradient-to-br from-orange-50 to-orange-100 border border-orange-200 rounded-lg p-6 hover:shadow-lg transition-shadow">
+              <h3 className="text-xl font-semibold text-gray-900 mb-3">🏡 Houses for Sale</h3>
+              <p className="text-gray-700 text-sm mb-4">
+                Browse completed houses for sale. Compare finished property prices with your building cost estimates.
+              </p>
+              <div className="space-y-2">
+                <a href="/houses-for-sale/nairobi-county" className="block text-orange-600 hover:text-orange-800 font-medium text-sm hover:underline">
+                  → Houses for Sale in Nairobi
+                </a>
+                <a href="/houses-for-sale/mombasa-county" className="block text-orange-600 hover:text-orange-800 font-medium text-sm hover:underline">
+                  → Houses for Sale in Mombasa
+                </a>
+                <a href="/houses-for-sale/kiambu-county" className="block text-orange-600 hover:text-orange-800 font-medium text-sm hover:underline">
+                  → Houses for Sale in Kiambu
+                </a>
+              </div>
+            </div>
+
+            {/* Land for Sale */}
+            <div className="bg-gradient-to-br from-green-50 to-green-100 border border-green-200 rounded-lg p-6 hover:shadow-lg transition-shadow">
+              <h3 className="text-xl font-semibold text-gray-900 mb-3">📍 Land for Your Project</h3>
+              <p className="text-gray-700 text-sm mb-4">
+                Find land where you can build. Factor in land costs with your construction budget.
+              </p>
+              <div className="space-y-2">
+                <a href="/land-for-sale/nairobi-county" className="block text-green-600 hover:text-green-800 font-medium text-sm hover:underline">
+                  → Land for Sale in Nairobi
+                </a>
+                <a href="/land-for-sale/kiambu-county" className="block text-green-600 hover:text-green-800 font-medium text-sm hover:underline">
+                  → Land for Sale in Kiambu
+                </a>
+                <a href="/land-for-sale/machakos-county" className="block text-green-600 hover:text-green-800 font-medium text-sm hover:underline">
+                  → Land for Sale in Machakos
+                </a>
+              </div>
+            </div>
+
+            {/* Apartments & Houses for Rent */}
+            <div className="bg-gradient-to-br from-blue-50 to-blue-100 border border-blue-200 rounded-lg p-6 hover:shadow-lg transition-shadow">
+              <h3 className="text-xl font-semibold text-gray-900 mb-3">🏢 Rent While Building</h3>
+              <p className="text-gray-700 text-sm mb-4">
+                Find rental properties while your house is under construction.
+              </p>
+              <div className="space-y-2">
+                <a href="/apartments-for-rent/nairobi-county" className="block text-blue-600 hover:text-blue-800 font-medium text-sm hover:underline">
+                  → Apartments for Rent Nairobi
+                </a>
+                <a href="/houses-for-rent/nairobi-county" className="block text-blue-600 hover:text-blue-800 font-medium text-sm hover:underline">
+                  → Houses for Rent Nairobi
+                </a>
+                <a href="/bedsitters-for-rent/nairobi-county" className="block text-blue-600 hover:text-blue-800 font-medium text-sm hover:underline">
+                  → Bedsitters for Rent Nairobi
+                </a>
+              </div>
+            </div>
+          </div>
+
+          {/* Property Type Links */}
+          <div className="bg-gray-50 rounded-lg p-6 border border-gray-200">
+            <h3 className="text-lg font-semibold text-gray-900 mb-4">Browse Properties by Type:</h3>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-3 text-sm">
+              <a href="/bungalows-for-sale/nairobi-county" className="text-gray-700 hover:text-orange-600 hover:underline">Bungalows for Sale</a>
+              <a href="/villas-for-sale/nairobi-county" className="text-gray-700 hover:text-orange-600 hover:underline">Villas for Sale</a>
+              <a href="/maisonettes-for-sale/nairobi-county" className="text-gray-700 hover:text-orange-600 hover:underline">Maisonettes for Sale</a>
+              <a href="/townhouses-for-sale/nairobi-county" className="text-gray-700 hover:text-orange-600 hover:underline">Townhouses for Sale</a>
+              <a href="/apartments-for-sale/nairobi-county" className="text-gray-700 hover:text-orange-600 hover:underline">Apartments for Sale</a>
+              <a href="/studio-apartments-for-sale/nairobi-county" className="text-gray-700 hover:text-orange-600 hover:underline">Studio Apartments</a>
+              <a href="/2-bedroom-houses-for-sale/nairobi-county" className="text-gray-700 hover:text-orange-600 hover:underline">2 Bedroom Houses</a>
+              <a href="/3-bedroom-houses-for-sale/nairobi-county" className="text-gray-700 hover:text-orange-600 hover:underline">3 Bedroom Houses</a>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* Key Features Section */}
       <div className="max-w-6xl mx-auto px-6 py-16">
         <div className="text-center mb-12">
@@ -863,11 +950,120 @@ export default function ConstructionCalculatorPage() {
             <div className="bg-gray-100 border border-gray-300 rounded-lg p-6">
               <h4 className="font-semibold text-gray-900 mb-3">💡 Use Our Calculator for Accurate Regional Pricing</h4>
               <p className="text-gray-700 text-sm">
-                Our construction cost calculator above automatically adjusts for regional pricing differences. 
-                Simply select your location from the dropdown menu to get accurate local estimates including 
+                Our construction cost calculator above automatically adjusts for regional pricing differences.
+                Simply select your location from the dropdown menu to get accurate local estimates including
                 transport costs, labor rate variations, and material availability factors.
               </p>
             </div>
+          </div>
+        </section>
+
+        {/* Regional Property Links Silo */}
+        <section className="mb-16 bg-gradient-to-br from-purple-50 to-pink-50 rounded-xl p-8 border border-purple-200">
+          <h2 className="text-3xl font-bold text-gray-900 mb-6 text-center">
+            🗺️ Explore Properties and Land by Region
+          </h2>
+          <p className="text-lg text-gray-700 mb-8 text-center max-w-3xl mx-auto">
+            After calculating regional construction costs, explore available properties and land in each region.
+            Find the best location for your building project based on cost and available inventory.
+          </p>
+
+          <div className="grid md:grid-cols-3 gap-6">
+            {/* Nairobi & Central Kenya */}
+            <div className="bg-white rounded-lg p-6 border border-gray-200">
+              <h3 className="text-xl font-semibold text-purple-800 mb-4">📍 Nairobi & Central Kenya</h3>
+              <div className="space-y-3">
+                <div>
+                  <h4 className="font-semibold text-gray-800 text-sm mb-2">Nairobi County</h4>
+                  <div className="space-y-1 text-sm">
+                    <a href="/houses-for-sale/nairobi-county" className="block text-gray-600 hover:text-purple-600 hover:underline">Houses for Sale</a>
+                    <a href="/land-for-sale/nairobi-county" className="block text-gray-600 hover:text-purple-600 hover:underline">Land for Sale</a>
+                    <a href="/apartments-for-rent/nairobi-county" className="block text-gray-600 hover:text-purple-600 hover:underline">Apartments for Rent</a>
+                  </div>
+                </div>
+                <div>
+                  <h4 className="font-semibold text-gray-800 text-sm mb-2">Kiambu County</h4>
+                  <div className="space-y-1 text-sm">
+                    <a href="/houses-for-sale/kiambu-county" className="block text-gray-600 hover:text-purple-600 hover:underline">Houses for Sale</a>
+                    <a href="/land-for-sale/kiambu-county" className="block text-gray-600 hover:text-purple-600 hover:underline">Land for Sale</a>
+                    <a href="/bungalows-for-sale/kiambu-county" className="block text-gray-600 hover:text-purple-600 hover:underline">Bungalows for Sale</a>
+                  </div>
+                </div>
+                <div>
+                  <h4 className="font-semibold text-gray-800 text-sm mb-2">Machakos County</h4>
+                  <div className="space-y-1 text-sm">
+                    <a href="/land-for-sale/machakos-county" className="block text-gray-600 hover:text-purple-600 hover:underline">Land for Sale</a>
+                    <a href="/houses-for-sale/machakos-county" className="block text-gray-600 hover:text-purple-600 hover:underline">Houses for Sale</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Coast Region */}
+            <div className="bg-white rounded-lg p-6 border border-gray-200">
+              <h3 className="text-xl font-semibold text-blue-800 mb-4">🌊 Coast Region</h3>
+              <div className="space-y-3">
+                <div>
+                  <h4 className="font-semibold text-gray-800 text-sm mb-2">Mombasa County</h4>
+                  <div className="space-y-1 text-sm">
+                    <a href="/houses-for-sale/mombasa-county" className="block text-gray-600 hover:text-blue-600 hover:underline">Houses for Sale</a>
+                    <a href="/apartments-for-sale/mombasa-county" className="block text-gray-600 hover:text-blue-600 hover:underline">Apartments for Sale</a>
+                    <a href="/villas-for-sale/mombasa-county" className="block text-gray-600 hover:text-blue-600 hover:underline">Villas for Sale</a>
+                    <a href="/land-for-sale/mombasa-county" className="block text-gray-600 hover:text-blue-600 hover:underline">Land for Sale</a>
+                  </div>
+                </div>
+                <div>
+                  <h4 className="font-semibold text-gray-800 text-sm mb-2">Kilifi County</h4>
+                  <div className="space-y-1 text-sm">
+                    <a href="/houses-for-sale/kilifi-county" className="block text-gray-600 hover:text-blue-600 hover:underline">Houses for Sale</a>
+                    <a href="/land-for-sale/kilifi-county" className="block text-gray-600 hover:text-blue-600 hover:underline">Land for Sale</a>
+                  </div>
+                </div>
+                <div>
+                  <h4 className="font-semibold text-gray-800 text-sm mb-2">Kwale County</h4>
+                  <div className="space-y-1 text-sm">
+                    <a href="/land-for-sale/kwale-county" className="block text-gray-600 hover:text-blue-600 hover:underline">Land for Sale</a>
+                    <a href="/houses-for-sale/kwale-county" className="block text-gray-600 hover:text-blue-600 hover:underline">Houses for Sale</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* Western & Other Regions */}
+            <div className="bg-white rounded-lg p-6 border border-gray-200">
+              <h3 className="text-xl font-semibold text-green-800 mb-4">🌾 Western & Other Regions</h3>
+              <div className="space-y-3">
+                <div>
+                  <h4 className="font-semibold text-gray-800 text-sm mb-2">Kisumu County</h4>
+                  <div className="space-y-1 text-sm">
+                    <a href="/houses-for-sale/kisumu-county" className="block text-gray-600 hover:text-green-600 hover:underline">Houses for Sale</a>
+                    <a href="/land-for-sale/kisumu-county" className="block text-gray-600 hover:text-green-600 hover:underline">Land for Sale</a>
+                    <a href="/houses-for-rent/kisumu-county" className="block text-gray-600 hover:text-green-600 hover:underline">Houses for Rent</a>
+                  </div>
+                </div>
+                <div>
+                  <h4 className="font-semibold text-gray-800 text-sm mb-2">Nakuru County</h4>
+                  <div className="space-y-1 text-sm">
+                    <a href="/houses-for-sale/nakuru-county" className="block text-gray-600 hover:text-green-600 hover:underline">Houses for Sale</a>
+                    <a href="/land-for-sale/nakuru-county" className="block text-gray-600 hover:text-green-600 hover:underline">Land for Sale</a>
+                  </div>
+                </div>
+                <div>
+                  <h4 className="font-semibold text-gray-800 text-sm mb-2">Uasin Gishu County</h4>
+                  <div className="space-y-1 text-sm">
+                    <a href="/houses-for-sale/uasin-gishu-county" className="block text-gray-600 hover:text-green-600 hover:underline">Houses for Sale</a>
+                    <a href="/land-for-sale/uasin-gishu-county" className="block text-gray-600 hover:text-green-600 hover:underline">Land for Sale</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="mt-8 bg-white rounded-lg p-6 border border-gray-200 text-center">
+            <p className="text-gray-700 text-sm">
+              💡 <strong>Smart Tip:</strong> Use the regional cost data above to identify the most cost-effective areas for your project,
+              then browse available properties and land in those locations.
+            </p>
           </div>
         </section>
 
@@ -1012,6 +1208,79 @@ export default function ConstructionCalculatorPage() {
                 government policy changes, and regional variations. The estimates you see reflect 
                 current Q3 2025 market conditions and include recent price adjustments.
               </p>
+            </div>
+          </div>
+        </section>
+
+        {/* Tools & Resources Silo */}
+        <section className="mb-16 bg-gradient-to-br from-teal-50 to-cyan-50 rounded-xl p-8 border border-teal-200">
+          <h2 className="text-3xl font-bold text-gray-900 mb-6 text-center">
+            🛠️ Construction Resources & Tools for Your Project
+          </h2>
+          <p className="text-lg text-gray-700 mb-8 text-center max-w-3xl mx-auto">
+            Plan your entire construction journey with our comprehensive tools and find trusted professionals for your project.
+          </p>
+
+          <div className="grid md:grid-cols-2 gap-6 mb-8">
+            {/* Related Calculators */}
+            <div className="bg-white rounded-lg p-6 border border-gray-200">
+              <h3 className="text-xl font-semibold text-teal-800 mb-4">📱 Related Calculators & Tools</h3>
+              <div className="space-y-3">
+                <a href="/mortgage-calculator-kenya" className="block p-3 bg-teal-50 rounded-lg hover:bg-teal-100 transition-colors">
+                  <h4 className="font-semibold text-gray-900 text-sm mb-1">Mortgage Calculator Kenya</h4>
+                  <p className="text-gray-600 text-xs">Calculate monthly mortgage payments and determine how much you can borrow for your construction project.</p>
+                </a>
+                <a href="/properties" className="block p-3 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
+                  <h4 className="font-semibold text-gray-900 text-sm mb-1">Browse All Properties</h4>
+                  <p className="text-gray-600 text-xs">Explore thousands of properties for sale and rent across all 47 counties in Kenya.</p>
+                </a>
+                <a href="/add-listing" className="block p-3 bg-green-50 rounded-lg hover:bg-green-100 transition-colors">
+                  <h4 className="font-semibold text-gray-900 text-sm mb-1">List Your Property</h4>
+                  <p className="text-gray-600 text-xs">Completed your construction? List your property for sale or rent on NewKenyan.com.</p>
+                </a>
+              </div>
+            </div>
+
+            {/* Business Directory */}
+            <div className="bg-white rounded-lg p-6 border border-gray-200">
+              <h3 className="text-xl font-semibold text-purple-800 mb-4">👷 Find Construction Professionals</h3>
+              <div className="space-y-3">
+                <a href="/business-directory" className="block p-3 bg-purple-50 rounded-lg hover:bg-purple-100 transition-colors">
+                  <h4 className="font-semibold text-gray-900 text-sm mb-1">Business Directory</h4>
+                  <p className="text-gray-600 text-xs">Find contractors, architects, engineers, and material suppliers for your construction project.</p>
+                </a>
+                <div className="p-3 bg-gray-50 rounded-lg">
+                  <h4 className="font-semibold text-gray-900 text-sm mb-2">Popular Categories:</h4>
+                  <div className="flex flex-wrap gap-2 text-xs">
+                    <a href="/business-directory" className="px-3 py-1 bg-white border border-gray-200 rounded-full hover:border-purple-300 hover:bg-purple-50 transition-colors">Contractors</a>
+                    <a href="/business-directory" className="px-3 py-1 bg-white border border-gray-200 rounded-full hover:border-purple-300 hover:bg-purple-50 transition-colors">Architects</a>
+                    <a href="/business-directory" className="px-3 py-1 bg-white border border-gray-200 rounded-full hover:border-purple-300 hover:bg-purple-50 transition-colors">Engineers</a>
+                    <a href="/business-directory" className="px-3 py-1 bg-white border border-gray-200 rounded-full hover:border-purple-300 hover:bg-purple-50 transition-colors">Material Suppliers</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Jobs Section */}
+          <div className="bg-white rounded-lg p-6 border border-gray-200">
+            <h3 className="text-xl font-semibold text-orange-800 mb-4">💼 Construction Jobs in Kenya</h3>
+            <p className="text-gray-700 text-sm mb-4">
+              Looking for construction work or hiring for your project? Browse construction and real estate jobs across Kenya.
+            </p>
+            <div className="grid md:grid-cols-3 gap-3 text-sm">
+              <a href="/local-jobs" className="text-center p-3 bg-orange-50 rounded-lg hover:bg-orange-100 transition-colors">
+                <div className="font-semibold text-gray-900 mb-1">Browse Jobs</div>
+                <div className="text-gray-600 text-xs">Construction & Real Estate</div>
+              </a>
+              <a href="/local-jobs" className="text-center p-3 bg-green-50 rounded-lg hover:bg-green-100 transition-colors">
+                <div className="font-semibold text-gray-900 mb-1">Post a Job</div>
+                <div className="text-gray-600 text-xs">Hire Construction Workers</div>
+              </a>
+              <a href="/local-jobs" className="text-center p-3 bg-blue-50 rounded-lg hover:bg-blue-100 transition-colors">
+                <div className="font-semibold text-gray-900 mb-1">Career Resources</div>
+                <div className="text-gray-600 text-xs">Construction Industry</div>
+              </a>
             </div>
           </div>
         </section>

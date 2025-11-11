@@ -47,7 +47,7 @@ interface PageProps {
 // Property type configuration
 const PROPERTY_TYPE = 'townhouses';
 const TRANSACTION_TYPE = 'rent';
-const DB_QUERY = '%townhouse%|%town house%';
+const DB_QUERY = '%townhouse%';
 const PROPERTY_LABEL = 'Townhouses';
 
 // ISR Configuration: Revalidate every 24 hours
@@ -87,7 +87,7 @@ async function getProperties(location: Location): Promise<PropertyListing[]> {
     .from('property_listings')
     .select('*')
     .eq('is_approved', true)
-    .eq('price_type', 'For Rent')
+    .eq('price_type', 'rent')
     .ilike('property_type', DB_QUERY);
 
   // Filter based on location type

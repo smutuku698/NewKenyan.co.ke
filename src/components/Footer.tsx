@@ -211,6 +211,9 @@ const Footer = () => {
               <Link href="/sitemap-page.html" className="text-gray-400 hover:text-white transition-colors">
                 Sitemap
               </Link>
+              <Link href="/jobs-sitemap-page.html" className="text-gray-400 hover:text-white transition-colors">
+                Jobs Sitemap
+              </Link>
               <Link href="/contact" className="text-gray-400 hover:text-white transition-colors">
                 Support
               </Link>

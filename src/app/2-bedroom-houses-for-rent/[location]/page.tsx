@@ -92,7 +92,7 @@ async function getProperties(location: Location): Promise<PropertyListing[]> {
     .from('property_listings')
     .select('*')
     .eq('is_approved', true)
-    .eq('price_type', 'For Rent')
+    .eq('price_type', 'rent')
     .eq('bedrooms', BEDROOM_COUNT)
     .ilike('property_type', DB_QUERY);
 
