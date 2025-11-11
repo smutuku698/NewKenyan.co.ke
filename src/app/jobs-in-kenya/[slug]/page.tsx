@@ -411,10 +411,10 @@ export default async function JobDetailsPage({ params }: JobDetailsPageProps) {
         {/* Jobs FAQ Section */}
         <JobsFAQSection />
 
-        {/* Enhanced JSON-LD Schema */}
+        {/* Enhanced JSON-LD Schema - Optimized for Bing Jobs & Google for Jobs */}
         <script
           type="application/ld+json"
-          dangerouslySetInnerHTML={{ 
+          dangerouslySetInnerHTML={{
             __html: JSON.stringify({
               "@context": "https://schema.org",
               "@type": "JobPosting",
@@ -426,6 +426,7 @@ export default async function JobDetailsPage({ params }: JobDetailsPageProps) {
                 "value": job.id.toString()
               },
               "datePosted": job.date,
+              "validThrough": new Date(new Date(job.date).setMonth(new Date(job.date).getMonth() + 3)).toISOString().split('T')[0],
               "employmentType": job.nature_of_job,
               "hiringOrganization": {
                 "@type": "Organization",
@@ -442,27 +443,35 @@ export default async function JobDetailsPage({ params }: JobDetailsPageProps) {
                   "addressCountry": "KE"
                 }
               },
+              "applicantLocationRequirements": {
+                "@type": "Country",
+                "name": "Kenya"
+              },
+              "jobLocationType": job.job_location.toLowerCase().includes('remote') || job.job_location.toLowerCase().includes('online') ? "TELECOMMUTE" : undefined,
               "baseSalary": job.salary ? {
                 "@type": "MonetaryAmount",
                 "currency": "KES",
                 "value": {
                   "@type": "QuantitativeValue",
                   "value": job.salary,
-                  "unitText": "MONTHLY"
+                  "unitText": "MONTH"
                 }
               } : undefined,
               "industry": job.industry,
               "qualifications": job.key_requirements_skills_qualification,
               "responsibilities": job.duties_and_responsibilities,
+              "skills": job.key_requirements_skills_qualification,
+              "directApply": true,
               "applicationContact": {
                 "@type": "ContactPoint",
                 "email": "hr@newkenyan.com",
-                "name": "NewKenyan HR Team"
+                "name": "NewKenyan HR Team",
+                "contactType": "Recruitment"
               },
               "keywords": [
-                "jobs in kenya", 
-                job.job_title.toLowerCase(), 
-                job.job_location.toLowerCase(), 
+                "jobs in kenya",
+                job.job_title.toLowerCase(),
+                job.job_location.toLowerCase(),
                 job.industry.toLowerCase(),
                 "kenya employment",
                 "career opportunities kenya"
