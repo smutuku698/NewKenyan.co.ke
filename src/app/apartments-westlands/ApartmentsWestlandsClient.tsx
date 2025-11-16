@@ -58,7 +58,7 @@ export default function ApartmentsWestlandsClient() {
         .eq('is_approved', true)
         .eq('price_type', 'rent')
         .ilike('city', '%westlands%')
-        .in('property_type', ['Apartment', 'Studio', 'Penthouse', 'Flat'])
+        .ilike('property_type', '%apartment%')
         .order('is_featured', { ascending: false })
         .order('created_at', { ascending: false });
 

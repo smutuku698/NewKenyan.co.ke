@@ -58,7 +58,7 @@ export default function LandForSaleKenyaClient() {
         .select('*')
         .eq('is_approved', true)
         .eq('price_type', 'sale')
-        .eq('property_type', 'Land')
+        .ilike('property_type', '%land%')
         .order('is_featured', { ascending: false })
         .order('created_at', { ascending: false});
 

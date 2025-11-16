@@ -85,7 +85,7 @@ export default function RentPropertiesPage() {
     // Property type filter
     if (filterType !== 'all') {
       filtered = filtered.filter(
-        (property) => property.property_type.toLowerCase() === filterType.toLowerCase()
+        (property) => property.property_type.toLowerCase().includes(filterType.toLowerCase())
       );
     }
 

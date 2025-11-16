@@ -58,7 +58,7 @@ export default function ThreeBedroomHouseClient() {
         .eq('is_approved', true)
         .eq('price_type', 'rent')
         .eq('bedrooms', 3)
-        .in('property_type', ['House', 'Bungalow', 'Townhouse', 'Maisonette', 'Villa'])
+        .ilike('property_type', '%house%')
         .order('is_featured', { ascending: false })
         .order('created_at', { ascending: false });
 
@@ -86,7 +86,7 @@ export default function ThreeBedroomHouseClient() {
           .select('*')
           .eq('is_approved', true)
           .eq('price_type', 'rent')
-          .in('property_type', ['House', 'Bungalow', 'Townhouse', 'Maisonette', 'Villa'])
+          .ilike('property_type', '%house%')
           .order('is_featured', { ascending: false })
           .order('created_at', { ascending: false })
           .limit(12);

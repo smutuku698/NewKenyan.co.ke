@@ -83,7 +83,7 @@ export default function PropertiesPage() {
 
     if (filterType !== 'all') {
       filtered = filtered.filter(property =>
-        property.property_type.toLowerCase() === filterType.toLowerCase()
+        property.property_type.toLowerCase().includes(filterType.toLowerCase())
       );
     }
 

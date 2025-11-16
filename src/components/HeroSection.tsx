@@ -53,14 +53,8 @@ export default function HeroSection() {
   };
 
   const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Construct search URL with filters
-    const params = new URLSearchParams();
-    if (searchQuery) params.set('q', searchQuery);
-    if (propertyType !== 'all') params.set('type', propertyType);
-    if (location) params.set('city', location);
-
-    window.location.href = `/properties?${params.toString()}`;
+    // Let the form submit naturally to the action URL
+    // The form will handle URL construction via hidden inputs and query parameters
   };
 
   return (
@@ -87,8 +81,8 @@ export default function HeroSection() {
               Browse 6,500+ apartments for rent, houses for sale, bedsitters, land, jobs, and businesses across Kenya. Affordable listings from KES 5,000/month.
             </p>
 
-            {/* Search Bar with Autocomplete */}
-            <form onSubmit={handleSearch} className="bg-white rounded-2xl shadow-lg p-2 md:p-3 border border-gray-100">
+            {/* Search Bar with Autocomplete - Using proper HTML form */}
+            <form action="/properties" method="get" className="bg-white rounded-2xl shadow-lg p-2 md:p-3 border border-gray-100">
               <div className="flex flex-col md:flex-row gap-2">
                 {/* Location Input with Autocomplete */}
                 <div className="relative flex-1">
@@ -96,6 +90,7 @@ export default function HeroSection() {
                     <MapPin className="h-5 w-5 text-gray-400" />
                     <input
                       type="text"
+                      name="city"
                       placeholder="Enter location"
                       value={location}
                       onChange={(e) => handleLocationChange(e.target.value)}
@@ -125,11 +120,13 @@ export default function HeroSection() {
                 <div className="flex items-center gap-2 flex-1 bg-gray-50 rounded-lg px-4 py-3">
                   <Home className="h-5 w-5 text-gray-400" />
                   <select
+                    name="type"
                     value={propertyType}
                     onChange={(e) => setPropertyType(e.target.value)}
                     className="bg-transparent outline-none w-full text-gray-700"
                   >
-                    {propertyTypes.map((type) => (
+                    <option value="">All Property Types</option>
+                    {propertyTypes.filter(t => t.value !== 'all').map((type) => (
                       <option key={type.value} value={type.value}>
                         {type.label}
                       </option>
@@ -138,13 +135,13 @@ export default function HeroSection() {
                 </div>
 
                 {/* Search Button */}
-                <Button
+                <button
                   type="submit"
-                  className="bg-orange-600 hover:bg-orange-700 text-white px-6 py-3 rounded-lg font-semibold flex items-center gap-2 whitespace-nowrap"
+                  className="bg-orange-600 hover:bg-orange-700 text-white px-6 py-3 rounded-lg font-semibold flex items-center gap-2 whitespace-nowrap transition-colors"
                 >
                   <Search className="h-5 w-5" />
                   <span className="hidden md:inline">Search</span>
-                </Button>
+                </button>
               </div>
             </form>
 

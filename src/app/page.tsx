@@ -193,7 +193,7 @@ export default function HomePage() {
       if (filterState.city && property.city !== filterState.city) return false;
 
       // Property type filter
-      if (filterState.propertyType && property.property_type !== filterState.propertyType) return false;
+      if (filterState.propertyType && !property.property_type.toLowerCase().includes(filterState.propertyType.toLowerCase())) return false;
 
       // Price filters
       if (filterState.priceMin && property.price < filterState.priceMin) return false;

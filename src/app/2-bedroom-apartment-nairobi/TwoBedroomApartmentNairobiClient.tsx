@@ -56,7 +56,7 @@ export default function TwoBedroomApartmentNairobiClient() {
         .from('property_listings')
         .select('*')
         .eq('is_approved', true)
-        .eq('property_type', 'Apartment')
+        .ilike('property_type', '%apartment%')
         .eq('bedrooms', 2)
         .eq('price_type', 'rent')
         .ilike('county', '%Nairobi%')

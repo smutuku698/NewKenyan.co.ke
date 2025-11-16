@@ -55,7 +55,7 @@ export default function ApartmentsForRentNairobiClient() {
         .from('property_listings')
         .select('*')
         .eq('is_approved', true)
-        .eq('property_type', 'Apartment')
+        .ilike('property_type', '%apartment%')
         .eq('price_type', 'rent')
         .ilike('county', '%Nairobi%')
         .order('is_featured', { ascending: false })

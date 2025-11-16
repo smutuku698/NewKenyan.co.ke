@@ -8,6 +8,7 @@ import InternalLinks from '@/components/InternalLinks';
 import PropertyTypeSwitcher from '@/components/PropertyTypeSwitcher';
 import CountyCrossLinks from '@/components/CountyCrossLinks';
 import RelatedLocations from '@/components/RelatedLocations';
+import PropertyCard from '@/components/PropertyCard';
 import { supabase } from '@/lib/supabase';
 import { Location, PropertyStats } from '@/lib/location-seo';
 import {
@@ -164,6 +165,33 @@ function calculateStats(properties: PropertyListing[]): PropertyStats {
   };
 }
 
+
+// Get alternative properties from nearby locations
+async function getAlternativeProperties(location: Location, limit: number = 8): Promise<PropertyListing[]> {
+  const countyName = location.county.replace(/ County$/i, '');
+
+  // Get properties from same county
+  let query = supabase
+    .from('property_listings')
+    .select('*')
+    .eq('is_approved', true)
+    .eq('price_type', 'sale')
+    .ilike('property_type', '%townhouse%')
+    .ilike('county', `%${countyName}%`)
+    .order('is_featured', { ascending: false })
+    .order('created_at', { ascending: false })
+    .limit(limit);
+
+  const { data, error } = await query;
+
+  if (error) {
+    console.error('Error fetching alternative properties:', error);
+    return [];
+  }
+
+  return data || [];
+}
+
 // Get related locations
 async function getRelatedLocations(location: Location) {
   let query = supabase
@@ -211,6 +239,10 @@ export default async function PropertyPage({ params }: PageProps) {
   const properties = await getProperties(location);
   const stats = calculateStats(properties);
   const relatedLocations = await getRelatedLocations(location);
+
+  // Get alternative properties if we have fewer than 3 or none
+  const needsAlternatives = properties.length < 3;
+  const alternativeProperties = needsAlternatives ? await getAlternativeProperties(location, 8) : [];
 
   const h1VariationIndex = parseInt(location.id.slice(0, 8), 16) % 4;
   const h1 = generatePropertyH1(location, PROPERTY_TYPE, TRANSACTION_TYPE, h1VariationIndex);
@@ -274,19 +306,91 @@ export default async function PropertyPage({ params }: PageProps) {
             enableFilters={true}
           />
         ) : (
-          <div className="text-center py-12 mb-12 bg-white rounded-lg shadow-sm">
-            <h3 className="text-xl font-semibold text-gray-900 mb-2">
-              No {PROPERTY_LABEL.toLowerCase()} for sale found in {location.name}
-            </h3>
+          <>
+            <div className="text-center py-12 mb-12">
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">
+                No houses for sale found in {location.name}
+              </h3>
+              <p className="text-gray-600 mb-6">
+                Be the first to list a property in {location.name}!
+              </p>
+              <a
+                href="/add-listing"
+                className="inline-flex items-center px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
+              >
+                List Your Property
+              </a>
+            </div>
+
+            {/* Show alternative properties from nearby areas */}
+            {alternativeProperties.length > 0 && (
+              <div className="mb-12">
+                <h2 className="text-2xl font-bold text-gray-900 mb-4">
+                  Houses for Sale in {location.county}
+                </h2>
+                <p className="text-gray-600 mb-6">
+                  Check out these houses for sale in nearby areas within {location.county}
+                </p>
+                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                  {alternativeProperties.map((property) => (
+                    <PropertyCard
+                      key={property.id}
+                      id={property.id}
+                      title={property.property_title}
+                      type={property.property_type}
+                      price={property.price}
+                      priceType={property.price_type}
+                      bedrooms={property.bedrooms || undefined}
+                      bathrooms={property.bathrooms || undefined}
+                      squareFeet={property.square_feet || undefined}
+                      location={`${property.city}${property.county ? `, ${property.county}` : ''}`}
+                      city={property.city}
+                      images={property.images}
+                      amenities={property.amenities}
+                      contactPhone={property.contact_phone}
+                      whatsappNumber={property.whatsapp_number || undefined}
+                      createdAt={property.created_at}
+                      isFeatured={property.is_featured}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+          </>
+        )}
+
+        {/* Show alternative properties when we have less than 3 exact matches */}
+        {properties.length > 0 && properties.length < 3 && alternativeProperties.length > 0 && (
+          <div className="mb-12">
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">
+              More Houses for Sale in {location.county}
+            </h2>
             <p className="text-gray-600 mb-6">
-              Be the first to list a property in {location.name}!
+              Explore more houses for sale in nearby areas
             </p>
-            <a
-              href="/add-listing"
-              className="inline-flex items-center px-6 py-3 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors"
-            >
-              List Your Property
-            </a>
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+              {alternativeProperties.filter(alt => !properties.find(p => p.id === alt.id)).slice(0, 8).map((property) => (
+                <PropertyCard
+                  key={property.id}
+                  id={property.id}
+                  title={property.property_title}
+                  type={property.property_type}
+                  price={property.price}
+                  priceType={property.price_type}
+                  bedrooms={property.bedrooms || undefined}
+                  bathrooms={property.bathrooms || undefined}
+                  squareFeet={property.square_feet || undefined}
+                  location={`${property.city}${property.county ? `, ${property.county}` : ''}`}
+                  city={property.city}
+                  images={property.images}
+                  amenities={property.amenities}
+                  contactPhone={property.contact_phone}
+                  whatsappNumber={property.whatsapp_number || undefined}
+                  createdAt={property.created_at}
+                  isFeatured={property.is_featured}
+                />
+              ))}
+            </div>
           </div>
         )}
 
