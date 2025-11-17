@@ -87,6 +87,9 @@ export default function RootLayout({
   return (
     <html lang="en">
         <head>
+          {/* Google Analytics - Must be in head for proper detection */}
+          <GoogleAnalytics />
+
           {/* Resource hints for critical origins */}
           <link rel="preconnect" href="https://gsdctfcfkrtuxnwapjcj.supabase.co" crossOrigin="anonymous" />
           <link rel="preconnect" href="https://cheerful-llama-11.clerk.accounts.dev" />
@@ -356,7 +359,6 @@ export default function RootLayout({
           className={`${manrope.variable} ${sourceSans.variable} ${inter.variable} font-body antialiased`}
         >
           <GoogleTagManagerNoScript />
-          <GoogleAnalytics />
           <SEOOptimizations />
           <SiteProtection />
           <AuthProvider>

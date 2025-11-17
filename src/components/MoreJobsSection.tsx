@@ -4,7 +4,7 @@ import { Briefcase } from 'lucide-react';
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import JobCard from './JobCard';
-import jobsData from '@/data/jobs.json';
+import jobsData from '../../local-jobs.json';
 
 interface Job {
   id: number;

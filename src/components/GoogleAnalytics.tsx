@@ -2,6 +2,7 @@
 
 import { useEffect, Suspense } from 'react'
 import { usePathname, useSearchParams } from 'next/navigation'
+import Script from 'next/script'
 
 declare global {
   interface Window {
@@ -35,11 +36,13 @@ export default function GoogleAnalytics() {
 
   return (
     <>
-      <script
-        async
+      <Script
+        strategy="afterInteractive"
         src={`https://www.googletagmanager.com/gtag/js?id=${GA_MEASUREMENT_ID}`}
       />
-      <script
+      <Script
+        id="google-analytics"
+        strategy="afterInteractive"
         dangerouslySetInnerHTML={{
           __html: `
             window.dataLayer = window.dataLayer || [];
@@ -47,7 +50,6 @@ export default function GoogleAnalytics() {
             gtag('js', new Date());
             gtag('config', '${GA_MEASUREMENT_ID}', {
               page_path: window.location.pathname,
-              custom_parameter: true,
             });
           `,
         }}

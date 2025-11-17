@@ -411,7 +411,7 @@ export default async function JobDetailsPage({ params }: JobDetailsPageProps) {
         {/* Jobs FAQ Section */}
         <JobsFAQSection />
 
-        {/* Enhanced JSON-LD Schema - Optimized for Bing Jobs & Google for Jobs */}
+        {/* Enhanced JSON-LD Schema - Optimized for Google for Jobs */}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{
@@ -419,15 +419,15 @@ export default async function JobDetailsPage({ params }: JobDetailsPageProps) {
               "@context": "https://schema.org",
               "@type": "JobPosting",
               "title": job.job_title,
-              "description": job.duties_and_responsibilities,
+              "description": `<p><strong>Job Duties and Responsibilities:</strong></p>${job.duties_and_responsibilities.split('\n').map(item => `<p>• ${item}</p>`).join('')}<p><strong>Key Requirements & Qualifications:</strong></p>${job.key_requirements_skills_qualification.split('\n').map(item => `<p>• ${item}</p>`).join('')}<p><strong>How to Apply:</strong></p><p>${processedHowToApply}</p>`,
               "identifier": {
                 "@type": "PropertyValue",
                 "name": "NewKenyan.com Job ID",
-                "value": job.id.toString()
+                "value": `NK-${job.id}`
               },
-              "datePosted": job.date,
+              "datePosted": new Date(job.date).toISOString().split('T')[0],
               "validThrough": new Date(new Date(job.date).setMonth(new Date(job.date).getMonth() + 3)).toISOString().split('T')[0],
-              "employmentType": job.nature_of_job,
+              "employmentType": job.nature_of_job.toUpperCase().includes('FULL') ? 'FULL_TIME' : job.nature_of_job.toUpperCase().includes('PART') ? 'PART_TIME' : job.nature_of_job.toUpperCase().includes('CONTRACT') ? 'CONTRACTOR' : 'FULL_TIME',
               "hiringOrganization": {
                 "@type": "Organization",
                 "name": "NewKenyan",
@@ -440,46 +440,42 @@ export default async function JobDetailsPage({ params }: JobDetailsPageProps) {
                 "address": {
                   "@type": "PostalAddress",
                   "addressLocality": job.job_location,
+                  "addressRegion": job.job_location,
                   "addressCountry": "KE"
                 }
               },
               "applicantLocationRequirements": {
                 "@type": "Country",
-                "name": "Kenya"
+                "name": "KE"
               },
               "jobLocationType": job.job_location.toLowerCase().includes('remote') || job.job_location.toLowerCase().includes('online') ? "TELECOMMUTE" : undefined,
-              "baseSalary": job.salary ? {
+              "baseSalary": job.salary && job.salary !== 'Negotiable' && job.salary !== 'Not Specified' ? {
                 "@type": "MonetaryAmount",
                 "currency": "KES",
                 "value": {
                   "@type": "QuantitativeValue",
-                  "value": job.salary,
+                  "value": job.salary.replace(/[^\d]/g, ''),
                   "unitText": "MONTH"
                 }
               } : undefined,
               "industry": job.industry,
-              "qualifications": job.key_requirements_skills_qualification,
-              "responsibilities": job.duties_and_responsibilities,
-              "skills": job.key_requirements_skills_qualification,
+              "educationRequirements": {
+                "@type": "EducationalOccupationalCredential",
+                "credentialCategory": job.key_requirements_skills_qualification.toLowerCase().includes('degree') ? 'degree' : 'certificate'
+              },
+              "experienceRequirements": {
+                "@type": "OccupationalExperienceRequirements",
+                "monthsOfExperience": job.key_requirements_skills_qualification.toLowerCase().includes('2 years') ? 24 : job.key_requirements_skills_qualification.toLowerCase().includes('3 years') ? 36 : job.key_requirements_skills_qualification.toLowerCase().includes('5 years') ? 60 : 12
+              },
               "directApply": true,
               "applicationContact": {
                 "@type": "ContactPoint",
                 "email": "hr@newkenyan.com",
-                "name": "NewKenyan HR Team",
                 "contactType": "Recruitment"
               },
-              "keywords": [
-                "jobs in kenya",
-                job.job_title.toLowerCase(),
-                job.job_location.toLowerCase(),
-                job.industry.toLowerCase(),
-                "kenya employment",
-                "career opportunities kenya"
-              ],
               "url": currentUrl,
-              "workHours": job.nature_of_job,
-              "jobBenefits": "Competitive salary, professional development, career growth opportunities"
-            })
+              "jobBenefits": "Competitive salary, professional development, career growth opportunities in Kenya"
+            }, null, 0).replace(/\\/g, '')
           }}
         />
 

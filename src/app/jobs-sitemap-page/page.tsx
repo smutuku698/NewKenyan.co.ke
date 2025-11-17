@@ -1,6 +1,6 @@
-import jobsData from '@/data/jobs.json'
+import jobsData from '../../../local-jobs.json'
 import Link from 'next/link'
-import { generateJobSlug } from '@/lib/utils'
+import { slugify } from '@/lib/slugify'
 
 export default function JobsSitemapPage() {
   // Group jobs by month
@@ -51,7 +51,7 @@ export default function JobsSitemapPage() {
                 </h2>
                 <ul className="grid grid-cols-1 md:grid-cols-2 gap-3">
                   {jobs.map((job, index) => {
-                    const slug = generateJobSlug(job.job_title, 'NewKenyan', job.job_location)
+                    const slug = slugify(job.job_title)
                     return (
                       <li key={`${slug}-${index}`} className="border-b border-gray-100 pb-3">
                         <Link

@@ -2,8 +2,8 @@
 import { MetadataRoute } from 'next'
 import { createClient } from '@supabase/supabase-js'
 import { generatePropertySlug, generateBusinessSlug } from '@/utils/seo'
-import jobsData from '@/data/jobs.json'
-import { generateJobSlug } from '@/lib/utils'
+import jobsData from '../../local-jobs.json'
+import { slugify } from '@/lib/slugify'
 import fs from 'fs'
 import path from 'path'
 
@@ -215,7 +215,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
 
     // Job pages from JSON data
     const jobPages = jobsData.jobs.map((job) => {
-      const slug = generateJobSlug(job.job_title, 'NewKenyan', job.job_location)
+      const slug = slugify(job.job_title)
       return {
         url: `${baseUrl}/jobs-in-kenya/${slug}`,
         lastModified: new Date(job.date),
