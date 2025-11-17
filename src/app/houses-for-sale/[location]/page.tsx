@@ -21,6 +21,7 @@ import {
   generateAboutContent,
   formatPrice
 } from '@/lib/property-page-generator';
+import { getFullCanonicalUrl } from '@/lib/canonical-mapping';
 import { getCityPillarContent, hasPillarContent } from '@/lib/city-pillar-content';
 import { getCountyContent, hasCountyContent } from '@/lib/county-content';
 
@@ -214,6 +215,112 @@ function calculateStats(properties: PropertyListing[]): PropertyStats {
   };
 }
 
+// Get smart alternative properties based on failed filters
+async function getSmartAlternatives(
+  location: Location,
+  searchParams?: { [key: string]: string | string[] | undefined },
+  limit: number = 12
+): Promise<{ sameCityDifferentBedrooms: PropertyListing[], sameBedroomsDifferentCity: PropertyListing[] }> {
+  const countyName = location.county.replace(/ County$/i, '');
+  const cityFilter = searchParams?.city as string | undefined;
+  const bedroomsFilter = searchParams?.bedrooms ? parseInt(searchParams.bedrooms as string) : undefined;
+
+  let sameCityDifferentBedrooms: PropertyListing[] = [];
+  let sameBedroomsDifferentCity: PropertyListing[] = [];
+
+  // If we have both city and bedrooms filters, get smart alternatives
+  if (cityFilter && bedroomsFilter && !isNaN(bedroomsFilter)) {
+    // Query 1: Same city (or location), different bedrooms
+    let query1 = supabase
+      .from('property_listings')
+      .select('*')
+      .eq('is_approved', true)
+      .eq('price_type', 'sale')
+      .ilike('property_type', '%house%')
+      .ilike('county', `%${countyName}%`)
+      .neq('bedrooms', bedroomsFilter) // Different bedrooms
+      .not('bedrooms', 'is', null);
+
+    if (location.type === 'county') {
+      query1 = query1.or(`city.ilike.%${cityFilter}%,address.ilike.%${cityFilter}%`);
+    } else if (location.type === 'neighborhood') {
+      query1 = query1.or(`city.ilike.%${location.name}%,address.ilike.%${location.name}%,city.ilike.%${cityFilter}%,address.ilike.%${cityFilter}%`);
+    }
+
+    query1 = query1
+      .order('is_featured', { ascending: false })
+      .order('created_at', { ascending: false })
+      .limit(limit);
+
+    const { data: data1 } = await query1;
+    sameCityDifferentBedrooms = data1 || [];
+
+    // Query 2: Same bedrooms, different city in same county
+    let query2 = supabase
+      .from('property_listings')
+      .select('*')
+      .eq('is_approved', true)
+      .eq('price_type', 'sale')
+      .ilike('property_type', '%house%')
+      .ilike('county', `%${countyName}%`)
+      .eq('bedrooms', bedroomsFilter);
+
+    query2 = query2
+      .order('is_featured', { ascending: false })
+      .order('created_at', { ascending: false })
+      .limit(limit);
+
+    const { data: data2 } = await query2;
+    sameBedroomsDifferentCity = data2 || [];
+  } else if (bedroomsFilter && !isNaN(bedroomsFilter)) {
+    // Only bedrooms filter: get different bedrooms in same location
+    let query1 = supabase
+      .from('property_listings')
+      .select('*')
+      .eq('is_approved', true)
+      .eq('price_type', 'sale')
+      .ilike('property_type', '%house%')
+      .ilike('county', `%${countyName}%`)
+      .neq('bedrooms', bedroomsFilter)
+      .not('bedrooms', 'is', null);
+
+    if (location.type === 'neighborhood') {
+      query1 = query1.or(`city.ilike.%${location.name}%,address.ilike.%${location.name}%`);
+    }
+
+    query1 = query1
+      .order('is_featured', { ascending: false })
+      .order('created_at', { ascending: false })
+      .limit(limit);
+
+    const { data: data1 } = await query1;
+    sameCityDifferentBedrooms = data1 || [];
+  } else if (cityFilter) {
+    // Only city filter: get same city, any bedrooms
+    let query1 = supabase
+      .from('property_listings')
+      .select('*')
+      .eq('is_approved', true)
+      .eq('price_type', 'sale')
+      .ilike('property_type', '%house%')
+      .ilike('county', `%${countyName}%`);
+
+    if (location.type === 'county') {
+      query1 = query1.or(`city.ilike.%${cityFilter}%,address.ilike.%${cityFilter}%`);
+    }
+
+    query1 = query1
+      .order('is_featured', { ascending: false })
+      .order('created_at', { ascending: false })
+      .limit(limit);
+
+    const { data: data1 } = await query1;
+    sameCityDifferentBedrooms = data1 || [];
+  }
+
+  return { sameCityDifferentBedrooms, sameBedroomsDifferentCity };
+}
+
 // Get related locations
 async function getRelatedLocations(location: Location) {
   let query = supabase
@@ -276,7 +383,21 @@ export async function generateMetadata({ params, searchParams }: PageProps): Pro
   const properties = await getHousesForSale(location, searchParams);
   const stats = calculateStats(properties);
 
-  return generatePropertyMetadata(location, 'houses', 'sale', stats);
+  const metadata = generatePropertyMetadata(location, 'houses', 'sale', stats);
+
+  // Add canonical URL if this page has a standalone equivalent
+  const canonicalUrl = getFullCanonicalUrl(location.slug, 'house', 'sale');
+  if (canonicalUrl) {
+    return {
+      ...metadata,
+      alternates: {
+        ...metadata.alternates,
+        canonical: canonicalUrl
+      }
+    };
+  }
+
+  return metadata;
 }
 
 export default async function HousesForSalePage({ params, searchParams }: PageProps) {
@@ -289,6 +410,12 @@ export default async function HousesForSalePage({ params, searchParams }: PagePr
   const properties = await getHousesForSale(location, searchParams);
   const stats = calculateStats(properties);
   const relatedLocations = await getRelatedLocations(location);
+
+  // Get smart alternatives if we have filters applied and no results
+  const hasFilters = searchParams?.city || searchParams?.bedrooms;
+  const smartAlternatives = (properties.length === 0 && hasFilters)
+    ? await getSmartAlternatives(location, searchParams, 12)
+    : { sameCityDifferentBedrooms: [], sameBedroomsDifferentCity: [] };
 
   // Get alternative properties if we have fewer than 3 or none
   const needsAlternatives = properties.length < 3;
@@ -372,10 +499,14 @@ export default async function HousesForSalePage({ params, searchParams }: PagePr
           <>
             <div className="text-center py-12 mb-12">
               <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                No houses for sale found in {location.name}
+                No houses for sale found {searchParams?.city ? `in ${searchParams.city}, ${location.name}` : `in ${location.name}`}
+                {searchParams?.bedrooms && ` with ${searchParams.bedrooms} bedroom${parseInt(searchParams.bedrooms as string) !== 1 ? 's' : ''}`}
               </h3>
               <p className="text-gray-600 mb-6">
-                Be the first to list a property in {location.name}!
+                {searchParams?.city || searchParams?.bedrooms
+                  ? `Try adjusting your filters or be the first to list a house ${searchParams?.city ? `in ${searchParams.city}` : `in ${location.name}`}!`
+                  : `Be the first to list a house for sale in ${location.name}!`
+                }
               </p>
               <a
                 href="/add-listing"
@@ -385,14 +516,94 @@ export default async function HousesForSalePage({ params, searchParams }: PagePr
               </a>
             </div>
 
-            {/* Show alternative properties from nearby areas */}
-            {alternativeProperties.length > 0 && (
+            {/* Smart Alternative 1: Same city/location, different bedrooms */}
+            {smartAlternatives.sameCityDifferentBedrooms.length > 0 && (
+              <div className="mb-12">
+                <h2 className="text-2xl font-bold text-gray-900 mb-4">
+                  {searchParams?.city
+                    ? `Other Houses for Sale in ${searchParams.city}`
+                    : `Other Houses for Sale in ${location.name}`}
+                </h2>
+                <p className="text-gray-600 mb-6">
+                  {searchParams?.bedrooms
+                    ? `No ${searchParams.bedrooms}-bedroom houses available. Check out these other options ${searchParams?.city ? `in ${searchParams.city}` : `in ${location.name}`}:`
+                    : `Available houses ${searchParams?.city ? `in ${searchParams.city}` : `in ${location.name}`}:`}
+                </p>
+                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                  {smartAlternatives.sameCityDifferentBedrooms.slice(0, 6).map((property) => (
+                    <PropertyCard
+                      key={property.id}
+                      id={property.id}
+                      title={property.property_title}
+                      type={property.property_type}
+                      price={property.price}
+                      priceType={property.price_type}
+                      bedrooms={property.bedrooms || undefined}
+                      bathrooms={property.bathrooms || undefined}
+                      squareFeet={property.square_feet || undefined}
+                      location={`${property.city}${property.county ? `, ${property.county}` : ''}`}
+                      city={property.city}
+                      images={property.images}
+                      amenities={property.amenities}
+                      contactPhone={property.contact_phone}
+                      whatsappNumber={property.whatsapp_number || undefined}
+                      createdAt={property.created_at}
+                      isFeatured={property.is_featured}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Smart Alternative 2: Same bedrooms, different cities in county */}
+            {smartAlternatives.sameBedroomsDifferentCity.length > 0 && (
+              <div className="mb-12">
+                <h2 className="text-2xl font-bold text-gray-900 mb-4">
+                  {searchParams?.bedrooms
+                    ? `${searchParams.bedrooms}-Bedroom Houses in ${location.county}`
+                    : `Houses for Sale in ${location.county}`}
+                </h2>
+                <p className="text-gray-600 mb-6">
+                  {searchParams?.bedrooms
+                    ? `Check out these ${searchParams.bedrooms}-bedroom houses in other areas of ${location.county}:`
+                    : `Available houses in nearby areas of ${location.county}:`}
+                </p>
+                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                  {smartAlternatives.sameBedroomsDifferentCity.slice(0, 6).map((property) => (
+                    <PropertyCard
+                      key={property.id}
+                      id={property.id}
+                      title={property.property_title}
+                      type={property.property_type}
+                      price={property.price}
+                      priceType={property.price_type}
+                      bedrooms={property.bedrooms || undefined}
+                      bathrooms={property.bathrooms || undefined}
+                      squareFeet={property.square_feet || undefined}
+                      location={`${property.city}${property.county ? `, ${property.county}` : ''}`}
+                      city={property.city}
+                      images={property.images}
+                      amenities={property.amenities}
+                      contactPhone={property.contact_phone}
+                      whatsappNumber={property.whatsapp_number || undefined}
+                      createdAt={property.created_at}
+                      isFeatured={property.is_featured}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Fallback: Show general alternative properties if no smart alternatives */}
+            {smartAlternatives.sameCityDifferentBedrooms.length === 0 &&
+             smartAlternatives.sameBedroomsDifferentCity.length === 0 &&
+             alternativeProperties.length > 0 && (
               <div className="mb-12">
                 <h2 className="text-2xl font-bold text-gray-900 mb-4">
                   Houses for Sale in {location.county}
                 </h2>
                 <p className="text-gray-600 mb-6">
-                  Check out these houses for sale in nearby areas within {location.county}
+                  Check out these houses for sale in {location.county}
                 </p>
                 <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                   {alternativeProperties.map((property) => (
