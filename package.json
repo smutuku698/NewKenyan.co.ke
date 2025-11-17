@@ -6,7 +6,13 @@
     "dev": "next dev --turbopack",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "index": "tsx scripts/index-all-urls.ts",
+    "index:google": "tsx scripts/index-all-urls.ts --service=google",
+    "index:bing": "tsx scripts/index-all-urls.ts --service=bing",
+    "index:force": "tsx scripts/index-all-urls.ts --force",
+    "index:stats": "tsx scripts/index-all-urls.ts --stats",
+    "index:dry-run": "tsx scripts/index-all-urls.ts --dry-run"
   },
   "dependencies": {
     "@clerk/nextjs": "^6.30.2",
@@ -27,6 +33,7 @@
     "critters": "^0.0.23",
     "csv-parser": "^3.2.0",
     "dompurify": "^3.2.6",
+    "googleapis": "^166.0.0",
     "gray-matter": "^4.0.3",
     "jsdom": "^26.1.0",
     "leaflet": "^1.9.4",
