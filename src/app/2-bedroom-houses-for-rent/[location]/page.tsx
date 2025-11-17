@@ -51,6 +51,9 @@ const DB_QUERY = '%house%|%bungalow%|%maisonette%';
 const PROPERTY_LABEL = '2 Bedroom Houses';
 const BEDROOM_COUNT = 2;
 
+// Smart alternatives configuration
+const ALTERNATIVE_PROPERTY_LABEL = 'Houses';
+
 // ISR Configuration: Revalidate every 24 hours
 export const revalidate = 86400;
 
@@ -95,6 +98,44 @@ async function getProperties(location: Location): Promise<PropertyListing[]> {
     .eq('price_type', 'rent')
     .eq('bedrooms', BEDROOM_COUNT)
     .ilike('property_type', DB_QUERY);
+
+  // Filter based on location type
+  if (location.type === 'county') {
+    query = query.ilike('county', `%${location.name}%`);
+  } else if (location.type === 'neighborhood') {
+    query = query
+      .ilike('county', `%${location.county}%`)
+      .or(`city.ilike.%${location.name}%,address.ilike.%${location.name}%`);
+  } else if (location.type === 'estate') {
+    query = query
+      .ilike('county', `%${location.county}%`)
+      .ilike('address', `%${location.name}%`);
+  }
+
+  query = query
+    .order('is_featured', { ascending: false })
+    .order('created_at', { ascending: false })
+    .limit(12);
+
+  const { data, error } = await query;
+
+  if (error) {
+    console.error('Error fetching properties:', error);
+    return [];
+  }
+
+  return data || [];
+}
+
+// Get smart alternative properties (same bedroom count, different property types)
+async function getAlternativeProperties(location: Location): Promise<PropertyListing[]> {
+  let query = supabase
+    .from('property_listings')
+    .select('*')
+    .eq('is_approved', true)
+    .eq('price_type', 'rent')
+    .eq('bedrooms', BEDROOM_COUNT)
+    .not('property_type', 'ilike', '%house%');
 
   // Filter based on location type
   if (location.type === 'county') {
@@ -211,6 +252,11 @@ export default async function PropertyPage({ params }: PageProps) {
   const stats = calculateStats(properties);
   const relatedLocations = await getRelatedLocations(location);
 
+  // Fetch alternative properties for smart alternatives
+  const alternativeProperties = properties.length === 0
+    ? await getAlternativeProperties(location)
+    : [];
+
   const h1VariationIndex = parseInt(location.id.slice(0, 8), 16) % 4;
   const h1 = generatePropertyH1(location, PROPERTY_TYPE, TRANSACTION_TYPE, h1VariationIndex);
   const breadcrumbItems = generatePropertyBreadcrumbs(location, PROPERTY_TYPE, TRANSACTION_TYPE);
@@ -272,10 +318,35 @@ export default async function PropertyPage({ params }: PageProps) {
             transactionType={TRANSACTION_TYPE}
             enableFilters={true}
           />
+        ) : alternativeProperties.length > 0 ? (
+          <>
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-6 mb-8">
+              <h3 className="text-lg font-semibold text-blue-900 mb-2">
+                No {PROPERTY_LABEL.toLowerCase()} for {TRANSACTION_TYPE} found in {location.name}
+              </h3>
+              <p className="text-blue-800">
+                We found {alternativeProperties.length} {BEDROOM_COUNT}-bedroom propert{alternativeProperties.length === 1 ? 'y' : 'ies'} for {TRANSACTION_TYPE} in {location.name}.
+                Showing alternative property types below:
+              </p>
+            </div>
+
+            <InfinitePropertyList
+              initialProperties={alternativeProperties}
+              location={{
+                type: location.type as 'county' | 'neighborhood' | 'estate',
+                name: location.name,
+                county: location.county,
+                city: location.city || undefined
+              }}
+              propertyType="all"
+              transactionType={TRANSACTION_TYPE}
+              enableFilters={true}
+            />
+          </>
         ) : (
           <div className="text-center py-12 mb-12 bg-white rounded-lg shadow-sm">
             <h3 className="text-xl font-semibold text-gray-900 mb-2">
-              No {PROPERTY_LABEL.toLowerCase()} for rent found in {location.name}
+              No {PROPERTY_LABEL.toLowerCase()} for {TRANSACTION_TYPE} found in {location.name}
             </h3>
             <p className="text-gray-600 mb-6">
               Be the first to list a property in {location.name}!
@@ -286,6 +357,21 @@ export default async function PropertyPage({ params }: PageProps) {
             >
               List Your Property
             </a>
+          </div>
+        )}
+
+        {alternativeProperties.length > 0 && (
+          <div className="bg-white p-6 rounded-lg shadow-sm mb-8 border-l-4 border-blue-500">
+            <h3 className="text-xl font-bold text-gray-900 mb-3">
+              Why am I seeing different property types?
+            </h3>
+            <p className="text-gray-700 mb-3">
+              There are currently no {ALTERNATIVE_PROPERTY_LABEL.toLowerCase()} with {BEDROOM_COUNT} bedrooms for {TRANSACTION_TYPE} in {location.name}.
+              To help you find a suitable property, we're showing other {BEDROOM_COUNT}-bedroom options available in this area.
+            </p>
+            <p className="text-gray-600">
+              These alternative properties match your bedroom requirement and may offer similar features and pricing.
+            </p>
           </div>
         )}
 
@@ -327,13 +413,15 @@ export default async function PropertyPage({ params }: PageProps) {
           </div>
         </div>
 
-        <RelatedLocations
-          currentLocation={location}
-          relatedLocations={relatedLocations}
-          propertyType={PROPERTY_TYPE}
-          transactionType={TRANSACTION_TYPE}
-          className="mb-8"
-        />
+        {alternativeProperties.length === 0 && (
+          <RelatedLocations
+            currentLocation={location}
+            relatedLocations={relatedLocations}
+            propertyType={PROPERTY_TYPE}
+            transactionType={TRANSACTION_TYPE}
+            className="mb-8"
+          />
+        )}
 
         <CountyCrossLinks
           currentCountySlug={location.type === 'county' ? location.slug : `${location.county.toLowerCase().replace(/\s+/g, '-')}-county`}

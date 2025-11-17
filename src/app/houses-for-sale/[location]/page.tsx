@@ -220,13 +220,19 @@ async function getSmartAlternatives(
   location: Location,
   searchParams?: { [key: string]: string | string[] | undefined },
   limit: number = 12
-): Promise<{ sameCityDifferentBedrooms: PropertyListing[], sameBedroomsDifferentCity: PropertyListing[] }> {
+): Promise<{
+  sameCityDifferentBedrooms: PropertyListing[],
+  sameBedroomsDifferentCity: PropertyListing[],
+  differentPropertyTypes: PropertyListing[]
+}> {
   const countyName = location.county.replace(/ County$/i, '');
   const cityFilter = searchParams?.city as string | undefined;
   const bedroomsFilter = searchParams?.bedrooms ? parseInt(searchParams.bedrooms as string) : undefined;
+  const propertyTypeFilter = searchParams?.property_type as string | undefined;
 
   let sameCityDifferentBedrooms: PropertyListing[] = [];
   let sameBedroomsDifferentCity: PropertyListing[] = [];
+  let differentPropertyTypes: PropertyListing[] = [];
 
   // If we have both city and bedrooms filters, get smart alternatives
   if (cityFilter && bedroomsFilter && !isNaN(bedroomsFilter)) {
@@ -318,7 +324,37 @@ async function getSmartAlternatives(
     sameCityDifferentBedrooms = data1 || [];
   }
 
-  return { sameCityDifferentBedrooms, sameBedroomsDifferentCity };
+  // Query 3: Different property types in same location (for houses, show apartments, bedsitters, studios, villas, etc.)
+  if (cityFilter || location.type !== 'county') {
+    let query3 = supabase
+      .from('property_listings')
+      .select('*')
+      .eq('is_approved', true)
+      .eq('price_type', 'sale')
+      .not('property_type', 'ilike', '%house%') // Different property types
+      .ilike('county', `%${countyName}%`);
+
+    if (cityFilter && location.type === 'county') {
+      query3 = query3.or(`city.ilike.%${cityFilter}%,address.ilike.%${cityFilter}%`);
+    } else if (location.type === 'neighborhood') {
+      query3 = query3.or(`city.ilike.%${location.name}%,address.ilike.%${location.name}%`);
+    }
+
+    // Apply bedroom filter if present
+    if (bedroomsFilter && !isNaN(bedroomsFilter)) {
+      query3 = query3.eq('bedrooms', bedroomsFilter);
+    }
+
+    query3 = query3
+      .order('is_featured', { ascending: false })
+      .order('created_at', { ascending: false })
+      .limit(limit);
+
+    const { data: data3 } = await query3;
+    differentPropertyTypes = data3 || [];
+  }
+
+  return { sameCityDifferentBedrooms, sameBedroomsDifferentCity, differentPropertyTypes };
 }
 
 // Get related locations
@@ -412,10 +448,10 @@ export default async function HousesForSalePage({ params, searchParams }: PagePr
   const relatedLocations = await getRelatedLocations(location);
 
   // Get smart alternatives if we have filters applied and no results
-  const hasFilters = searchParams?.city || searchParams?.bedrooms;
+  const hasFilters = searchParams?.city || searchParams?.bedrooms || searchParams?.property_type;
   const smartAlternatives = (properties.length === 0 && hasFilters)
     ? await getSmartAlternatives(location, searchParams, 12)
-    : { sameCityDifferentBedrooms: [], sameBedroomsDifferentCity: [] };
+    : { sameCityDifferentBedrooms: [], sameBedroomsDifferentCity: [], differentPropertyTypes: [] };
 
   // Get alternative properties if we have fewer than 3 or none
   const needsAlternatives = properties.length < 3;
@@ -594,9 +630,49 @@ export default async function HousesForSalePage({ params, searchParams }: PagePr
               </div>
             )}
 
+            {/* Smart Alternative 3: Different property types in same location */}
+            {smartAlternatives.differentPropertyTypes.length > 0 && (
+              <div className="mb-12">
+                <h2 className="text-2xl font-bold text-gray-900 mb-4">
+                  {searchParams?.city
+                    ? `Other Property Types for Sale in ${searchParams.city}`
+                    : `Other Property Types for Sale in ${location.name}`}
+                </h2>
+                <p className="text-gray-600 mb-6">
+                  {searchParams?.bedrooms
+                    ? `Check out these ${searchParams.bedrooms}-bedroom properties (Apartments, Villas, Bungalows, etc.) ${searchParams?.city ? `in ${searchParams.city}` : `in ${location.name}`}:`
+                    : `Explore other property types available ${searchParams?.city ? `in ${searchParams.city}` : `in ${location.name}`}:`}
+                </p>
+                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                  {smartAlternatives.differentPropertyTypes.slice(0, 6).map((property) => (
+                    <PropertyCard
+                      key={property.id}
+                      id={property.id}
+                      title={property.property_title}
+                      type={property.property_type}
+                      price={property.price}
+                      priceType={property.price_type}
+                      bedrooms={property.bedrooms || undefined}
+                      bathrooms={property.bathrooms || undefined}
+                      squareFeet={property.square_feet || undefined}
+                      location={`${property.city}${property.county ? `, ${property.county}` : ''}`}
+                      city={property.city}
+                      images={property.images}
+                      amenities={property.amenities}
+                      contactPhone={property.contact_phone}
+                      whatsappNumber={property.whatsapp_number || undefined}
+                      createdAt={property.created_at}
+                      isFeatured={property.is_featured}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* Fallback: Show general alternative properties if no smart alternatives */}
             {smartAlternatives.sameCityDifferentBedrooms.length === 0 &&
              smartAlternatives.sameBedroomsDifferentCity.length === 0 &&
+             smartAlternatives.differentPropertyTypes.length === 0 &&
              alternativeProperties.length > 0 && (
               <div className="mb-12">
                 <h2 className="text-2xl font-bold text-gray-900 mb-4">

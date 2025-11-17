@@ -42,6 +42,7 @@ interface PropertyListing {
 }
 
 interface PageProps {
+  searchParams: { [key: string]: string | string[] | undefined };
   params: { location: string };
 }
 
@@ -83,7 +84,10 @@ async function getLocation(slug: string): Promise<Location | null> {
 }
 
 // Get properties
-async function getProperties(location: Location): Promise<PropertyListing[]> {
+async function getProperties(
+  location: Location,
+  searchParams?: { [key: string]: string | string[] | undefined }
+): Promise<PropertyListing[]> {
   let query = supabase
     .from('property_listings')
     .select('*')
@@ -91,23 +95,68 @@ async function getProperties(location: Location): Promise<PropertyListing[]> {
     .eq('price_type', 'sale')
     .ilike('property_type', DB_QUERY);
 
-  // Filter based on location type
+  // Build location filters with proper AND logic
   if (location.type === 'county') {
-    query = query.ilike('county', `%${location.name}%`);
+    // Remove " County" suffix from location name for database matching
+    const countyName = location.name.replace(/ County$/i, '');
+    query = query.ilike('county', `%${countyName}%`);
+
+    // If city param is provided, add it as additional filter within the county
+    if (searchParams?.city && typeof searchParams.city === 'string') {
+      query = query.or(`city.ilike.%${searchParams.city}%,address.ilike.%${searchParams.city}%`);
+    }
   } else if (location.type === 'neighborhood') {
+    // Remove " County" suffix from county name for database matching
+    const countyName = location.county.replace(/ County$/i, '');
     query = query
-      .ilike('county', `%${location.county}%`)
+      .ilike('county', `%${countyName}%`)
       .or(`city.ilike.%${location.name}%,address.ilike.%${location.name}%`);
+
+    // If city param provided and different from location name, add additional filter
+    if (searchParams?.city && typeof searchParams.city === 'string' &&
+        searchParams.city.toLowerCase() !== location.name.toLowerCase()) {
+      query = query.or(`city.ilike.%${searchParams.city}%,address.ilike.%${searchParams.city}%`);
+    }
   } else if (location.type === 'estate') {
+    // Remove " County" suffix from county name for database matching
+    const countyName = location.county.replace(/ County$/i, '');
     query = query
-      .ilike('county', `%${location.county}%`)
+      .ilike('county', `%${countyName}%`)
       .ilike('address', `%${location.name}%`);
+  }
+
+  // Apply other query parameter filters
+  if (searchParams) {
+    if (searchParams.bedrooms && typeof searchParams.bedrooms === 'string') {
+      const bedrooms = parseInt(searchParams.bedrooms);
+      if (!isNaN(bedrooms)) {
+        query = query.eq('bedrooms', bedrooms);
+      }
+    }
+    if (searchParams.min_price && typeof searchParams.min_price === 'string') {
+      const minPrice = parseInt(searchParams.min_price);
+      if (!isNaN(minPrice)) {
+        query = query.gte('price', minPrice);
+      }
+    }
+    if (searchParams.max_price && typeof searchParams.max_price === 'string') {
+      const maxPrice = parseInt(searchParams.max_price);
+      if (!isNaN(maxPrice)) {
+        query = query.lte('price', maxPrice);
+      }
+    }
+    if (searchParams.bathrooms && typeof searchParams.bathrooms === 'string') {
+      const bathrooms = parseInt(searchParams.bathrooms);
+      if (!isNaN(bathrooms)) {
+        query = query.gte('bathrooms', bathrooms);
+      }
+    }
   }
 
   query = query
     .order('is_featured', { ascending: false })
     .order('created_at', { ascending: false })
-    .limit(12);
+    .limit(100);
 
   const { data, error } = await query;
 
@@ -165,6 +214,147 @@ function calculateStats(properties: PropertyListing[]): PropertyStats {
   };
 }
 
+// Get smart alternative properties based on failed filters
+async function getSmartAlternatives(
+  location: Location,
+  searchParams?: { [key: string]: string | string[] | undefined },
+  limit: number = 12
+): Promise<{
+  sameCityDifferentBedrooms: PropertyListing[],
+  sameBedroomsDifferentCity: PropertyListing[],
+  differentPropertyTypes: PropertyListing[]
+}> {
+  const countyName = location.county.replace(/ County$/i, '');
+  const cityFilter = searchParams?.city as string | undefined;
+  const bedroomsFilter = searchParams?.bedrooms ? parseInt(searchParams.bedrooms as string) : undefined;
+  const propertyTypeFilter = searchParams?.property_type as string | undefined;
+
+  let sameCityDifferentBedrooms: PropertyListing[] = [];
+  let sameBedroomsDifferentCity: PropertyListing[] = [];
+  let differentPropertyTypes: PropertyListing[] = [];
+
+  // If we have both city and bedrooms filters, get smart alternatives
+  if (cityFilter && bedroomsFilter && !isNaN(bedroomsFilter)) {
+    // Query 1: Same city (or location), different bedrooms
+    let query1 = supabase
+      .from('property_listings')
+      .select('*')
+      .eq('is_approved', true)
+      .eq('price_type', 'sale')
+      .ilike('property_type', '%maisonette%')
+      .ilike('county', `%${countyName}%`)
+      .neq('bedrooms', bedroomsFilter) // Different bedrooms
+      .not('bedrooms', 'is', null);
+
+    if (location.type === 'county') {
+      query1 = query1.or(`city.ilike.%${cityFilter}%,address.ilike.%${cityFilter}%`);
+    } else if (location.type === 'neighborhood') {
+      query1 = query1.or(`city.ilike.%${location.name}%,address.ilike.%${location.name}%,city.ilike.%${cityFilter}%,address.ilike.%${cityFilter}%`);
+    }
+
+    query1 = query1
+      .order('is_featured', { ascending: false })
+      .order('created_at', { ascending: false })
+      .limit(limit);
+
+    const { data: data1 } = await query1;
+    sameCityDifferentBedrooms = data1 || [];
+
+    // Query 2: Same bedrooms, different city in same county
+    let query2 = supabase
+      .from('property_listings')
+      .select('*')
+      .eq('is_approved', true)
+      .eq('price_type', 'sale')
+      .ilike('property_type', '%maisonette%')
+      .ilike('county', `%${countyName}%`)
+      .eq('bedrooms', bedroomsFilter);
+
+    query2 = query2
+      .order('is_featured', { ascending: false })
+      .order('created_at', { ascending: false })
+      .limit(limit);
+
+    const { data: data2 } = await query2;
+    sameBedroomsDifferentCity = data2 || [];
+  } else if (bedroomsFilter && !isNaN(bedroomsFilter)) {
+    // Only bedrooms filter: get different bedrooms in same location
+    let query1 = supabase
+      .from('property_listings')
+      .select('*')
+      .eq('is_approved', true)
+      .eq('price_type', 'sale')
+      .ilike('property_type', '%maisonette%')
+      .ilike('county', `%${countyName}%`)
+      .neq('bedrooms', bedroomsFilter)
+      .not('bedrooms', 'is', null);
+
+    if (location.type === 'neighborhood') {
+      query1 = query1.or(`city.ilike.%${location.name}%,address.ilike.%${location.name}%`);
+    }
+
+    query1 = query1
+      .order('is_featured', { ascending: false })
+      .order('created_at', { ascending: false })
+      .limit(limit);
+
+    const { data: data1 } = await query1;
+    sameCityDifferentBedrooms = data1 || [];
+  } else if (cityFilter) {
+    // Only city filter: get same city, any bedrooms
+    let query1 = supabase
+      .from('property_listings')
+      .select('*')
+      .eq('is_approved', true)
+      .eq('price_type', 'sale')
+      .ilike('property_type', '%maisonette%')
+      .ilike('county', `%${countyName}%`);
+
+    if (location.type === 'county') {
+      query1 = query1.or(`city.ilike.%${cityFilter}%,address.ilike.%${cityFilter}%`);
+    }
+
+    query1 = query1
+      .order('is_featured', { ascending: false })
+      .order('created_at', { ascending: false })
+      .limit(limit);
+
+    const { data: data1 } = await query1;
+    sameCityDifferentBedrooms = data1 || [];
+  }
+
+  // Query 3: Different property types in same location (for maisonettes, show apartments, bungalows, maisonettes, etc.)
+  if (cityFilter || location.type !== 'county') {
+    let query3 = supabase
+      .from('property_listings')
+      .select('*')
+      .eq('is_approved', true)
+      .eq('price_type', 'sale')
+      .not('property_type', 'ilike', '%maisonette%') // Different property types
+      .ilike('county', `%${countyName}%`);
+
+    if (cityFilter && location.type === 'county') {
+      query3 = query3.or(`city.ilike.%${cityFilter}%,address.ilike.%${cityFilter}%`);
+    } else if (location.type === 'neighborhood') {
+      query3 = query3.or(`city.ilike.%${location.name}%,address.ilike.%${location.name}%`);
+    }
+
+    // Apply bedroom filter if present
+    if (bedroomsFilter && !isNaN(bedroomsFilter)) {
+      query3 = query3.eq('bedrooms', bedroomsFilter);
+    }
+
+    query3 = query3
+      .order('is_featured', { ascending: false })
+      .order('created_at', { ascending: false })
+      .limit(limit);
+
+    const { data: data3 } = await query3;
+    differentPropertyTypes = data3 || [];
+  }
+
+  return { sameCityDifferentBedrooms, sameBedroomsDifferentCity, differentPropertyTypes };
+}
 
 // Get alternative properties from nearby locations
 async function getAlternativeProperties(location: Location, limit: number = 8): Promise<PropertyListing[]> {
@@ -213,7 +403,7 @@ async function getRelatedLocations(location: Location) {
 }
 
 // Generate metadata
-export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+export async function generateMetadata({ params, searchParams }: PageProps): Promise<Metadata> {
   const location = await getLocation(params.location);
 
   if (!location) {
@@ -223,22 +413,28 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     };
   }
 
-  const properties = await getProperties(location);
+  const properties = await getProperties(location, searchParams);
   const stats = calculateStats(properties);
 
   return generatePropertyMetadata(location, PROPERTY_TYPE, TRANSACTION_TYPE, stats);
 }
 
-export default async function PropertyPage({ params }: PageProps) {
+export default async function PropertyPage({ params, searchParams }: PageProps) {
   const location = await getLocation(params.location);
 
   if (!location) {
     notFound();
   }
 
-  const properties = await getProperties(location);
+  const properties = await getProperties(location, searchParams);
   const stats = calculateStats(properties);
   const relatedLocations = await getRelatedLocations(location);
+
+  // Get smart alternatives if we have filters applied and no results
+  const hasFilters = searchParams?.city || searchParams?.bedrooms || searchParams?.property_type;
+  const smartAlternatives = (properties.length === 0 && hasFilters)
+    ? await getSmartAlternatives(location, searchParams, 12)
+    : { sameCityDifferentBedrooms: [], sameBedroomsDifferentCity: [], differentPropertyTypes: [] };
 
   // Get alternative properties if we have fewer than 3 or none
   const needsAlternatives = properties.length < 3;
@@ -309,10 +505,14 @@ export default async function PropertyPage({ params }: PageProps) {
           <>
             <div className="text-center py-12 mb-12">
               <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                No maisonettes for sale found in {location.name}
+                No maisonettes for rent found {searchParams?.city ? `in ${searchParams.city}, ${location.name}` : `in ${location.name}`}
+                {searchParams?.bedrooms && ` with ${searchParams.bedrooms} bedroom${parseInt(searchParams.bedrooms as string) !== 1 ? 's' : ''}`}
               </h3>
               <p className="text-gray-600 mb-6">
-                Be the first to list a property in {location.name}!
+                {searchParams?.city || searchParams?.bedrooms
+                  ? `Try adjusting your filters or be the first to list a maisonette ${searchParams?.city ? `in ${searchParams.city}` : `in ${location.name}`}!`
+                  : `Be the first to list a maisonette for rent in ${location.name}!`
+                }
               </p>
               <a
                 href="/add-listing"
@@ -322,14 +522,134 @@ export default async function PropertyPage({ params }: PageProps) {
               </a>
             </div>
 
-            {/* Show alternative properties from nearby areas */}
-            {alternativeProperties.length > 0 && (
+            {/* Smart Alternative 1: Same city/location, different bedrooms */}
+            {smartAlternatives.sameCityDifferentBedrooms.length > 0 && (
               <div className="mb-12">
                 <h2 className="text-2xl font-bold text-gray-900 mb-4">
-                  Maisonettes for Sale in {location.county}
+                  {searchParams?.city
+                    ? `Other Maisonettes for Rent in ${searchParams.city}`
+                    : `Other Maisonettes for Rent in ${location.name}`}
                 </h2>
                 <p className="text-gray-600 mb-6">
-                  Check out these maisonettes for sale in nearby areas within {location.county}
+                  {searchParams?.bedrooms
+                    ? `No ${searchParams.bedrooms}-bedroom maisonettes available. Check out these other options ${searchParams?.city ? `in ${searchParams.city}` : `in ${location.name}`}:`
+                    : `Available maisonettes ${searchParams?.city ? `in ${searchParams.city}` : `in ${location.name}`}:`}
+                </p>
+                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                  {smartAlternatives.sameCityDifferentBedrooms.slice(0, 6).map((property) => (
+                    <PropertyCard
+                      key={property.id}
+                      id={property.id}
+                      title={property.property_title}
+                      type={property.property_type}
+                      price={property.price}
+                      priceType={property.price_type}
+                      bedrooms={property.bedrooms || undefined}
+                      bathrooms={property.bathrooms || undefined}
+                      squareFeet={property.square_feet || undefined}
+                      location={`${property.city}${property.county ? `, ${property.county}` : ''}`}
+                      city={property.city}
+                      images={property.images}
+                      amenities={property.amenities}
+                      contactPhone={property.contact_phone}
+                      whatsappNumber={property.whatsapp_number || undefined}
+                      createdAt={property.created_at}
+                      isFeatured={property.is_featured}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Smart Alternative 2: Same bedrooms, different cities in county */}
+            {smartAlternatives.sameBedroomsDifferentCity.length > 0 && (
+              <div className="mb-12">
+                <h2 className="text-2xl font-bold text-gray-900 mb-4">
+                  {searchParams?.bedrooms
+                    ? `${searchParams.bedrooms}-Bedroom Maisonettes in ${location.county}`
+                    : `Maisonettes for Rent in ${location.county}`}
+                </h2>
+                <p className="text-gray-600 mb-6">
+                  {searchParams?.bedrooms
+                    ? `Check out these ${searchParams.bedrooms}-bedroom maisonettes in other areas of ${location.county}:`
+                    : `Available maisonettes in nearby areas of ${location.county}:`}
+                </p>
+                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                  {smartAlternatives.sameBedroomsDifferentCity.slice(0, 6).map((property) => (
+                    <PropertyCard
+                      key={property.id}
+                      id={property.id}
+                      title={property.property_title}
+                      type={property.property_type}
+                      price={property.price}
+                      priceType={property.price_type}
+                      bedrooms={property.bedrooms || undefined}
+                      bathrooms={property.bathrooms || undefined}
+                      squareFeet={property.square_feet || undefined}
+                      location={`${property.city}${property.county ? `, ${property.county}` : ''}`}
+                      city={property.city}
+                      images={property.images}
+                      amenities={property.amenities}
+                      contactPhone={property.contact_phone}
+                      whatsappNumber={property.whatsapp_number || undefined}
+                      createdAt={property.created_at}
+                      isFeatured={property.is_featured}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Smart Alternative 3: Different property types in same location */}
+            {smartAlternatives.differentPropertyTypes.length > 0 && (
+              <div className="mb-12">
+                <h2 className="text-2xl font-bold text-gray-900 mb-4">
+                  {searchParams?.city
+                    ? `Other Property Types for Rent in ${searchParams.city}`
+                    : `Other Property Types for Rent in ${location.name}`}
+                </h2>
+                <p className="text-gray-600 mb-6">
+                  {searchParams?.bedrooms
+                    ? `Check out these ${searchParams.bedrooms}-bedroom properties (Apartments, Bungalows, Maisonettes, etc.) ${searchParams?.city ? `in ${searchParams.city}` : `in ${location.name}`}:`
+                    : `Explore other property types available ${searchParams?.city ? `in ${searchParams.city}` : `in ${location.name}`}:`}
+                </p>
+                <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
+                  {smartAlternatives.differentPropertyTypes.slice(0, 6).map((property) => (
+                    <PropertyCard
+                      key={property.id}
+                      id={property.id}
+                      title={property.property_title}
+                      type={property.property_type}
+                      price={property.price}
+                      priceType={property.price_type}
+                      bedrooms={property.bedrooms || undefined}
+                      bathrooms={property.bathrooms || undefined}
+                      squareFeet={property.square_feet || undefined}
+                      location={`${property.city}${property.county ? `, ${property.county}` : ''}`}
+                      city={property.city}
+                      images={property.images}
+                      amenities={property.amenities}
+                      contactPhone={property.contact_phone}
+                      whatsappNumber={property.whatsapp_number || undefined}
+                      createdAt={property.created_at}
+                      isFeatured={property.is_featured}
+                    />
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Fallback: Show general alternative properties if no smart alternatives */}
+            {smartAlternatives.sameCityDifferentBedrooms.length === 0 &&
+             smartAlternatives.sameBedroomsDifferentCity.length === 0 &&
+             smartAlternatives.differentPropertyTypes.length === 0 &&
+             alternativeProperties.length > 0 && (
+              <div className="mb-12">
+                <h2 className="text-2xl font-bold text-gray-900 mb-4">
+                  Maisonettes for Rent in {location.county}
+                </h2>
+                <p className="text-gray-600 mb-6">
+                  Check out these maisonettes for rent in {location.county}
                 </p>
                 <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
                   {alternativeProperties.map((property) => (
@@ -363,10 +683,10 @@ export default async function PropertyPage({ params }: PageProps) {
         {properties.length > 0 && properties.length < 3 && alternativeProperties.length > 0 && (
           <div className="mb-12">
             <h2 className="text-2xl font-bold text-gray-900 mb-4">
-              More Maisonettes for Sale in {location.county}
+              More Maisonettes for Rent in {location.county}
             </h2>
             <p className="text-gray-600 mb-6">
-              Explore more maisonettes for sale in nearby areas
+              Explore more maisonettes for rent in nearby areas
             </p>
             <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
               {alternativeProperties.filter(alt => !properties.find(p => p.id === alt.id)).slice(0, 8).map((property) => (
