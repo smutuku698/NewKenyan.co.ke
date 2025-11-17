@@ -141,6 +141,9 @@ export default function robots(): MetadataRoute.Robots {
         crawlDelay: 10, // Slow down aggressive crawlers
       },
     ],
-    sitemap: 'https://newkenyan.com/sitemap.xml',
+    sitemap: [
+      'https://newkenyan.com/sitemap.xml',
+      'https://newkenyan.com/jobs-sitemap.xml',
+    ],
   }
 }

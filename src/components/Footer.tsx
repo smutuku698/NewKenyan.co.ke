@@ -208,10 +208,10 @@ const Footer = () => {
               <Link href="/terms-of-service" className="text-gray-400 hover:text-white transition-colors">
                 Terms
               </Link>
-              <Link href="/sitemap-page.html" className="text-gray-400 hover:text-white transition-colors">
+              <Link href="/sitemap-page" className="text-gray-400 hover:text-white transition-colors">
                 Sitemap
               </Link>
-              <Link href="/jobs-sitemap-page.html" className="text-gray-400 hover:text-white transition-colors">
+              <Link href="/jobs-sitemap-page" className="text-gray-400 hover:text-white transition-colors">
                 Jobs Sitemap
               </Link>
               <Link href="/contact" className="text-gray-400 hover:text-white transition-colors">
