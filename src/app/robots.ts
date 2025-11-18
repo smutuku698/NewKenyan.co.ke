@@ -3,7 +3,7 @@ import { MetadataRoute } from 'next'
 export default function robots(): MetadataRoute.Robots {
   return {
     rules: [
-      // Block known scrapers and bad bots
+      // Block known scrapers and bad bots - MUST come before wildcard
       {
         userAgent: [
           'AhrefsBot',
@@ -18,7 +18,7 @@ export default function robots(): MetadataRoute.Robots {
           'AwarioBot',
           'MegaIndex',
           'BUbiNG',
-          'YandexBot', // Can be aggressive
+          'YandexBot',
           'ExtLinksBot',
           'SEOkicks',
           'HTTrack',
@@ -28,122 +28,94 @@ export default function robots(): MetadataRoute.Robots {
           'curl',
           'wget',
         ],
-        disallow: '/',
+        disallow: ['/'],
       },
-      // Allow legitimate search engines - full access
+      // Googlebot - primary search engine
       {
         userAgent: 'Googlebot',
-        allow: '/',
         disallow: ['/admin/', '/api/', '/dashboard/'],
       },
       {
         userAgent: 'Googlebot-Image',
-        allow: '/',
         disallow: ['/admin/', '/api/', '/dashboard/'],
       },
+      // Other major search engines
       {
         userAgent: 'Bingbot',
-        allow: '/',
         disallow: ['/admin/', '/api/', '/dashboard/'],
       },
       {
         userAgent: 'DuckDuckBot',
-        allow: '/',
         disallow: ['/admin/', '/api/', '/dashboard/'],
       },
       {
-        userAgent: 'Slurp', // Yahoo
-        allow: '/',
+        userAgent: 'Slurp',
         disallow: ['/admin/', '/api/', '/dashboard/'],
       },
       {
         userAgent: 'Baiduspider',
-        allow: '/',
         disallow: ['/admin/', '/api/', '/dashboard/'],
       },
-      // AI Crawlers - Allow for AI training and search
+      // AI Crawlers
       {
         userAgent: 'GPTBot',
-        allow: '/',
         disallow: ['/admin/', '/api/', '/dashboard/'],
       },
       {
         userAgent: 'ChatGPT-User',
-        allow: '/',
         disallow: ['/admin/', '/api/', '/dashboard/'],
       },
       {
         userAgent: 'Claude-Web',
-        allow: '/',
         disallow: ['/admin/', '/api/', '/dashboard/'],
       },
       {
         userAgent: 'Anthropic-AI',
-        allow: '/',
         disallow: ['/admin/', '/api/', '/dashboard/'],
       },
       {
         userAgent: 'cohere-ai',
-        allow: '/',
         disallow: ['/admin/', '/api/', '/dashboard/'],
       },
       {
         userAgent: 'PerplexityBot',
-        allow: '/',
         disallow: ['/admin/', '/api/', '/dashboard/'],
       },
       {
         userAgent: 'Applebot',
-        allow: '/',
         disallow: ['/admin/', '/api/', '/dashboard/'],
       },
       {
         userAgent: 'Applebot-Extended',
-        allow: '/',
         disallow: ['/admin/', '/api/', '/dashboard/'],
       },
       {
         userAgent: 'Google-Extended',
-        allow: '/',
+        disallow: ['/admin/', '/api/', '/dashboard/'],
+      },
+      // Social media crawlers for preview cards
+      {
+        userAgent: 'facebookexternalhit',
         disallow: ['/admin/', '/api/', '/dashboard/'],
       },
       {
-        userAgent: 'facebookexternalhit', // Facebook previews
-        allow: '/',
+        userAgent: 'Twitterbot',
         disallow: ['/admin/', '/api/', '/dashboard/'],
       },
       {
-        userAgent: 'Twitterbot', // Twitter card previews
-        allow: '/',
+        userAgent: 'LinkedInBot',
         disallow: ['/admin/', '/api/', '/dashboard/'],
       },
       {
-        userAgent: 'LinkedInBot', // LinkedIn previews
-        allow: '/',
+        userAgent: 'WhatsApp',
         disallow: ['/admin/', '/api/', '/dashboard/'],
       },
-      {
-        userAgent: 'WhatsApp', // WhatsApp previews
-        allow: '/',
-        disallow: ['/admin/', '/api/', '/dashboard/'],
-      },
-      // Default rule for other bots - restricted access
+      // Default rule - MUST be last
       {
         userAgent: '*',
-        allow: '/',
-        disallow: [
-          '/admin/',
-          '/api/',
-          '/dashboard/',
-          '/_next/',
-          '/static/',
-        ],
-        crawlDelay: 10, // Slow down aggressive crawlers
+        disallow: ['/admin/', '/api/', '/dashboard/', '/_next/', '/static/'],
       },
     ],
-    sitemap: [
-      'https://newkenyan.com/sitemap.xml',
-      'https://newkenyan.com/jobs-sitemap.xml',
-    ],
+    sitemap: 'https://newkenyan.com/sitemap.xml',
   }
 }
